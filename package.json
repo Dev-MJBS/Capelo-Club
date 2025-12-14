@@ -11,7 +11,8 @@
     "create:test-group": "node scripts/create-test-group.js",
     "add:bach": "node scripts/add-bach-group.js",
     "check:groups": "node scripts/check-groups.js",
-    "make:admin": "node scripts/make-admin.js"
+    "make:admin": "node scripts/make-admin.js",
+    "postinstall": "npm install --legacy-peer-deps --no-save || true"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",
@@ -19,7 +20,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "dotenv": "^17.2.3",
-    "lucide-react": "latest",
+    "lucide-react": "0.560.0",
     "next": "15.0.0",
     "next-themes": "^0.4.6",
     "react": "19.0.0-rc-65a56d0e-20241020",
