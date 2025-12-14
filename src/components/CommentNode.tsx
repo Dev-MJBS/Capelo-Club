@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { MessageSquare, ThumbsUp, User, Send } from 'lucide-react'
+import { MessageSquare, ThumbsUp, User, Send, CheckCircle2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
@@ -13,7 +13,7 @@ type Post = {
     parent_id: string | null
     created_at: string
     likes_count: number
-    profiles?: { username: string, avatar_url: string }
+    profiles?: { username: string, avatar_url: string, is_verified?: boolean }
     children?: Post[]
 }
 
@@ -59,12 +59,23 @@ export default function CommentNode({ post, depth = 0, groupId }: { post: Post, 
         <div className={`mt-4 ${depth > 0 ? `ml-4 pl-4 border-l-2 ${renderColors[depth % 3]}` : ''}`}>
             <div className="bg-white dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 bg-indigo-100 dark:bg-slate-800 rounded-full flex items-center justify-center">
-                        <User size={16} className="text-indigo-600 dark:text-indigo-400" />
-                    </div>
+                    {post.profiles?.avatar_url ? (
+                        <img 
+                            src={post.profiles.avatar_url} 
+                            alt={post.profiles.username} 
+                            className="w-8 h-8 rounded-full object-cover"
+                        />
+                    ) : (
+                        <div className="w-8 h-8 bg-indigo-100 dark:bg-slate-800 rounded-full flex items-center justify-center">
+                            <User size={16} className="text-indigo-600 dark:text-indigo-400" />
+                        </div>
+                    )}
                     <div>
-                        <span className="text-sm font-semibold text-slate-900 dark:text-white block">
+                        <span className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-1">
                             {post.profiles?.username || 'Usuário'}
+                            {post.profiles?.is_verified && (
+                                <CheckCircle2 size={12} className="text-blue-500 fill-blue-500" />
+                            )}
                         </span>
                         <span className="text-xs text-slate-500">
                             {new Date(post.created_at).toLocaleString('pt-BR')}

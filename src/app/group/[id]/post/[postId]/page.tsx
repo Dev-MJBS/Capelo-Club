@@ -6,6 +6,8 @@ import CommentNode from '@/components/CommentNode'
 import CommentInput from '@/components/CommentInput'
 import LikeButton from '@/components/LikeButton'
 
+import { CheckCircle2 } from 'lucide-react'
+
 type Post = {
     id: string
     user_id: string
@@ -14,7 +16,7 @@ type Post = {
     parent_id: string | null
     created_at: string
     likes_count: number
-    profiles?: { username: string, avatar_url: string }
+    profiles?: { username: string, avatar_url: string, is_verified?: boolean }
     children?: Post[]
 }
 
@@ -45,7 +47,7 @@ export default async function ThreadPage(props: { params: Promise<{ id: string, 
     // Fetch profiles for all authors
     const userIds = allGroupPosts ? [...new Set(allGroupPosts.map(p => p.user_id))] : []
     const { data: profiles } = userIds.length > 0
-        ? await supabase.from('profiles').select('id, username, avatar_url').in('id', userIds)
+        ? await supabase.from('profiles').select('id, username, avatar_url, is_verified').in('id', userIds)
         : { data: [] }
     const profilesMap = new Map(profiles?.map(p => [p.id, p]))
 
@@ -87,12 +89,23 @@ export default async function ThreadPage(props: { params: Promise<{ id: string, 
                 <div className="mb-8 p-6 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
                     <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">{rootPost.title || 'Discussão'}</h1>
                     <div className="flex items-center gap-2 mb-6">
-                        <div className="w-10 h-10 bg-indigo-100 dark:bg-slate-800 rounded-full flex items-center justify-center">
-                            <User size={20} className="text-indigo-600 dark:text-indigo-400" />
-                        </div>
+                        {rootPost.profiles?.avatar_url ? (
+                            <img 
+                                src={rootPost.profiles.avatar_url} 
+                                alt={rootPost.profiles.username} 
+                                className="w-10 h-10 rounded-full object-cover"
+                            />
+                        ) : (
+                            <div className="w-10 h-10 bg-indigo-100 dark:bg-slate-800 rounded-full flex items-center justify-center">
+                                <User size={20} className="text-indigo-600 dark:text-indigo-400" />
+                            </div>
+                        )}
                         <div>
-                            <span className="font-semibold text-slate-900 dark:text-white block">
+                            <span className="font-semibold text-slate-900 dark:text-white flex items-center gap-1">
                                 {rootPost.profiles?.username || 'Usuário'}
+                                {rootPost.profiles?.is_verified && (
+                                    <CheckCircle2 size={14} className="text-blue-500 fill-blue-500" />
+                                )}
                             </span>
                             <span className="text-sm text-slate-500">
                                 Postado em {new Date(rootPost.created_at).toLocaleDateString('pt-BR')}
