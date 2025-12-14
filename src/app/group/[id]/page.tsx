@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
-import { MessageSquare, ArrowLeft, Calendar, User } from 'lucide-react'
+import { MessageSquare, ArrowLeft, Calendar, User, CheckCircle2 } from 'lucide-react'
 import GroupPostCardActions from '@/components/GroupPostCardActions'
 
 export default async function GroupPage(props: { params: Promise<{ id: string }> }) {
@@ -75,9 +75,22 @@ export default async function GroupPage(props: { params: Promise<{ id: string }>
 
                                     <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-500 flex-wrap gap-4">
                                         <div className="flex items-center gap-4">
-                                            <span className="flex items-center gap-1">
-                                                <User size={14} />
-                                                {author?.username || 'Usuário Desconhecido'}
+                                            <span className="flex items-center gap-1.5">
+                                                {author?.avatar_url ? (
+                                                    <img 
+                                                        src={author.avatar_url} 
+                                                        alt={author.username} 
+                                                        className="w-5 h-5 rounded-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <User size={14} />
+                                                )}
+                                                <span className="flex items-center gap-1">
+                                                    {author?.username || 'Usuário Desconhecido'}
+                                                    {author?.is_verified && (
+                                                        <CheckCircle2 size={12} className="text-blue-500 fill-blue-500" />
+                                                    )}
+                                                </span>
                                             </span>
                                             <span className="flex items-center gap-1">
                                                 <Calendar size={14} />
