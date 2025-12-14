@@ -7,14 +7,20 @@ export async function updateSession(request: NextRequest) {
         request,
     })
 
-    console.log('Middleware Env Check:', {
-        url: process.env.NEXT_PUBLIC_SUPABASE_URL ? 'Defined' : 'Missing',
-        key: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'Defined' : 'Missing'
-    })
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+    if (!supabaseUrl || !supabaseKey) {
+        console.error('Middleware Error: Missing Supabase environment variables')
+        return NextResponse.json(
+            { error: 'Configuration Error: Missing Supabase environment variables' },
+            { status: 500 }
+        )
+    }
 
     const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+        supabaseUrl,
+        supabaseKey,
         {
             cookies: {
                 getAll() {
