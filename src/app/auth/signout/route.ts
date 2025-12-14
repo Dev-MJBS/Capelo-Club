@@ -15,7 +15,13 @@ export async function POST(req: Request) {
     }
 
     revalidatePath('/', 'layout')
-    return NextResponse.redirect(new URL('/', req.url), {
+
+    // Fix for 0.0.0.0 origin in Docker/Railway
+    const host = req.headers.get('x-forwarded-host') || req.headers.get('host')
+    const protocol = req.headers.get('x-forwarded-proto') || 'https'
+    const origin = host ? `${protocol}://${host}` : new URL(req.url).origin
+
+    return NextResponse.redirect(`${origin}/`, {
         status: 302,
     })
 }
