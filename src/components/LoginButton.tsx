@@ -5,13 +5,22 @@ import { LogIn, Twitter } from 'lucide-react'
 
 export default function LoginButton() {
     const handleLogin = async (provider: 'google' | 'twitter') => {
-        const supabase = createClient()
-        await supabase.auth.signInWithOAuth({
-            provider: provider,
-            options: {
-                redirectTo: `${location.origin}/auth/callback`,
-            },
-        })
+        try {
+            const supabase = createClient()
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: provider,
+                options: {
+                    redirectTo: `${window.location.origin}/auth/callback`,
+                },
+            })
+            if (error) {
+                console.error('Login error:', error)
+                alert(`Erro ao iniciar login: ${error.message}`)
+            }
+        } catch (err) {
+            console.error('Unexpected login error:', err)
+            alert('Ocorreu um erro inesperado ao tentar fazer login.')
+        }
     }
 
     return (
