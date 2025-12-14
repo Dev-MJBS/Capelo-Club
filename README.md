@@ -47,6 +47,10 @@ A full-stack book club forum built with Next.js 15, TypeScript, Tailwind CSS, an
 3. Add the Environment Variables (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`) in the Vercel project settings.
 4. Deploy!
 
+### Deploy trigger
+
+Forçar novo deploy: este commit é apenas um trigger para redeploy com `vercel.json` atualizado (`installCommand: npm install --legacy-peer-deps`, `buildCommand: npm run build`).
+
 ## Customization
 
 - **Adding Groups**: Currently, groups are seeded via SQL. Add more rows to the `groups` table in Supabase.
