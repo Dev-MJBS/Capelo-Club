@@ -1,0 +1,1 @@
+INSERT INTO groups (title, book_title, description) VALUES ('Clube do Duna', 'Duna', 'Discussoes sobre o universo de Frank Herbert.'), ('Leitores de 1984', '1984', 'O Grande Irmao esta de olho.'), ('Fas de Harry Potter', 'Harry Potter e a Pedra Filosofal', 'O menino que sobreviveu.');
