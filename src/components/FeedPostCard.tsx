@@ -85,7 +85,7 @@ export default function FeedPostCard({ post, currentUserId }: FeedPostCardProps)
 
                 <div className="flex items-center gap-4 text-slate-500 dark:text-slate-400 text-sm flex-wrap">
                     <div onClick={(e) => e.stopPropagation()}>
-                        <LikeButton postId={post.id} initialLikes={post.likes_count} />
+                        <LikeButton postId={post.id} initialLikes={post.likes_count} currentUserId={currentUserId} />
                     </div>
                     <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-full">
                         <MessageSquare size={16} />

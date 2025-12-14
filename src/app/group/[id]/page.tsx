@@ -102,6 +102,7 @@ export default async function GroupPage(props: { params: Promise<{ id: string }>
                                                 postId={post.id} 
                                                 isOwner={isOwner} 
                                                 initialLikes={post.likes_count}
+                                                currentUserId={user.id}
                                             />
                                             <span className="flex items-center gap-1">
                                                 <MessageSquare size={14} />

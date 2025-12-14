@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { MessageSquare, ThumbsUp, User, Send, CheckCircle2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import DeletePostButton from './DeletePostButton'
 
 type Post = {
     id: string
@@ -19,17 +20,52 @@ type Post = {
 
 const renderColors = ['border-l-indigo-500', 'border-l-pink-500', 'border-l-cyan-500']
 
-export default function CommentNode({ post, depth = 0, groupId }: { post: Post, depth: number, groupId: string }) {
+export default function CommentNode({ post, depth = 0, groupId, currentUserId }: { post: Post, depth: number, groupId: string, currentUserId: string }) {
     const router = useRouter()
     const [likes, setLikes] = useState(post.likes_count)
+    const [liked, setLiked] = useState(false)
+    const [likeLoading, setLikeLoading] = useState(false)
     const [isReplying, setIsReplying] = useState(false)
     const [replyContent, setReplyContent] = useState('')
     const [submitting, setSubmitting] = useState(false)
 
+    const isOwner = currentUserId === post.user_id
+
+    // Check if user liked the comment
+    useEffect(() => {
+        if (!currentUserId) return
+        const checkLike = async () => {
+            const supabase = createClient()
+            const { data } = await supabase.from('post_likes').select('*').eq('post_id', post.id).eq('user_id', currentUserId).maybeSingle()
+            if (data) setLiked(true)
+        }
+        checkLike()
+    }, [post.id, currentUserId])
+
     const handleLike = async () => {
-        setLikes(prev => prev + 1) // Optimistic
-        const supabase = createClient()
-        await supabase.from('posts').update({ likes_count: likes + 1 }).eq('id', post.id)
+        if (likeLoading || !currentUserId) return
+        setLikeLoading(true)
+        
+        const previousLiked = liked
+        const previousLikes = likes
+        
+        setLiked(!previousLiked)
+        setLikes(previousLiked ? previousLikes - 1 : previousLikes + 1)
+
+        try {
+            const supabase = createClient()
+            if (previousLiked) {
+                await supabase.from('post_likes').delete().eq('post_id', post.id).eq('user_id', currentUserId)
+            } else {
+                await supabase.from('post_likes').insert({ post_id: post.id, user_id: currentUserId })
+            }
+        } catch (error) {
+            console.error(error)
+            setLiked(previousLiked)
+            setLikes(previousLikes)
+        } finally {
+            setLikeLoading(false)
+        }
     }
 
     const handleReply = async (e: React.FormEvent) => {
@@ -85,12 +121,15 @@ export default function CommentNode({ post, depth = 0, groupId }: { post: Post, 
                 <p className="text-slate-700 dark:text-slate-300 text-sm mb-3 whitespace-pre-wrap">{post.content}</p>
 
                 <div className="flex items-center gap-4 text-xs text-slate-500">
-                    <button onClick={handleLike} className="flex items-center gap-1 hover:text-indigo-600 transition-colors">
-                        <ThumbsUp size={14} /> {likes} Likes
+                    <button onClick={handleLike} className={`flex items-center gap-1 transition-colors ${liked ? 'text-indigo-600 font-medium' : 'hover:text-indigo-600'}`}>
+                        <ThumbsUp size={14} fill={liked ? 'currentColor' : 'none'} /> {likes} Likes
                     </button>
                     <button onClick={() => setIsReplying(!isReplying)} className="flex items-center gap-1 hover:text-indigo-600 transition-colors">
                         <MessageSquare size={14} /> Responder
                     </button>
+                    {isOwner && (
+                        <DeletePostButton postId={post.id} />
+                    )}
                 </div>
 
                 {isReplying && (
@@ -117,7 +156,7 @@ export default function CommentNode({ post, depth = 0, groupId }: { post: Post, 
             {post.children && post.children.length > 0 && (
                 <div className="space-y-4">
                     {post.children.map(child => (
-                        <CommentNode key={child.id} post={child} depth={depth + 1} groupId={groupId} />
+                        <CommentNode key={child.id} post={child} depth={depth + 1} groupId={groupId} currentUserId={currentUserId} />
                     ))}
                 </div>
             )}

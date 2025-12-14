@@ -118,7 +118,7 @@ export default async function ThreadPage(props: { params: Promise<{ id: string, 
 
                     {/* Actions Bar */}
                     <div className="flex items-center gap-6 mt-6 pt-6 border-t border-slate-100 dark:border-slate-800">
-                        <LikeButton postId={rootPost.id} initialLikes={rootPost.likes_count} />
+                        <LikeButton postId={rootPost.id} initialLikes={rootPost.likes_count} currentUserId={user.id} />
                     </div>
                 </div>
 
@@ -130,7 +130,7 @@ export default async function ThreadPage(props: { params: Promise<{ id: string, 
 
                     <div className="space-y-6 mt-8">
                         {rootPost.children?.map(child => (
-                            <CommentNode key={child.id} post={child} depth={0} groupId={groupId} />
+                            <CommentNode key={child.id} post={child} depth={0} groupId={groupId} currentUserId={user.id} />
                         ))}
                     </div>
                 </div>
