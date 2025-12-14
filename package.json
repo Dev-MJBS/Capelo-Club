@@ -12,7 +12,7 @@
     "add:bach": "node scripts/add-bach-group.js",
     "check:groups": "node scripts/check-groups.js",
     "make:admin": "node scripts/make-admin.js",
-    "postinstall": "npm install --legacy-peer-deps --no-save || true"
+    "postinstall": ""
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",
