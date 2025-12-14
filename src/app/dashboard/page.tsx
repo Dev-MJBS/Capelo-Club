@@ -75,6 +75,7 @@ export default async function Dashboard() {
                                                     user_id: post.user_id
                                                 }} 
                                                 currentUserId={user.id} 
+                                                isAdmin={!!profile?.is_admin}
                                             />
                                         </ErrorBoundary>
                                     )

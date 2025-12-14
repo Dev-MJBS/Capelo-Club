@@ -5,8 +5,7 @@ import { ArrowLeft, User } from 'lucide-react'
 import CommentNode from '@/components/CommentNode'
 import CommentInput from '@/components/CommentInput'
 import LikeButton from '@/components/LikeButton'
-
-import { CheckCircle2 } from 'lucide-react'
+import VerifiedBadge from '@/components/VerifiedBadge'
 
 type Post = {
     id: string
@@ -20,6 +19,8 @@ type Post = {
     children?: Post[]
 }
 
+import VerifyUserButton from '@/components/VerifyUserButton'
+
 export default async function ThreadPage(props: { params: Promise<{ id: string, postId: string }> }) {
     const params = await props.params;
     const { id: groupId, postId } = params
@@ -27,6 +28,9 @@ export default async function ThreadPage(props: { params: Promise<{ id: string, 
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/')
+
+    const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
+    const isAdmin = !!profile?.is_admin
 
     // Fetch the main post
     const { data: mainPost } = await supabase
@@ -104,7 +108,14 @@ export default async function ThreadPage(props: { params: Promise<{ id: string, 
                             <span className="font-semibold text-slate-900 dark:text-white flex items-center gap-1">
                                 {rootPost.profiles?.username || 'Usuário'}
                                 {rootPost.profiles?.is_verified && (
-                                    <CheckCircle2 size={14} className="text-blue-500 fill-blue-500" />
+                                    <VerifiedBadge size={16} />
+                                )}
+                                {isAdmin && (
+                                    <VerifyUserButton 
+                                        userId={rootPost.user_id} 
+                                        isVerified={!!rootPost.profiles?.is_verified} 
+                                        isAdmin={isAdmin} 
+                                    />
                                 )}
                             </span>
                             <span className="text-sm text-slate-500">
@@ -130,7 +141,7 @@ export default async function ThreadPage(props: { params: Promise<{ id: string, 
 
                     <div className="space-y-6 mt-8">
                         {rootPost.children?.map(child => (
-                            <CommentNode key={child.id} post={child} depth={0} groupId={groupId} currentUserId={user.id} />
+                            <CommentNode key={child.id} post={child} depth={0} groupId={groupId} currentUserId={user.id} isAdmin={isAdmin} />
                         ))}
                     </div>
                 </div>

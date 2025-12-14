@@ -1,9 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { MessageSquare, Clock, CheckCircle2 } from 'lucide-react'
+import { MessageSquare, Clock } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import VerifiedBadge from './VerifiedBadge'
 
 export interface FeedPost {
     id: string
@@ -28,13 +29,15 @@ export interface FeedPost {
 interface FeedPostCardProps {
     post: FeedPost
     currentUserId?: string
+    isAdmin?: boolean
 }
 
 import DeletePostButton from './DeletePostButton'
 import ReportButton from './ReportButton'
 import LikeButton from './LikeButton'
+import VerifyUserButton from './VerifyUserButton'
 
-export default function FeedPostCard({ post, currentUserId }: FeedPostCardProps) {
+export default function FeedPostCard({ post, currentUserId, isAdmin = false }: FeedPostCardProps) {
     const isOwner = currentUserId && post.user_id === currentUserId
     return (
         <Link href={`/group/${post.group.id}/post/${post.id}`} className="block group">
@@ -57,7 +60,16 @@ export default function FeedPostCard({ post, currentUserId }: FeedPostCardProps)
                                 )}
                                 {post.user?.username || 'user'}
                                 {post.user?.is_verified && (
-                                    <CheckCircle2 size={12} className="text-blue-500 fill-blue-500" />
+                                    <VerifiedBadge size={14} />
+                                )}
+                                {isAdmin && (
+                                    <div onClick={(e) => e.stopPropagation()}>
+                                        <VerifyUserButton 
+                                            userId={post.user_id} 
+                                            isVerified={!!post.user?.is_verified} 
+                                            isAdmin={isAdmin} 
+                                        />
+                                    </div>
                                 )}
                             </span>
                         </span>

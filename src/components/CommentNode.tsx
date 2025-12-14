@@ -1,10 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { MessageSquare, ThumbsUp, User, Send, CheckCircle2 } from 'lucide-react'
+import { MessageSquare, ThumbsUp, User, Send } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import DeletePostButton from './DeletePostButton'
+import VerifyUserButton from './VerifyUserButton'
+import VerifiedBadge from './VerifiedBadge'
 
 type Post = {
     id: string
@@ -20,7 +22,7 @@ type Post = {
 
 const renderColors = ['border-l-indigo-500', 'border-l-pink-500', 'border-l-cyan-500']
 
-export default function CommentNode({ post, depth = 0, groupId, currentUserId }: { post: Post, depth: number, groupId: string, currentUserId: string }) {
+export default function CommentNode({ post, depth = 0, groupId, currentUserId, isAdmin = false }: { post: Post, depth: number, groupId: string, currentUserId: string, isAdmin?: boolean }) {
     const router = useRouter()
     const [likes, setLikes] = useState(post.likes_count)
     const [liked, setLiked] = useState(false)
@@ -110,7 +112,14 @@ export default function CommentNode({ post, depth = 0, groupId, currentUserId }:
                         <span className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-1">
                             {post.profiles?.username || 'Usuário'}
                             {post.profiles?.is_verified && (
-                                <CheckCircle2 size={12} className="text-blue-500 fill-blue-500" />
+                                <VerifiedBadge size={12} />
+                            )}
+                            {isAdmin && (
+                                <VerifyUserButton 
+                                    userId={post.user_id} 
+                                    isVerified={!!post.profiles?.is_verified} 
+                                    isAdmin={isAdmin} 
+                                />
                             )}
                         </span>
                         <span className="text-xs text-slate-500">
@@ -156,7 +165,7 @@ export default function CommentNode({ post, depth = 0, groupId, currentUserId }:
             {post.children && post.children.length > 0 && (
                 <div className="space-y-4">
                     {post.children.map(child => (
-                        <CommentNode key={child.id} post={child} depth={depth + 1} groupId={groupId} currentUserId={currentUserId} />
+                        <CommentNode key={child.id} post={child} depth={depth + 1} groupId={groupId} currentUserId={currentUserId} isAdmin={isAdmin} />
                     ))}
                 </div>
             )}
