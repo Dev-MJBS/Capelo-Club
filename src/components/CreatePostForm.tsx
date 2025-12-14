@@ -31,30 +31,47 @@ export default function CreatePostForm({ groupId }: { groupId: string }) {
         e.preventDefault()
         setLoading(true)
 
-        const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
+        try {
+            const supabase = createClient()
+            const { data: { user } } = await supabase.auth.getUser()
 
-        if (!user) {
-            router.push('/')
-            return
+            if (!user) {
+                router.push('/')
+                return
+            }
+
+            const postData: any = {
+                group_id: groupId,
+                user_id: user.id,
+                title,
+                content,
+                parent_id: null
+            }
+
+            // Apenas adicionar image_url se houver uma imagem
+            if (imageUrl) {
+                postData.image_url = imageUrl
+            }
+
+            const { data, error } = await supabase.from('posts').insert([postData]).select()
+
+            if (error) {
+                console.error('Erro ao criar post:', error)
+                alert(`Erro ao criar post: ${error.message}`)
+            } else {
+                console.log('Post criado com sucesso:', data)
+                if (data && data.length > 0) {
+                    const postId = data[0].id
+                    router.push(`/group/${groupId}/post/${postId}`)
+                    router.refresh()
+                }
+            }
+        } catch (error) {
+            console.error('Erro inesperado:', error)
+            alert('Erro inesperado ao criar post')
+        } finally {
+            setLoading(false)
         }
-
-        const { error } = await supabase.from('posts').insert({
-            group_id: groupId,
-            user_id: user.id,
-            title,
-            content,
-            parent_id: null,
-            image_url: imageUrl || null
-        })
-
-        if (!error) {
-            router.push(`/group/${groupId}`)
-            router.refresh()
-        } else {
-            alert('Erro ao criar post')
-        }
-        setLoading(false)
     }
 
     return (

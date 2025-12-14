@@ -13,19 +13,19 @@ export default function Home() {
                 </div>
 
                 <div className="bg-white/10 dark:bg-slate-900/50 backdrop-blur-xl p-8 rounded-3xl shadow-2xl w-full border border-white/20 dark:border-slate-800 text-center">
-                    <h1 className="text-4xl font-extrabold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-cyan-300 drop-shadow-sm">Capelo Club</h1>
+                    <h1 className="text-4xl font-extrabold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-cyan-300 drop-shadow-sm">Capelo's Club</h1>
                     <p className="text-slate-200 mb-8 font-light text-lg">Sua comunidade exclusiva de leitura.</p>
                     <p className="text-slate-300 mb-8 leading-relaxed">
                         Conecte-se com leitores apaixonados. Discuta, compartilhe e descubra novos mundos.
                     </p>
-                    <div className="w-full">
+                    <div className="w-full flex justify-center">
                         <LoginButton />
                     </div>
                 </div>
             </section>
 
             <footer className="relative z-10 mt-12 text-slate-400 text-sm">
-                © 2025 Capelo Club. Inspire-se.
+                © 2025 Capelo's Club. Inspire-se.
             </footer>
         </div>
     )

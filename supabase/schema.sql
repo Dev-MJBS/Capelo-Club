@@ -2,7 +2,10 @@
 create table profiles (
   id uuid references auth.users not null primary key,
   username text,
-  avatar_url text
+  avatar_url text,
+  is_admin boolean default false,
+  is_verified boolean default false,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
 -- Set up Row Level Security (RLS)
@@ -31,6 +34,20 @@ alter table groups enable row level security;
 create policy "Groups are viewable by authenticated users." on groups
   for select using (auth.role() = 'authenticated');
 
+create policy "Only admins can create groups." on groups
+  for insert with check (
+    auth.uid() in (
+      select id from profiles where is_admin = true
+    )
+  );
+
+create policy "Only admins can delete groups." on groups
+  for delete using (
+    auth.uid() in (
+      select id from profiles where is_admin = true
+    )
+  );
+
 -- Create posts table
 create table posts (
   id uuid default gen_random_uuid() primary key,
@@ -55,19 +72,19 @@ create policy "Authenticated users can create posts." on posts
 create policy "Users can update own posts." on posts
   for update using (auth.uid() = user_id);
 
-create policy "Admins can delete posts." on posts
-  for delete using (
-    auth.uid() in (
-      select id from profiles where username = 'admin' -- Simplification, ideally use claims or roles table
-    ) OR auth.uid() = user_id
-  );
+create policy "Users can delete own posts." on posts
+  for delete using (auth.uid() = user_id);
 
 -- Create a function to handle new user signup
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
   insert into public.profiles (id, username, avatar_url)
-  values (new.id, new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'avatar_url');
+  values (
+    new.id, 
+    coalesce(new.raw_user_meta_data->>'user_name', split_part(new.email, '@', 1)),
+    new.raw_user_meta_data->>'avatar_url'
+  );
   return new;
 end;
 $$ language plpgsql security definer;

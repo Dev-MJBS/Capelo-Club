@@ -1,11 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import { LogOut, User, Menu, Bell } from 'lucide-react'
+import { LogOut, User, Menu, Bell, Settings } from 'lucide-react'
 import { ModeToggle } from '@/components/mode-toggle'
 import { type User as SupabaseUser } from '@supabase/supabase-js'
 
-export default function Navbar({ user, onOpenMobileMenu }: { user: SupabaseUser, onOpenMobileMenu?: () => void }) {
+export default function Navbar({ user, isAdmin, onOpenMobileMenu }: { user: SupabaseUser, isAdmin?: boolean, onOpenMobileMenu?: () => void }) {
     return (
         <header className="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm border-b border-slate-200 dark:border-slate-800">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -30,6 +30,16 @@ export default function Navbar({ user, onOpenMobileMenu }: { user: SupabaseUser,
                     >
                         <Bell size={18} />
                     </Link>
+
+                    {isAdmin && (
+                        <Link
+                            href="/admin"
+                            className="flex items-center gap-2 text-sm font-medium text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 transition-colors p-2 rounded-md hover:bg-purple-50 dark:hover:bg-purple-900/30"
+                            title="Painel de Admin"
+                        >
+                            <Settings size={18} />
+                        </Link>
+                    )}
 
                     <Link
                         href="/profile"

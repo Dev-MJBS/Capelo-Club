@@ -39,29 +39,40 @@ export default function CreatePostPage() {
         }
         setLoading(true)
 
-        const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
+        try {
+            const supabase = createClient()
+            const { data: { user } } = await supabase.auth.getUser()
 
-        if (!user) {
-            router.push('/')
-            return
+            if (!user) {
+                router.push('/')
+                return
+            }
+
+            const { data, error } = await supabase.from('posts').insert({
+                group_id: selectedGroupId,
+                user_id: user.id,
+                title,
+                content,
+                parent_id: null
+            }).select()
+
+            if (error) {
+                console.error('Erro ao criar post:', error)
+                alert(`Erro ao criar post: ${error.message}`)
+            } else {
+                console.log('Post criado com sucesso:', data)
+                if (data && data.length > 0) {
+                    const postId = data[0].id
+                    router.push(`/group/${selectedGroupId}/post/${postId}`)
+                    router.refresh()
+                }
+            }
+        } catch (error) {
+            console.error('Erro inesperado:', error)
+            alert('Erro inesperado ao criar post')
+        } finally {
+            setLoading(false)
         }
-
-        const { error } = await supabase.from('posts').insert({
-            group_id: selectedGroupId,
-            user_id: user.id,
-            title,
-            content,
-            parent_id: null
-        })
-
-        if (!error) {
-            router.push(`/dashboard`)
-            router.refresh()
-        } else {
-            alert('Erro ao criar post')
-        }
-        setLoading(false)
     }
 
     return (

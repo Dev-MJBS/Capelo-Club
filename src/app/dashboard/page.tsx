@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import GroupCard from '@/components/GroupCard'
 import Navbar from '@/components/Navbar'
 import FeedPostCard from '@/components/FeedPostCard'
+import ErrorBoundary from '@/components/ErrorBoundary'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { PlusCircle } from 'lucide-react'
@@ -15,6 +16,13 @@ export default async function Dashboard() {
         redirect('/')
     }
 
+    // Fetch user profile to check if admin
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single()
+
     // Fetch groups
     const { data: groups } = await supabase.from('groups').select('*').order('created_at', { ascending: false })
 
@@ -24,14 +32,14 @@ export default async function Dashboard() {
         .select(`
             *,
             group:groups(id, title, book_title),
-            user:profiles(username, avatar_url)
+            user:profiles(username, avatar_url, is_verified)
         `)
         .order('created_at', { ascending: false })
         .limit(20)
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-            <Navbar user={user} />
+            <Navbar user={user} isAdmin={profile?.is_admin} />
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -53,20 +61,22 @@ export default async function Dashboard() {
                                 {posts.map((post) => {
                                     if (!post.group || !post.user) return null
                                     return (
-                                        <FeedPostCard 
-                                            key={post.id} 
-                                            post={{
-                                                id: post.id,
-                                                title: post.title || '',
-                                                content: post.content,
-                                                created_at: post.created_at,
-                                                likes_count: post.likes_count,
-                                                group: post.group,
-                                                user: post.user,
-                                                user_id: post.user_id
-                                            }} 
-                                            currentUserId={user.id} 
-                                        />
+                                        <ErrorBoundary key={post.id}>
+                                            <FeedPostCard 
+                                                post={{
+                                                    id: post.id,
+                                                    title: post.title || '',
+                                                    content: post.content,
+                                                    created_at: post.created_at,
+                                                    likes_count: post.likes_count,
+                                                    image_url: post.image_url,
+                                                    group: post.group,
+                                                    user: post.user,
+                                                    user_id: post.user_id
+                                                }} 
+                                                currentUserId={user.id} 
+                                            />
+                                        </ErrorBoundary>
                                     )
                                 })}
                             </div>

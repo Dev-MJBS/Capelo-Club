@@ -3,19 +3,16 @@ const { createClient } = require('@supabase/supabase-js');
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl) {
-    console.error('❌ NEXT_PUBLIC_SUPABASE_URL não está configurada!');
-    process.exit(1);
-}
-
-if (!supabaseServiceKey) {
-    console.warn('⚠️  SUPABASE_SERVICE_ROLE_KEY não configurada. Você precisará:');
-    console.warn('   1. Ir para https://app.supabase.com/project/[seu-projeto]/settings/api');
-    console.warn('   2. Copiar a "Service Role" key');
-    console.warn('   3. Adicionar em .env.local: SUPABASE_SERVICE_ROLE_KEY=sua_chave');
-    console.error('❌ Operação cancelada. Configure o Service Role Key antes de tentar novamente.');
+if (!supabaseUrl || !supabaseServiceKey) {
+    console.error('❌ Configuração incompleta!');
+    console.error('Variáveis necessárias:');
+    console.error('  - NEXT_PUBLIC_SUPABASE_URL');
+    console.error('  - SUPABASE_SERVICE_ROLE_KEY');
+    console.log('\nPara obter a Service Role Key:');
+    console.log('  1. Acesse https://app.supabase.com/project/[seu-projeto]/settings/api');
+    console.log('  2. Copie a "Service Role" key');
+    console.log('  3. Adicione em .env.local: SUPABASE_SERVICE_ROLE_KEY=sua_chave');
     process.exit(1);
 }
 
@@ -43,6 +40,17 @@ async function seedGroups() {
     try {
         console.log('📚 Inserindo grupos...');
         
+        // Primeiro, deletar grupos existentes para evitar duplicatas
+        const { error: deleteError } = await supabase
+            .from('groups')
+            .delete()
+            .neq('id', '00000000-0000-0000-0000-000000000000'); // Sempre true, deleta tudo
+
+        if (deleteError && !deleteError.message.includes('no rows')) {
+            console.warn('⚠️  Aviso ao limpar grupos antigos:', deleteError.message);
+        }
+
+        // Inserir novos grupos
         const { data, error } = await supabase
             .from('groups')
             .insert(groups)
@@ -58,10 +66,10 @@ async function seedGroups() {
         data.forEach(group => {
             console.log(`  - ${group.title} (${group.book_title})`);
         });
-        
+
         process.exit(0);
     } catch (error) {
-        console.error('❌ Erro:', error);
+        console.error('❌ Erro inesperado:', error.message || error);
         process.exit(1);
     }
 }

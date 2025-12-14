@@ -1,9 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, User, ThumbsUp } from 'lucide-react'
+import { ArrowLeft, User } from 'lucide-react'
 import CommentNode from '@/components/CommentNode'
 import CommentInput from '@/components/CommentInput'
+import LikeButton from '@/components/LikeButton'
 
 type Post = {
     id: string
@@ -102,12 +103,9 @@ export default async function ThreadPage(props: { params: Promise<{ id: string, 
                         {rootPost.content}
                     </div>
 
-                    {/* Actions Bar - Static for now */}
+                    {/* Actions Bar */}
                     <div className="flex items-center gap-6 mt-6 pt-6 border-t border-slate-100 dark:border-slate-800">
-                        <button className="flex items-center gap-2 text-slate-600 hover:text-indigo-600 font-medium text-sm">
-                            <ThumbsUp size={18} />
-                            {rootPost.likes_count} Curtidas
-                        </button>
+                        <LikeButton postId={rootPost.id} initialLikes={rootPost.likes_count} />
                     </div>
                 </div>
 

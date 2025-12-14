@@ -1,7 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
-import { MessageSquare, ThumbsUp, ArrowLeft, Calendar, User } from 'lucide-react'
+import { MessageSquare, ArrowLeft, Calendar, User } from 'lucide-react'
+import GroupPostCardActions from '@/components/GroupPostCardActions'
 
 export default async function GroupPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
@@ -63,13 +64,16 @@ export default async function GroupPage(props: { params: Promise<{ id: string }>
                 <div className="space-y-4">
                     {posts?.map((post) => {
                         const author = profilesMap.get(post.user_id)
+                        const isOwner = user.id === post.user_id
                         return (
-                            <Link key={post.id} href={`/group/${id}/post/${post.id}`} className="block">
+                            <Link key={post.id} href={`/group/${id}/post/${post.id}`} className="block group">
                                 <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors shadow-sm hover:shadow-md">
-                                    <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">{post.title}</h4>
+                                    <div className="flex items-start justify-between gap-4 mb-2">
+                                        <h4 className="text-lg font-semibold text-slate-900 dark:text-white">{post.title}</h4>
+                                    </div>
                                     <p className="text-slate-600 dark:text-slate-400 text-sm line-clamp-2 mb-4">{post.content}</p>
 
-                                    <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-500">
+                                    <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-500 flex-wrap gap-4">
                                         <div className="flex items-center gap-4">
                                             <span className="flex items-center gap-1">
                                                 <User size={14} />
@@ -81,10 +85,11 @@ export default async function GroupPage(props: { params: Promise<{ id: string }>
                                             </span>
                                         </div>
                                         <div className="flex items-center gap-4">
-                                            <span className="flex items-center gap-1">
-                                                <ThumbsUp size={14} />
-                                                {post.likes_count || 0}
-                                            </span>
+                                            <GroupPostCardActions 
+                                                postId={post.id} 
+                                                isOwner={isOwner} 
+                                                initialLikes={post.likes_count}
+                                            />
                                             <span className="flex items-center gap-1">
                                                 <MessageSquare size={14} />
                                                 Ver respostas

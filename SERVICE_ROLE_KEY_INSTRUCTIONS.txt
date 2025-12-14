@@ -1,0 +1,21 @@
+🔑 **Como obter a Service Role Key:**
+
+1. Acesse: https://supabase.com/dashboard
+2. Selecione seu projeto
+3. Vá para: **Settings** (engrenagem) → **API**
+4. Procure por **"Service Role Key"** (não é a Anon Key!)
+5. Copie a chave
+6. Adicione ao `.env.local`:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=seu-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sua-chave-anon
+SUPABASE_SERVICE_ROLE_KEY=sua-service-role-key-aqui
+```
+
+⚠️ **IMPORTANTE:** A Service Role Key é sensível! Nunca compartilhe ou commite no Git.
+
+Após adicionar, execute novamente:
+```bash
+npm run add:bach
+```
