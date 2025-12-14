@@ -47,7 +47,14 @@ export default function FeedPostCard({ post, currentUserId }: FeedPostCardProps)
                         <span>•</span>
                         <span className="flex items-center gap-1">
                             postado por 
-                            <span className="text-slate-700 dark:text-slate-300 flex items-center gap-0.5">
+                            <span className="text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                                {post.user?.avatar_url && (
+                                    <img 
+                                        src={post.user.avatar_url} 
+                                        alt={post.user.username} 
+                                        className="w-5 h-5 rounded-full object-cover"
+                                    />
+                                )}
                                 {post.user?.username || 'user'}
                                 {post.user?.is_verified && (
                                     <CheckCircle2 size={12} className="text-blue-500 fill-blue-500" />

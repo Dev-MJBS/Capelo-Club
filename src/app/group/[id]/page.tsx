@@ -28,7 +28,7 @@ export default async function GroupPage(props: { params: Promise<{ id: string }>
     // Manually fetch profiles since we didn't set up explicit FK reference in schema for easy join (my bad, but fixing via code)
     const userIds = posts ? [...new Set(posts.map(p => p.user_id))] : []
     const { data: profiles } = userIds.length > 0
-        ? await supabase.from('profiles').select('id, username, avatar_url').in('id', userIds)
+        ? await supabase.from('profiles').select('id, username, avatar_url, is_verified').in('id', userIds)
         : { data: [] }
 
     const profilesMap = new Map(profiles?.map(p => [p.id, p]))
