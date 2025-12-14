@@ -28,7 +28,7 @@ export default function LoginButton() {
                 className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-700 text-white font-medium rounded-lg hover:bg-slate-800 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0 w-full"
             >
                 <Twitter size={20} />
-                Entrar com Twitter
+                Entrar com X
             </button>
         </div>
     )
