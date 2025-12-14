@@ -14,13 +14,14 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Capelo Club",
+  title: "Capelo's Club",
   description: "Sua comunidade exclusiva de leitura. Conecte-se com leitores apaixonados e discuta seus livros favoritos.",
 };
 
 import { ThemeProvider } from "@/components/theme-provider"
 import { ModeToggle } from "@/components/mode-toggle"
 import ContactModerationButton from "@/components/ContactModerationButton"
+import Footer from "@/components/Footer"
 
 export default function RootLayout({
   children,
@@ -42,7 +43,12 @@ export default function RootLayout({
             <ModeToggle />
           </div>
           <ContactModerationButton />
-          {children}
+          <div className="flex flex-col min-h-screen">
+            <main className="flex-grow">
+              {children}
+            </main>
+            <Footer />
+          </div>
         </ThemeProvider>
       </body>
     </html>
