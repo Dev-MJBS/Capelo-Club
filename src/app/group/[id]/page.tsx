@@ -15,6 +15,13 @@ export default async function GroupPage(props: { params: Promise<{ id: string }>
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/')
 
+    // Fetch user profile to check if admin
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single()
+
     // Fetch group details
     const { data: group } = await supabase.from('groups').select('*').eq('id', id).single()
     if (!group) notFound()
@@ -110,6 +117,7 @@ export default async function GroupPage(props: { params: Promise<{ id: string }>
                                                 isOwner={isOwner} 
                                                 initialLikes={post.likes_count}
                                                 currentUserId={user.id}
+                                                isAdmin={!!profile?.is_admin}
                                             />
                                             <span className="flex items-center gap-1">
                                                 <MessageSquare size={14} />

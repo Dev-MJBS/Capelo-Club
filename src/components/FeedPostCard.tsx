@@ -103,13 +103,13 @@ export default function FeedPostCard({ post, currentUserId, isAdmin = false }: F
                         <MessageSquare size={16} />
                         <span>Comentários</span>
                     </div>
-                    {isOwner && (
+                    {(isOwner || isAdmin) && (
                         <div className="ml-auto flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                             <DeletePostButton postId={post.id} />
                             <ReportButton postId={post.id} type="post" />
                         </div>
                     )}
-                    {!isOwner && (
+                    {(!isOwner && !isAdmin) && (
                         <div className="ml-auto" onClick={(e) => e.stopPropagation()}>
                             <ReportButton postId={post.id} type="post" />
                         </div>

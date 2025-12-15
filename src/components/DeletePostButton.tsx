@@ -5,7 +5,7 @@ import { Trash2, Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-export default function DeletePostButton({ postId, onSuccess }: { postId: string, onSuccess?: () => void }) {
+export default function DeletePostButton({ postId, onSuccess, redirectTo }: { postId: string, onSuccess?: () => void, redirectTo?: string }) {
     const [loading, setLoading] = useState(false)
     const router = useRouter()
 
@@ -22,7 +22,10 @@ export default function DeletePostButton({ postId, onSuccess }: { postId: string
         setLoading(false)
 
         if (result.success) {
-            if (onSuccess) {
+            if (redirectTo) {
+                router.push(redirectTo)
+                router.refresh()
+            } else if (onSuccess) {
                 onSuccess()
             } else {
                 // Default behavior: refresh

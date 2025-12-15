@@ -9,12 +9,13 @@ interface GroupPostCardActionsProps {
     isOwner: boolean
     initialLikes: number
     currentUserId?: string
+    isAdmin?: boolean
 }
 
-export default function GroupPostCardActions({ postId, isOwner, initialLikes, currentUserId }: GroupPostCardActionsProps) {
+export default function GroupPostCardActions({ postId, isOwner, initialLikes, currentUserId, isAdmin = false }: GroupPostCardActionsProps) {
     return (
         <>
-            {isOwner && (
+            {(isOwner || isAdmin) && (
                 <div className="flex items-center gap-1">
                     <DeletePostButton postId={postId} />
                 </div>

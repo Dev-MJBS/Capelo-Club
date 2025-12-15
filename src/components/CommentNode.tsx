@@ -136,7 +136,7 @@ export default function CommentNode({ post, depth = 0, groupId, currentUserId, i
                     <button onClick={() => setIsReplying(!isReplying)} className="flex items-center gap-1 hover:text-indigo-600 transition-colors">
                         <MessageSquare size={14} /> Responder
                     </button>
-                    {isOwner && (
+                    {(isOwner || isAdmin) && (
                         <DeletePostButton postId={post.id} />
                     )}
                 </div>

@@ -6,6 +6,7 @@ import CommentNode from '@/components/CommentNode'
 import CommentInput from '@/components/CommentInput'
 import LikeButton from '@/components/LikeButton'
 import VerifiedBadge from '@/components/VerifiedBadge'
+import DeletePostButton from '@/components/DeletePostButton'
 
 type Post = {
     id: string
@@ -71,6 +72,8 @@ export default async function ThreadPage(props: { params: Promise<{ id: string, 
     const rootPost = postMap.get(postId)
     if (!rootPost) notFound()
 
+    const isOwner = user.id === rootPost.user_id
+
     // Populate children
     postsWithProfiles?.forEach(p => {
         if (p.parent_id && postMap.has(p.parent_id)) {
@@ -130,6 +133,9 @@ export default async function ThreadPage(props: { params: Promise<{ id: string, 
                     {/* Actions Bar */}
                     <div className="flex items-center gap-6 mt-6 pt-6 border-t border-slate-100 dark:border-slate-800">
                         <LikeButton postId={rootPost.id} initialLikes={rootPost.likes_count} currentUserId={user.id} />
+                        {(isOwner || isAdmin) && (
+                            <DeletePostButton postId={rootPost.id} redirectTo={`/group/${groupId}`} />
+                        )}
                     </div>
                 </div>
 
