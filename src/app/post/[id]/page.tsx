@@ -158,7 +158,7 @@ export default async function GlobalPostPage(props: { params: Promise<{ id: stri
                             <LikeButton 
                                 postId={mainPost.id} 
                                 initialLikes={mainPost.likes_count} 
-                                userId={user.id} 
+                                currentUserId={user.id} 
                             />
                         </div>
                     </div>
