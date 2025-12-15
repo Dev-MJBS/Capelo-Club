@@ -107,6 +107,7 @@ export default async function Dashboard() {
                                             title={group.title}
                                             bookTitle={group.book_title}
                                             description={group.description}
+                                            memberCount={group.members_count}
                                         />
                                     </div>
                                 ))}

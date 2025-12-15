@@ -1,8 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
-import { MessageSquare, ArrowLeft, Calendar, User, CheckCircle2 } from 'lucide-react'
+import { MessageSquare, ArrowLeft, Calendar, User } from 'lucide-react'
 import GroupPostCardActions from '@/components/GroupPostCardActions'
+import VerifiedBadge from '@/components/VerifiedBadge'
+import JoinGroupButton from '@/components/JoinGroupButton'
 
 export default async function GroupPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
@@ -49,8 +51,13 @@ export default async function GroupPage(props: { params: Promise<{ id: string }>
 
             <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
                 <div className="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 mb-8">
-                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">{group.book_title}</h2>
-                    <p className="text-slate-600 dark:text-slate-300">{group.description}</p>
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                        <div>
+                            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">{group.book_title}</h2>
+                            <p className="text-slate-600 dark:text-slate-300">{group.description}</p>
+                        </div>
+                        <JoinGroupButton groupId={group.id} userId={user.id} />
+                    </div>
                 </div>
 
                 <div className="flex items-center justify-between mb-6">
@@ -88,7 +95,7 @@ export default async function GroupPage(props: { params: Promise<{ id: string }>
                                                 <span className="flex items-center gap-1">
                                                     {author?.username || 'Usuário Desconhecido'}
                                                     {author?.is_verified && (
-                                                        <CheckCircle2 size={12} className="text-blue-500 fill-blue-500" />
+                                                        <VerifiedBadge size={14} />
                                                     )}
                                                 </span>
                                             </span>
