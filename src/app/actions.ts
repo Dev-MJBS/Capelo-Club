@@ -27,11 +27,11 @@ export async function createSubclub(prevState: any, formData: FormData) {
         // For now, assuming a bucket 'subclub-banners' was created or we use 'post_images' if exists?
         // Let's try 'banners'. If it fails, we catch.
         const { error: uploadError } = await supabase.storage
-            .from('banners')
+            .from('subclub-banners')
             .upload(fileName, bannerFile)
 
         if (!uploadError) {
-            const { data: { publicUrl } } = supabase.storage.from('banners').getPublicUrl(fileName)
+            const { data: { publicUrl } } = supabase.storage.from('subclub-banners').getPublicUrl(fileName)
             bannerUrl = publicUrl
         }
     }

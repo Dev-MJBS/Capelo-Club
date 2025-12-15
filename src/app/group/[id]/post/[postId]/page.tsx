@@ -143,11 +143,13 @@ export default async function ThreadPage(props: { params: Promise<{ id: string, 
                     <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6">Respostas ({rootPost.children?.length ?? 0})</h3>
 
                     {/* Global Reply Input for Main Post */}
-                    <CommentInput groupId={groupId} parentId={rootPost.id} />
+                    <div id="main-reply-form">
+                        <CommentInput groupId={groupId} parentId={rootPost.id} />
+                    </div>
 
                     <div className="space-y-6 mt-8">
                         {rootPost.children?.map(child => (
-                            <CommentNode key={child.id} post={child} depth={0} groupId={groupId} currentUserId={user.id} isAdmin={isAdmin} />
+                            <CommentNode key={child.id} post={child} depth={0} groupId={groupId} currentUserId={user.id} isAdmin={isAdmin} rootPostId={rootPost.id} />
                         ))}
                     </div>
                 </div>

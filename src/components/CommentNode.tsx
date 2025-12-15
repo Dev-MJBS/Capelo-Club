@@ -22,7 +22,7 @@ type Post = {
 
 const renderColors = ['border-l-indigo-500', 'border-l-pink-500', 'border-l-cyan-500']
 
-export default function CommentNode({ post, depth = 0, groupId, currentUserId, isAdmin = false }: { post: Post, depth: number, groupId: string, currentUserId: string, isAdmin?: boolean }) {
+export default function CommentNode({ post, depth = 0, groupId, currentUserId, isAdmin = false, rootPostId }: { post: Post, depth: number, groupId: string, currentUserId: string, isAdmin?: boolean, rootPostId?: string }) {
     const router = useRouter()
     const [likes, setLikes] = useState(post.likes_count)
     const [liked, setLiked] = useState(false)
@@ -125,7 +125,7 @@ export default function CommentNode({ post, depth = 0, groupId, currentUserId, i
     const MAX_DEPTH = 6
 
     return (
-        <div className={`mt-4 ${depth > 0 ? `ml-4 pl-4 border-l-2 ${renderColors[depth % 3]}` : ''}`}>
+        <div className={`mt-4 ${depth > 0 && depth < MAX_DEPTH ? `ml-4 pl-4 border-l-2 ${renderColors[depth % 3]}` : ''}`}>
             <div className="bg-white dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-2 mb-2">
                     {post.profiles?.avatar_url ? (
@@ -170,9 +170,17 @@ export default function CommentNode({ post, depth = 0, groupId, currentUserId, i
                             <MessageSquare size={14} /> Responder
                         </button>
                     ) : (
-                         <span className="text-slate-400 italic">
-                            Limite de respostas atingido
-                        </span>
+                         <button 
+                            onClick={() => {
+                                const element = document.getElementById('main-reply-form');
+                                if (element) {
+                                    element.scrollIntoView({ behavior: 'smooth' });
+                                }
+                            }}
+                            className="text-indigo-600 hover:underline text-xs font-medium flex items-center gap-1"
+                         >
+                            <MessageSquare size={14} /> Continuar discussão no tópico principal
+                        </button>
                     )}
 
                     {(isOwner || isAdmin) && (
@@ -219,6 +227,7 @@ export default function CommentNode({ post, depth = 0, groupId, currentUserId, i
                             groupId={groupId} 
                             currentUserId={currentUserId} 
                             isAdmin={isAdmin} 
+                            rootPostId={rootPostId}
                         />
                     ))}
                 </div>
