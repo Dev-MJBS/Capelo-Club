@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Send } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
-export default function CommentInput({ groupId, subclubId, parentId }: { groupId?: string, subclubId?: string, parentId: string }) {
+export default function CommentInput({ groupId, subclubId, parentId }: { groupId?: string | null, subclubId?: string | null, parentId: string }) {
     const [content, setContent] = useState('')
     const [loading, setLoading] = useState(false)
     const router = useRouter()

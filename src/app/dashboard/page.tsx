@@ -36,7 +36,6 @@ export default async function Dashboard() {
             subclub:subclubs(id, name, display_name),
             user:profiles(username, avatar_url, is_verified)
         `)
-        .order('likes_count', { ascending: false })
         .order('created_at', { ascending: false })
         .limit(50)
 

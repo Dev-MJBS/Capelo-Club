@@ -22,7 +22,7 @@ type Post = {
 
 const renderColors = ['border-l-indigo-500', 'border-l-pink-500', 'border-l-cyan-500']
 
-export default function CommentNode({ post, depth = 0, groupId, currentUserId, isAdmin = false, rootPostId }: { post: Post, depth: number, groupId: string, currentUserId: string, isAdmin?: boolean, rootPostId?: string }) {
+export default function CommentNode({ post, depth = 0, groupId, currentUserId, isAdmin = false, rootPostId }: { post: Post, depth: number, groupId?: string | null, currentUserId: string, isAdmin?: boolean, rootPostId?: string }) {
     const router = useRouter()
     const [likes, setLikes] = useState(post.likes_count)
     const [liked, setLiked] = useState(false)
@@ -109,7 +109,7 @@ export default function CommentNode({ post, depth = 0, groupId, currentUserId, i
         
         if (user) {
             await supabase.from('posts').insert({
-                group_id: groupId,
+                group_id: groupId || null,
                 user_id: user.id,
                 content: replyContent,
                 parent_id: post.id, // Normal reply

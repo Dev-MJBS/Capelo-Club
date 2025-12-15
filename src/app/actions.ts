@@ -137,3 +137,33 @@ export async function createTweet(formData: FormData) {
     return { success: true }
 }
 
+export async function updateGroup(groupId: string, formData: FormData) {
+    const supabase = await createClient()
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'Not authenticated' }
+
+    // Check if admin
+    const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
+    if (!profile?.is_admin) return { success: false, error: 'Forbidden' }
+
+    const title = formData.get('title') as string
+    const bookTitle = formData.get('bookTitle') as string
+    const description = formData.get('description') as string
+
+    if (!title || !bookTitle) return { success: false, error: 'Campos obrigatórios faltando' }
+
+    const { error } = await supabase.from('groups').update({
+        title,
+        book_title: bookTitle,
+        description
+    }).eq('id', groupId)
+
+    if (error) return { success: false, error: error.message }
+
+    revalidatePath(`/group/${groupId}`)
+    revalidatePath('/dashboard')
+    return { success: true }
+}
+
+

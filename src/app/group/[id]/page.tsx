@@ -5,6 +5,7 @@ import { MessageSquare, ArrowLeft, Calendar, User } from 'lucide-react'
 import GroupPostCardActions from '@/components/GroupPostCardActions'
 import VerifiedBadge from '@/components/VerifiedBadge'
 import JoinGroupButton from '@/components/JoinGroupButton'
+import EditGroupButton from '@/components/EditGroupButton'
 
 export default async function GroupPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
@@ -59,8 +60,11 @@ export default async function GroupPage(props: { params: Promise<{ id: string }>
             <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
                 <div className="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 mb-8">
                     <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-                        <div>
-                            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">{group.book_title}</h2>
+                        <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{group.book_title}</h2>
+                                {profile?.is_admin && <EditGroupButton group={group} />}
+                            </div>
                             <p className="text-slate-600 dark:text-slate-300">{group.description}</p>
                         </div>
                         <JoinGroupButton groupId={group.id} userId={user.id} />
