@@ -14,16 +14,20 @@ export default async function NotificationsPage() {
     const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
 
     // Fetch notifications
-    const { data: notifications } = await supabase
+    const { data: notifications, error } = await supabase
         .from('notifications')
         .select(`
             *,
-            actor:profiles(username, avatar_url),
+            actor:profiles!notifications_actor_id_profiles_fkey(username, avatar_url),
             post:posts(id, content, group_id)
         `)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(50)
+
+    if (error) {
+        console.error('Error fetching notifications:', error)
+    }
 
     // Mark as read
     if (notifications && notifications.length > 0) {

@@ -13,10 +13,15 @@ export interface FeedPost {
     created_at: string
     likes_count: number
     image_url?: string | null
-    group: {
+    group?: {
         id: string
         title: string
         book_title: string
+    }
+    subclub?: {
+        id: string
+        name: string
+        display_name: string
     }
     user: {
         username: string
@@ -39,18 +44,43 @@ import VerifyUserButton from './VerifyUserButton'
 
 export default function FeedPostCard({ post, currentUserId, isAdmin = false }: FeedPostCardProps) {
     const isOwner = currentUserId && post.user_id === currentUserId
+    
+    // Determine link destination
+    let postLink = '#'
+    if (post.group) {
+        postLink = `/group/${post.group.id}/post/${post.id}`
+    } else if (post.subclub) {
+        postLink = `/c/${post.subclub.name}/post/${post.id}`
+    } else {
+        // Global tweet link (maybe just a modal or separate page later, for now just # or maybe a generic post view)
+        // Let's assume we might have a global post view or just link to dashboard for now
+        postLink = `/post/${post.id}` // We might need to create this route if it doesn't exist
+    }
+
     return (
-        <Link href={`/group/${post.group.id}/post/${post.id}`} className="block group">
+        <Link href={postLink} className="block group">
             <article className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all shadow-sm hover:shadow-md">
                 <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mb-1">
-                        <span className="font-semibold text-indigo-600 dark:text-indigo-400">
-                            g/{post.group.title}
-                        </span>
+                    <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mb-1 flex-wrap">
+                        {post.group && (
+                            <span className="font-semibold text-indigo-600 dark:text-indigo-400">
+                                g/{post.group.title}
+                            </span>
+                        )}
+                        {post.subclub && (
+                            <span className="font-semibold text-indigo-600 dark:text-indigo-400">
+                                c/{post.subclub.display_name}
+                            </span>
+                        )}
+                        {!post.group && !post.subclub && (
+                            <span className="font-semibold text-slate-500 dark:text-slate-400">
+                                Feed
+                            </span>
+                        )}
+                        
                         <span>•</span>
                         <span className="flex items-center gap-1">
-                            postado por 
-                            <span className="text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                            <span className="text-slate-700 dark:text-slate-300 flex items-center gap-1 font-medium">
                                 {post.user?.avatar_url && (
                                     <img 
                                         src={post.user.avatar_url} 
@@ -81,17 +111,19 @@ export default function FeedPostCard({ post, currentUserId, isAdmin = false }: F
                     </div>
                 </div>
 
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                    {post.title}
-                </h3>
+                {post.title && (
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                        {post.title}
+                    </h3>
+                )}
 
                 {post.image_url && (
-                    <div className="mb-4 rounded-lg overflow-hidden max-h-64">
+                    <div className="mb-4 rounded-lg overflow-hidden max-h-96">
                         <img src={post.image_url} alt="Post" className="w-full h-full object-cover" />
                     </div>
                 )}
 
-                <p className="text-slate-600 dark:text-slate-300 line-clamp-3 mb-4 text-sm">
+                <p className="text-slate-600 dark:text-slate-300 whitespace-pre-wrap mb-4 text-base">
                     {post.content}
                 </p>
 

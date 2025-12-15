@@ -6,6 +6,7 @@ import ErrorBoundary from '@/components/ErrorBoundary'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { PlusCircle, Compass } from 'lucide-react'
+import TweetInput from '@/components/TweetInput'
 
 export default async function Dashboard() {
     const supabase = await createClient()
@@ -19,23 +20,25 @@ export default async function Dashboard() {
     // Fetch user profile to check if admin
     const { data: profile } = await supabase
         .from('profiles')
-        .select('is_admin')
+        .select('is_admin, avatar_url')
         .eq('id', user.id)
         .single()
 
     // Fetch groups
     const { data: groups } = await supabase.from('groups').select('*').order('created_at', { ascending: false })
 
-    // Fetch recent posts with group and profile info
+    // Fetch recent posts (Tweets + Group Posts)
     const { data: posts } = await supabase
         .from('posts')
         .select(`
             *,
             group:groups(id, title, book_title),
+            subclub:subclubs(id, name, display_name),
             user:profiles(username, avatar_url, is_verified)
         `)
+        .order('likes_count', { ascending: false })
         .order('created_at', { ascending: false })
-        .limit(20)
+        .limit(50)
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -46,20 +49,23 @@ export default async function Dashboard() {
 
                     {/* Left/Main Column: Feed */}
                     <div className="lg:col-span-8 space-y-6">
+                        <TweetInput userAvatar={profile?.avatar_url} />
+
                         <div className="flex items-center justify-between">
-                            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Feed Recente</h2>
+                            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Feed</h2>
                             {/* Optional: Filter buttons (Hot, New, Top) */}
                         </div>
 
                         {(!posts || posts.length === 0) ? (
                             <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-xl border border-dashed border-slate-300 dark:border-slate-700">
                                 <p className="text-slate-500 text-lg mb-2">Seu feed está vazio!</p>
-                                <p className="text-slate-400 text-sm">Entre em um grupo para começar a discutir.</p>
+                                <p className="text-slate-400 text-sm">Seja o primeiro a publicar algo.</p>
                             </div>
                         ) : (
                             <div className="space-y-4">
                                 {posts.map((post) => {
-                                    if (!post.group || !post.user) return null
+                                    // Allow posts without group (tweets)
+                                    if (!post.user) return null
                                     return (
                                         <ErrorBoundary key={post.id}>
                                             <FeedPostCard 
@@ -71,6 +77,7 @@ export default async function Dashboard() {
                                                     likes_count: post.likes_count,
                                                     image_url: post.image_url,
                                                     group: post.group,
+                                                    subclub: post.subclub,
                                                     user: post.user,
                                                     user_id: post.user_id
                                                 }} 
