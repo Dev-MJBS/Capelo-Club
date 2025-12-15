@@ -18,7 +18,7 @@ export default async function Home() {
     return (
         <div className="min-h-screen flex flex-col items-center bg-slate-50 dark:bg-slate-950 relative">
             {/* Hero Section */}
-            <div className="w-full h-[50vh] flex flex-col items-center justify-center bg-[url('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=2828&auto=format&fit=crop')] bg-cover bg-center text-white relative">
+            <div className="w-full min-h-screen flex flex-col items-center justify-center bg-[url('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=2828&auto=format&fit=crop')] bg-cover bg-center text-white relative">
                 <div className="absolute inset-0 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm z-0"></div>
 
                 <div className="relative z-10 flex flex-col items-center max-w-lg mx-auto px-4 w-full text-center">
@@ -29,9 +29,6 @@ export default async function Home() {
                     <p className="text-slate-200 mb-8 font-light text-lg">Sua comunidade exclusiva de leitura.</p>
                     <div className="flex gap-4">
                         <LoginButton />
-                        <Link href="/subclubs" className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full font-medium transition backdrop-blur-md border border-white/20 flex items-center gap-2">
-                            <Compass size={18} /> Explorar Clubes
-                        </Link>
                     </div>
                 </div>
             </div>

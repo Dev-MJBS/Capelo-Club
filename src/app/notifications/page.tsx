@@ -18,7 +18,7 @@ export default async function NotificationsPage() {
         .from('notifications')
         .select(`
             *,
-            actor:profiles!actor_id(username, avatar_url),
+            actor:profiles(username, avatar_url),
             post:posts(id, content, group_id)
         `)
         .eq('user_id', user.id)
