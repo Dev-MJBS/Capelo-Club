@@ -15,16 +15,41 @@ export default function ProfileForm({ initialUsername = '', initialAvatarUrl = '
     const router = useRouter()
     const [username, setUsername] = useState(initialUsername)
     const [loading, setLoading] = useState(false)
+    const [uploading, setUploading] = useState(false)
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
-    const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl) // For preview if we supported upload, simpler now is text URL or just username. 
-    // User asked for "Colocar foto de perfil" (Upload).
-    // Supabase Storage implementation is needed for real upload.
-    // For now, I'll implement Username update first, and maybe a text input for Avatar URL or a placeholder for upload logic if I don't setup bucket.
-    // Wait, requirement: "likes e upload de imagens/quotes (use Supabase Storage)".
-    // I should implement Storage if possible. But bucket creation needs SQL or Dashboard.
-    // I will focus on Username first and "Avatar URL" text input (or basic placeholder) to verify the flow, 
-    // then I can try to add proper upload if I can verify bucket existence.
-    // Actually, I can allow user to paste an image URL for now to be safe and simple (Low-codeish).
+    const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl)
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files || e.target.files.length === 0) {
+            return
+        }
+        
+        const file = e.target.files[0]
+        const fileExt = file.name.split('.').pop()
+        const fileName = `${userId}-${Math.random()}.${fileExt}`
+        const filePath = `${fileName}`
+
+        setUploading(true)
+        const supabase = createClient()
+
+        try {
+            const { error: uploadError } = await supabase.storage
+                .from('avatars')
+                .upload(filePath, file)
+
+            if (uploadError) {
+                throw uploadError
+            }
+
+            const { data } = supabase.storage.from('avatars').getPublicUrl(filePath)
+            setAvatarUrl(data.publicUrl)
+        } catch (error: any) {
+            console.error(error)
+            alert('Erro ao fazer upload da imagem. Certifique-se que o bucket "avatars" existe e é público no Supabase.')
+        } finally {
+            setUploading(false)
+        }
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -66,25 +91,38 @@ export default function ProfileForm({ initialUsername = '', initialAvatarUrl = '
                             ) : (
                                 <User size={40} className="text-slate-400" />
                             )}
+                            {uploading && (
+                                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                    <Loader2 className="animate-spin text-white" size={24} />
+                                </div>
+                            )}
                         </div>
-                        {/* Visual hint only for now unless we implement file upload */}
-                        <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-not-allowed">
+                        <label htmlFor="avatar-upload" className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                             <Camera className="text-white" size={24} />
-                        </div>
+                        </label>
+                        <input 
+                            type="file" 
+                            id="avatar-upload" 
+                            accept="image/*" 
+                            onChange={handleImageUpload} 
+                            className="hidden" 
+                            disabled={uploading}
+                        />
                     </div>
 
                     <div className="flex-1 w-full">
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                            URL da Imagem de Avatar
+                            Foto de Perfil
                         </label>
-                        <input
-                            type="url"
-                            value={avatarUrl}
-                            onChange={(e) => setAvatarUrl(e.target.value)}
-                            placeholder="https://exemplo.com/sua-foto.jpg"
-                            className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
-                        />
-                        <p className="text-xs text-slate-500 mt-1">Cole o link de uma imagem da internet.</p>
+                        <div className="flex items-center gap-4">
+                            <label 
+                                htmlFor="avatar-upload"
+                                className="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer transition-colors"
+                            >
+                                {uploading ? 'Enviando...' : 'Escolher Arquivo'}
+                            </label>
+                            <span className="text-xs text-slate-500">JPG, PNG ou GIF. Máx 2MB.</span>
+                        </div>
                     </div>
                 </div>
 
