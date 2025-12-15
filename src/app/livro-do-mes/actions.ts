@@ -182,3 +182,54 @@ export async function getUserVote() {
 
     return data?.nomination_id
 }
+
+export async function adminPickWinner(nominationId: string) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    if (!user) throw new Error('Unauthorized')
+
+    // Check admin
+    const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
+    if (!profile?.is_admin) throw new Error('Forbidden')
+
+    // Get nomination details
+    const { data: nomination } = await supabase
+        .from('monthly_nominations')
+        .select('*')
+        .eq('id', nominationId)
+        .single()
+
+    if (!nomination) throw new Error('Nomination not found')
+
+    // Get vote count
+    const { count } = await supabase
+        .from('monthly_votes')
+        .select('*', { count: 'exact', head: true })
+        .eq('nomination_id', nominationId)
+
+    // Insert into book_of_the_month
+    // We need a slug. Let's generate one from month date.
+    const date = new Date(nomination.target_month_date)
+    const slug = getMonthSlug(date)
+
+    const { error } = await supabase.from('book_of_the_month').upsert({
+        month_date: nomination.target_month_date,
+        slug: slug,
+        book_title: nomination.book_title,
+        book_author: nomination.book_author,
+        book_isbn: nomination.book_isbn,
+        book_cover_url: nomination.book_cover_url,
+        book_description: 'Vencedor da votação da comunidade.',
+        openlibrary_key: nomination.openlibrary_key,
+        winner_votes: count || 0,
+        selected_at: new Date().toISOString()
+    })
+
+    if (error) throw error
+
+    revalidatePath('/livro-do-mes/votacao')
+    revalidatePath('/dashboard')
+    return { success: true }
+}
+

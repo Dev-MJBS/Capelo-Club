@@ -6,11 +6,20 @@ import { LogIn, Twitter } from 'lucide-react'
 export default function LoginButton() {
     const handleLogin = async (provider: 'google' | 'twitter') => {
         try {
+            const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+            if (!supabaseUrl) {
+                alert('Erro de configuração: NEXT_PUBLIC_SUPABASE_URL não definido.')
+                return
+            }
+
             const supabase = createClient()
+            const redirectTo = `${window.location.origin}/auth/callback`
+            console.log('Redirecting to:', redirectTo)
+
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: provider,
                 options: {
-                    redirectTo: `${window.location.origin}/auth/callback`,
+                    redirectTo: redirectTo,
                 },
             })
             if (error) {

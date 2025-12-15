@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { nominateBook, voteForBook, type VotingState } from '@/app/livro-do-mes/actions'
+import { nominateBook, voteForBook, adminPickWinner, type VotingState } from '@/app/livro-do-mes/actions'
 import BookSearch from './BookSearch'
-import { Loader2, Check, AlertCircle, Calendar, BookOpen } from 'lucide-react'
+import { Loader2, Check, AlertCircle, Calendar, BookOpen, Crown } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 type Nominee = {
@@ -21,9 +21,10 @@ interface VotingInterfaceProps {
     userVoteId: string | null
     isVerified: boolean
     userId: string
+    isAdmin?: boolean
 }
 
-export default function VotingInterface({ state, nominees, userVoteId, isVerified, userId }: VotingInterfaceProps) {
+export default function VotingInterface({ state, nominees, userVoteId, isVerified, userId, isAdmin = false }: VotingInterfaceProps) {
     const router = useRouter()
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -150,13 +151,36 @@ export default function VotingInterface({ state, nominees, userVoteId, isVerifie
                                                     <Check size={16} /> Votado
                                                 </span>
                                             ) : (
-                                                <button
-                                                    onClick={() => handleVote(nominee.id)}
-                                                    disabled={!canVote || loading}
-                                                    className="px-4 py-1.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-medium rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
-                                                >
-                                                    Votar
-                                                </button>
+                                                <div className="flex gap-2">
+                                                    {isAdmin && (
+                                                        <button
+                                                            onClick={async () => {
+                                                                if(!confirm(`Confirmar "${nominee.book_title}" como vencedor?`)) return
+                                                                setLoading(true)
+                                                                try {
+                                                                    await adminPickWinner(nominee.id)
+                                                                    router.refresh()
+                                                                } catch(e: any) {
+                                                                    setError(e.message)
+                                                                } finally {
+                                                                    setLoading(false)
+                                                                }
+                                                            }}
+                                                            disabled={loading}
+                                                            className="px-3 py-1.5 bg-yellow-500 text-white text-sm font-medium rounded-lg hover:bg-yellow-600 disabled:opacity-50 transition-colors flex items-center gap-1"
+                                                            title="Definir como Vencedor (Admin)"
+                                                        >
+                                                            <Crown size={14} />
+                                                        </button>
+                                                    )}
+                                                    <button
+                                                        onClick={() => handleVote(nominee.id)}
+                                                        disabled={!canVote || loading}
+                                                        className="px-4 py-1.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-medium rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+                                                    >
+                                                        Votar
+                                                    </button>
+                                                </div>
                                             )}
                                         </div>
                                     </div>

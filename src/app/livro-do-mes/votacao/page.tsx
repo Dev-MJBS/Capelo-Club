@@ -29,6 +29,7 @@ export default async function VotingPage() {
                     userVoteId={userVoteId}
                     isVerified={!!profile?.is_verified}
                     userId={user.id}
+                    isAdmin={!!profile?.is_admin}
                 />
             </main>
         </div>
