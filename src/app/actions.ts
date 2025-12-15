@@ -95,3 +95,45 @@ export async function toggleVerifiedStatus(userId: string, isVerified: boolean) 
     revalidatePath('/', 'layout')
     return { success: true }
 }
+
+export async function createTweet(formData: FormData) {
+    const supabase = await createClient()
+    
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'Not authenticated' }
+
+    const content = formData.get('content') as string
+    const imageFile = formData.get('image') as File | null
+
+    if (!content && (!imageFile || imageFile.size === 0)) {
+        return { success: false, error: 'Conteúdo vazio' }
+    }
+
+    let imageUrl = null
+    if (imageFile && imageFile.size > 0) {
+        const fileExt = imageFile.name.split('.').pop()
+        const fileName = `tweet-${Date.now()}.${fileExt}`
+        
+        const { error: uploadError } = await supabase.storage
+            .from('post_images')
+            .upload(fileName, imageFile)
+            
+        if (uploadError) return { success: false, error: 'Erro ao fazer upload da imagem: ' + uploadError.message }
+        
+        const { data } = supabase.storage.from('post_images').getPublicUrl(fileName)
+        imageUrl = data.publicUrl
+    }
+
+    const { error } = await supabase.from('posts').insert({
+        content,
+        image_url: imageUrl,
+        user_id: user.id,
+        // group_id is null for tweets
+    })
+
+    if (error) return { success: false, error: error.message }
+
+    revalidatePath('/dashboard')
+    return { success: true }
+}
+

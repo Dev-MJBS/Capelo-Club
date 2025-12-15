@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { Image as ImageIcon, Send, Loader2, X } from 'lucide-react'
+import { createTweet } from '@/app/actions'
 
 export default function TweetInput({ userAvatar }: { userAvatar?: string }) {
     const router = useRouter()
@@ -34,42 +34,22 @@ export default function TweetInput({ userAvatar }: { userAvatar?: string }) {
         if (!content.trim() && !image) return
 
         setLoading(true)
-        const supabase = createClient()
 
         try {
-            const { data: { user } } = await supabase.auth.getUser()
-            if (!user) throw new Error('Not authenticated')
-
-            let imageUrl = null
-
+            const formData = new FormData()
+            formData.append('content', content)
             if (image) {
-                const fileExt = image.name.split('.').pop()
-                const fileName = `tweet-${Date.now()}.${fileExt}`
-                const { error: uploadError } = await supabase.storage
-                    .from('post_images')
-                    .upload(fileName, image)
-
-                if (uploadError) throw uploadError
-
-                const { data } = supabase.storage.from('post_images').getPublicUrl(fileName)
-                imageUrl = data.publicUrl
+                formData.append('image', image)
             }
 
-            const postData: any = {
-                content,
-                image_url: imageUrl,
-                user_id: user.id,
-                // group_id and subclub_id are omitted to allow them to be null (or default)
-                // This avoids errors if subclub_id column doesn't exist yet in the schema
+            const result = await createTweet(formData)
+
+            if (!result.success) {
+                throw new Error(result.error)
             }
-
-            const { error } = await supabase.from('posts').insert(postData)
-
-            if (error) throw error
 
             setContent('')
             removeImage()
-            router.refresh()
         } catch (error: any) {
             console.error(error)
             alert('Erro ao publicar: ' + (error.message || 'Erro desconhecido'))
