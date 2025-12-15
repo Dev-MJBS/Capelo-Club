@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Users, Plus, ArrowLeft } from 'lucide-react'
-import FeedPostCard from '@/components/FeedPostCard' // Reuse existing or simple card
+import BookOfTheMonthCard from '@/components/BookOfTheMonthCard'
 
 export default async function SubclubPage(props: { params: Promise<{ name: string }> }) {
     const params = await props.params;
@@ -30,9 +30,29 @@ export default async function SubclubPage(props: { params: Promise<{ name: strin
         .order('created_at', { ascending: false })
 
     const { data: { user } } = await supabase.auth.getUser()
+    
+    let isAdmin = false
+    let currentBook = null
 
-    // Check if user is member (optional for UI state, join button etc)
-    // Skipping complex join logic for now, focus on viewing
+    if (user) {
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('is_admin')
+            .eq('id', user.id)
+            .single()
+        isAdmin = !!profile?.is_admin
+    }
+
+    // Special logic for 'livro-do-mes'
+    if (name === 'livro-do-mes') {
+        const { data: book } = await supabase
+            .from('book_of_the_month')
+            .select('*')
+            .eq('is_current', true)
+            .single()
+        
+        currentBook = book
+    }
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
@@ -63,9 +83,14 @@ export default async function SubclubPage(props: { params: Promise<{ name: strin
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {/* Main Feed */}
                     <div className="md:col-span-2 space-y-4">
+                        
+                        {/* Book of the Month Display */}
+                        {currentBook && (
+                            <BookOfTheMonthCard book={currentBook} isAdmin={isAdmin} />
+                        )}
+
                         <div className="flex items-center justify-between mb-4">
                             <h2 className="text-xl font-bold text-slate-900 dark:text-white">Discussões Recentes</h2>
-                            {/* We need verify user is logged in to show create button ideally, or redirect */}
                             <Link
                                 href={`/c/${name}/submit`}
                                 className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition flex items-center gap-2"
@@ -75,11 +100,6 @@ export default async function SubclubPage(props: { params: Promise<{ name: strin
                         </div>
 
                         {posts?.map(post => (
-                            // We might need to adapt FeedPostCard if it expects strictly typed props or just reuse logic
-                            // Assuming FeedPostCard can handle the post object structure.
-                            // Wait, existing FeedPostCard might need group info?
-                            // Let's create a simplified card inline or adapt.
-                            // Actually, let's use a standard list item for now to be safe and clean.
                             <div key={post.id} className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 transition shadow-sm">
                                 <Link href={`/c/${name}/post/${post.id}`}>
                                     <div className="flex items-center gap-2 mb-2 text-xs text-slate-500">
@@ -94,7 +114,6 @@ export default async function SubclubPage(props: { params: Promise<{ name: strin
                                     <p className="text-slate-600 dark:text-slate-400 text-sm line-clamp-3 mb-3">{post.content}</p>
                                     <div className="flex gap-4 text-xs text-slate-500 font-medium">
                                         <span>{post.likes_count || 0} Likes</span>
-                                        {/* Comment count would be nice but requires join/count */}
                                     </div>
                                 </Link>
                             </div>

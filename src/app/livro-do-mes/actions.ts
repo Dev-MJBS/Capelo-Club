@@ -233,3 +233,34 @@ export async function adminPickWinner(nominationId: string) {
     return { success: true }
 }
 
+export async function updateCurrentBook(formData: FormData) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    if (!user) return { success: false, error: 'Unauthorized' }
+
+    const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
+    if (!profile?.is_admin) return { success: false, error: 'Forbidden' }
+
+    const id = formData.get('id') as string
+    const title = formData.get('title') as string
+    const author = formData.get('author') as string
+    const description = formData.get('description') as string
+    const coverUrl = formData.get('coverUrl') as string
+
+    if (!id || !title || !author) return { success: false, error: 'Missing fields' }
+
+    const { error } = await supabase.from('book_of_the_month').update({
+        book_title: title,
+        book_author: author,
+        book_description: description,
+        book_cover_url: coverUrl
+    }).eq('id', id)
+
+    if (error) return { success: false, error: error.message }
+
+    revalidatePath('/c/livro-do-mes')
+    return { success: true }
+}
+
+
