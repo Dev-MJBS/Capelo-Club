@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Send } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
-export default function CommentInput({ groupId, parentId }: { groupId: string, parentId: string }) {
+export default function CommentInput({ groupId, subclubId, parentId }: { groupId?: string, subclubId?: string, parentId: string }) {
     const [content, setContent] = useState('')
     const [loading, setLoading] = useState(false)
     const router = useRouter()
@@ -20,7 +20,8 @@ export default function CommentInput({ groupId, parentId }: { groupId: string, p
 
         if (user) {
             const { error } = await supabase.from('posts').insert({
-                group_id: groupId,
+                group_id: groupId || null,
+                subclub_id: subclubId || null,
                 user_id: user.id,
                 content: content,
                 parent_id: parentId,

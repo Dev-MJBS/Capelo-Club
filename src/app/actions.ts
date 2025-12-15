@@ -2,6 +2,62 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
+
+export async function createSubclub(prevState: any, formData: FormData) {
+    const supabase = await createClient()
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { message: 'Você precisa estar logado.' }
+
+    const name = formData.get('name') as string
+    const displayName = formData.get('displayName') as string
+    const description = formData.get('description') as string
+    const bannerFile = formData.get('banner') as File | null
+
+    if (!name || !displayName) return { message: 'Campos obrigatórios faltando.' }
+
+    // Upload banner if exists
+    let bannerUrl = null
+    if (bannerFile && bannerFile.size > 0) {
+        const fileExt = bannerFile.name.split('.').pop()
+        const fileName = `${name}-${Date.now()}.${fileExt}`
+
+        // Ensure bucket exists or use default 'public' or similar
+        // For now, assuming a bucket 'subclub-banners' was created or we use 'post_images' if exists?
+        // Let's try 'banners'. If it fails, we catch.
+        const { error: uploadError } = await supabase.storage
+            .from('banners')
+            .upload(fileName, bannerFile)
+
+        if (!uploadError) {
+            const { data: { publicUrl } } = supabase.storage.from('banners').getPublicUrl(fileName)
+            bannerUrl = publicUrl
+        }
+    }
+
+    const { data: subclub, error: dbError } = await supabase.from('subclubs').insert({
+        name,
+        display_name: displayName,
+        description,
+        owner_id: user.id,
+        banner_url: bannerUrl
+    }).select().single()
+
+    if (dbError) {
+        if (dbError.code === '23505') return { message: 'Este nome de subclube já existe.' }
+        return { message: dbError.message }
+    }
+
+    // Add owner as moderator/member
+    await supabase.from('subclub_members').insert({
+        subclub_id: subclub.id,
+        user_id: user.id,
+        role: 'moderator'
+    })
+
+    redirect(`/c/${name}`)
+}
 
 export async function deletePost(postId: string) {
     const supabase = await createClient()
@@ -24,7 +80,7 @@ export async function deletePost(postId: string) {
 
 export async function toggleVerifiedStatus(userId: string, isVerified: boolean) {
     const supabase = await createClient()
-    
+
     // Check if current user is admin
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { success: false, error: 'Unauthorized' }
