@@ -144,22 +144,6 @@ export default async function Dashboard() {
                             </div>
                         </div>
 
-                        <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl p-6 text-white shadow-lg relative overflow-hidden">
-                            <div className="absolute top-3 right-3 bg-yellow-400 text-amber-900 text-xs font-bold px-3 py-1 rounded-full">
-                                Em Breve
-                            </div>
-                            <h3 className="font-bold text-lg mb-2">Capelo Club Premium</h3>
-                            <div className="space-y-2 text-indigo-100 text-sm mb-4">
-                                <p>✓ Prioridade de suporte</p>
-                                <p>✓ Selo de verificado no perfil</p>
-                                <p>✓ Posts com destaque</p>
-                                <p>✓ Acesso a benefícios exclusivos</p>
-                            </div>
-                            <button disabled className="bg-white text-indigo-600 text-sm font-bold px-4 py-2 rounded-lg opacity-60 cursor-not-allowed transition-colors w-full">
-                                Em Breve
-                            </button>
-                        </div>
-
                         <div className="text-xs text-slate-400 dark:text-slate-600">
                             <p>© 2025 Capelo Club. Todos os direitos reservados.</p>
                         </div>
