@@ -11,9 +11,11 @@ export default async function CreateSubclubPage() {
         redirect('/auth/login?next=/subclubs/create')
     }
 
+    const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
+
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-            <Navbar />
+            <Navbar user={user} isAdmin={profile?.is_admin} />
             <main className="max-w-2xl mx-auto px-4 py-8">
                 <CreateSubclubForm />
             </main>
