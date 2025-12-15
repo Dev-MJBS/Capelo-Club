@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, User } from 'lucide-react'
 import CommentNode from '@/components/CommentNode'
 import CommentInput from '@/components/CommentInput'
 import LikeButton from '@/components/LikeButton'
