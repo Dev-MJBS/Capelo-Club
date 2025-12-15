@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { LogOut, User, Menu, Bell, Settings } from 'lucide-react'
 import { ModeToggle } from '@/components/mode-toggle'
 import { type User as SupabaseUser } from '@supabase/supabase-js'
+import NotificationBell from './NotificationBell'
 
 export default function Navbar({ user, isAdmin, onOpenMobileMenu }: { user: SupabaseUser, isAdmin?: boolean, onOpenMobileMenu?: () => void }) {
     return (
@@ -23,13 +24,7 @@ export default function Navbar({ user, isAdmin, onOpenMobileMenu }: { user: Supa
                 <div className="flex items-center gap-2 sm:gap-4">
                     <ModeToggle />
 
-                    <Link
-                        href="/notifications"
-                        className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 transition-colors p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800"
-                        title="Notificações"
-                    >
-                        <Bell size={18} />
-                    </Link>
+                    <NotificationBell userId={user.id} />
 
                     {isAdmin && (
                         <Link
