@@ -55,22 +55,24 @@ export default function TweetInput({ userAvatar }: { userAvatar?: string }) {
                 imageUrl = data.publicUrl
             }
 
-            const { error } = await supabase.from('posts').insert({
+            const postData: any = {
                 content,
                 image_url: imageUrl,
                 user_id: user.id,
-                group_id: null, // Global post
-                subclub_id: null
-            })
+                // group_id and subclub_id are omitted to allow them to be null (or default)
+                // This avoids errors if subclub_id column doesn't exist yet in the schema
+            }
+
+            const { error } = await supabase.from('posts').insert(postData)
 
             if (error) throw error
 
             setContent('')
             removeImage()
             router.refresh()
-        } catch (error) {
+        } catch (error: any) {
             console.error(error)
-            alert('Erro ao publicar.')
+            alert('Erro ao publicar: ' + (error.message || 'Erro desconhecido'))
         } finally {
             setLoading(false)
         }
