@@ -1,10 +1,13 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
-import { MessageSquare, Clock } from 'lucide-react'
-import { formatDistanceToNow } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
-import VerifiedBadge from './VerifiedBadge'
+import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
+import toast from 'react-hot-toast'
+import PostHeader from './PostHeader'
+import PostContent from './PostContent'
+import PostActions from './PostActions'
 
 export interface FeedPost {
     id: string
@@ -13,6 +16,8 @@ export interface FeedPost {
     created_at: string
     likes_count: number
     image_url?: string | null
+    is_edited?: boolean
+    edited_at?: string | null
     group?: {
         id: string
         title: string
@@ -37,14 +42,19 @@ interface FeedPostCardProps {
     isAdmin?: boolean
 }
 
-import DeletePostButton from './DeletePostButton'
-import ReportButton from './ReportButton'
-import LikeButton from './LikeButton'
-import VerifyUserButton from './VerifyUserButton'
-
+/**
+ * FeedPostCard Component (Refactored)
+ * Now uses modular subcomponents and includes edit functionality
+ */
 export default function FeedPostCard({ post, currentUserId, isAdmin = false }: FeedPostCardProps) {
+    const router = useRouter()
+    const [isEditing, setIsEditing] = useState(false)
+    const [editedTitle, setEditedTitle] = useState(post.title || '')
+    const [editedContent, setEditedContent] = useState(post.content)
+    const [saving, setSaving] = useState(false)
+
     const isOwner = currentUserId && post.user_id === currentUserId
-    
+
     // Determine link destination
     let postLink = '#'
     if (post.group) {
@@ -52,101 +62,110 @@ export default function FeedPostCard({ post, currentUserId, isAdmin = false }: F
     } else if (post.subclub) {
         postLink = `/c/${post.subclub.name}/post/${post.id}`
     } else {
-        // Global tweet link (maybe just a modal or separate page later, for now just # or maybe a generic post view)
-        // Let's assume we might have a global post view or just link to dashboard for now
-        postLink = `/post/${post.id}` // We might need to create this route if it doesn't exist
+        postLink = `/post/${post.id}`
+    }
+
+    const handleEditClick = () => {
+        setIsEditing(true)
+    }
+
+    const handleCancelEdit = () => {
+        setIsEditing(false)
+        setEditedTitle(post.title || '')
+        setEditedContent(post.content)
+    }
+
+    const handleSaveEdit = async () => {
+        if (!editedContent.trim()) {
+            toast.error('O conteúdo não pode estar vazio')
+            return
+        }
+
+        setSaving(true)
+        const supabase = createClient()
+
+        try {
+            const { error } = await supabase
+                .from('posts')
+                .update({
+                    title: editedTitle || null,
+                    content: editedContent,
+                    is_edited: true,
+                    edited_at: new Date().toISOString()
+                })
+                .eq('id', post.id)
+
+            if (error) {
+                toast.error(`Erro ao salvar: ${error.message}`)
+            } else {
+                toast.success('Post editado com sucesso!')
+                setIsEditing(false)
+                router.refresh()
+            }
+        } catch (err) {
+            console.error('Error saving edit:', err)
+            toast.error('Erro inesperado ao salvar')
+        } finally {
+            setSaving(false)
+        }
+    }
+
+    if (isEditing) {
+        return (
+            <article className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                <PostHeader post={post} currentUserId={currentUserId} isAdmin={isAdmin} />
+
+                <div className="space-y-4">
+                    {post.title !== null && (
+                        <input
+                            type="text"
+                            value={editedTitle}
+                            onChange={(e) => setEditedTitle(e.target.value)}
+                            placeholder="Título (opcional)"
+                            className="w-full px-4 py-2 text-lg font-bold rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                    )}
+
+                    <textarea
+                        value={editedContent}
+                        onChange={(e) => setEditedContent(e.target.value)}
+                        rows={6}
+                        className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                        placeholder="Conteúdo do post"
+                    />
+
+                    <div className="flex gap-2 justify-end">
+                        <button
+                            onClick={handleCancelEdit}
+                            disabled={saving}
+                            className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            onClick={handleSaveEdit}
+                            disabled={saving || !editedContent.trim()}
+                            className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                        >
+                            {saving ? 'Salvando...' : 'Salvar'}
+                        </button>
+                    </div>
+                </div>
+            </article>
+        )
     }
 
     return (
         <Link href={postLink} className="block group">
             <article className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all shadow-sm hover:shadow-md">
-                <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mb-1 flex-wrap">
-                        {post.group && (
-                            <span className="font-semibold text-indigo-600 dark:text-indigo-400">
-                                g/{post.group.title}
-                            </span>
-                        )}
-                        {post.subclub && (
-                            <span className="font-semibold text-indigo-600 dark:text-indigo-400">
-                                c/{post.subclub.display_name}
-                            </span>
-                        )}
-                        {!post.group && !post.subclub && (
-                            <span className="font-semibold text-slate-500 dark:text-slate-400">
-                                Feed
-                            </span>
-                        )}
-                        
-                        <span>•</span>
-                        <span className="flex items-center gap-1">
-                            <span className="text-slate-700 dark:text-slate-300 flex items-center gap-1 font-medium">
-                                {post.user?.avatar_url && (
-                                    <img 
-                                        src={post.user.avatar_url} 
-                                        alt={post.user.username} 
-                                        className="w-5 h-5 rounded-full object-cover"
-                                    />
-                                )}
-                                {post.user?.username || 'user'}
-                                {post.user?.is_verified && (
-                                    <VerifiedBadge size={14} />
-                                )}
-                                {isAdmin && (
-                                    <div onClick={(e) => e.stopPropagation()}>
-                                        <VerifyUserButton 
-                                            userId={post.user_id} 
-                                            isVerified={!!post.user?.is_verified} 
-                                            isAdmin={isAdmin} 
-                                        />
-                                    </div>
-                                )}
-                            </span>
-                        </span>
-                        <span>•</span>
-                        <span className="flex items-center gap-1">
-                            <Clock size={12} />
-                            {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: ptBR })}
-                        </span>
-                    </div>
-                </div>
-
-                {post.title && (
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                        {post.title}
-                    </h3>
-                )}
-
-                {post.image_url && (
-                    <div className="mb-4 rounded-lg overflow-hidden max-h-96">
-                        <img src={post.image_url} alt="Post" className="w-full h-full object-cover" />
-                    </div>
-                )}
-
-                <p className="text-slate-600 dark:text-slate-300 whitespace-pre-wrap mb-4 text-base">
-                    {post.content}
-                </p>
-
-                <div className="flex items-center gap-4 text-slate-500 dark:text-slate-400 text-sm flex-wrap">
-                    <div onClick={(e) => e.stopPropagation()}>
-                        <LikeButton postId={post.id} initialLikes={post.likes_count} currentUserId={currentUserId} />
-                    </div>
-                    <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-full">
-                        <MessageSquare size={16} />
-                        <span>Comentários</span>
-                    </div>
-                    {(isOwner || isAdmin) && (
-                        <div className="ml-auto flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                            <DeletePostButton postId={post.id} />
-                            <ReportButton postId={post.id} type="post" />
-                        </div>
-                    )}
-                    {(!isOwner && !isAdmin) && (
-                        <div className="ml-auto" onClick={(e) => e.stopPropagation()}>
-                            <ReportButton postId={post.id} type="post" />
-                        </div>
-                    )}
-                </div>
+                <PostHeader post={post} currentUserId={currentUserId} isAdmin={isAdmin} />
+                <PostContent post={post} />
+                <PostActions
+                    post={post}
+                    currentUserId={currentUserId}
+                    isAdmin={isAdmin}
+                    onEditClick={isOwner ? handleEditClick : undefined}
+                />
             </article>
         </Link>
     )
