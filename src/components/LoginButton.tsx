@@ -29,7 +29,13 @@ export default function LoginButton() {
 
             if (error) {
                 console.error('Login error:', error)
-                toast.error(`Erro ao iniciar login: ${error.message}`)
+
+                // Better error message for unconfigured providers
+                if (error.message.includes('not enabled') || error.message.includes('not configured')) {
+                    toast.error(`${provider === 'github' ? 'GitHub' : provider === 'google' ? 'Google' : 'Twitter'} OAuth não está configurado. Use outro método de login.`)
+                } else {
+                    toast.error(`Erro ao iniciar login: ${error.message}`)
+                }
             }
         } catch (err) {
             console.error('Unexpected login error:', err)
