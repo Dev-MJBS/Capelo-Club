@@ -36,7 +36,7 @@ Aqui não tem algoritmo, não tem post superficial, não tem spam. Só conversa 
 - **Analytics**: Plausible (privacy-friendly)
 - **Hospedagem**: Railway.app
 
-### ✨ Novos Recursos (Dezembro 2024)
+### ✨ Novos Recursos (Dezembro 2025)
 
 #### 🎨 Melhorias de UI/UX
 - **Edição de Posts**: Edite posts e comentários inline com indicador "editado"
