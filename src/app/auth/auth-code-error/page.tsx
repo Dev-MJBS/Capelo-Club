@@ -1,19 +1,21 @@
 import Link from 'next/link'
 import { AlertTriangle } from 'lucide-react'
 
-export default function AuthCodeError({
+export default async function AuthCodeError({
     searchParams,
 }: {
-    searchParams: { error?: string }
+    searchParams: Promise<{ error?: string }>
 }) {
+    const params = await searchParams
+
     const errorMessages: Record<string, string> = {
         access_denied: 'Você cancelou a autorização',
         exchange_failed: 'Falha ao trocar código por sessão',
         no_code: 'Nenhum código de autorização recebido',
     }
 
-    const errorMessage = searchParams.error
-        ? errorMessages[searchParams.error] || searchParams.error
+    const errorMessage = params.error
+        ? errorMessages[params.error] || params.error
         : 'Erro desconhecido'
 
     return (
@@ -32,7 +34,7 @@ export default function AuthCodeError({
                     Não foi possível completar o login.
                 </p>
 
-                {searchParams.error && (
+                {params.error && (
                     <div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-6">
                         <p className="text-sm text-red-800 dark:text-red-200 font-medium">
                             {errorMessage}
