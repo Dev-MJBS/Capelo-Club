@@ -48,15 +48,22 @@ export async function updateSession(request: NextRequest) {
     const path = request.nextUrl.pathname
 
     // Check if user is banned or kicked
-    if (user && !path.startsWith('/banned') && !path.startsWith('/kicked')) {
+    if (user && !path.startsWith('/banned') && !path.startsWith('/kicked') && !path.startsWith('/validate-invite')) {
         const { data: profile } = await supabase
             .from('profiles')
             .select('is_banned, banned_reason, kicked_until, kick_reason')
             .eq('id', user.id)
-            .single()
+            .maybeSingle()
+
+        // Se não tem perfil, precisa validar convite
+        if (!profile) {
+            const url = request.nextUrl.clone()
+            url.pathname = '/validate-invite'
+            return NextResponse.redirect(url)
+        }
 
         // Redirect banned users
-        if (profile?.is_banned) {
+        if (profile.is_banned) {
             const url = request.nextUrl.clone()
             url.pathname = '/banned'
             url.searchParams.set('reason', profile.banned_reason || 'Violação dos termos de uso')
@@ -64,7 +71,7 @@ export async function updateSession(request: NextRequest) {
         }
 
         // Redirect kicked users
-        if (profile?.kicked_until && new Date(profile.kicked_until) > new Date()) {
+        if (profile.kicked_until && new Date(profile.kicked_until) > new Date()) {
             const url = request.nextUrl.clone()
             url.pathname = '/kicked'
             url.searchParams.set('until', profile.kicked_until)
