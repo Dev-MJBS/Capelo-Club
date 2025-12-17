@@ -2,11 +2,20 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Plus, Trash2, Loader2 } from 'lucide-react'
+import { Plus, Trash2, Loader2, Edit2, X, Save } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
-export default function AdminGroupManager() {
+interface Group {
+    id: string
+    title: string
+    book_title: string
+    description: string | null
+}
+
+export default function AdminGroupManager({ initialGroups }: { initialGroups: Group[] }) {
+    const [groups, setGroups] = useState<Group[]>(initialGroups)
     const [showForm, setShowForm] = useState(false)
+    const [editingId, setEditingId] = useState<string | null>(null)
     const [loading, setLoading] = useState(false)
     const [title, setTitle] = useState('')
     const [bookTitle, setBookTitle] = useState('')
@@ -19,17 +28,18 @@ export default function AdminGroupManager() {
 
         try {
             const supabase = createClient()
-            const { error } = await supabase.from('groups').insert({
+            const { data, error } = await supabase.from('groups').insert({
                 title,
                 book_title: bookTitle,
                 description
-            })
+            }).select().single()
 
             if (error) {
                 console.error('Erro ao criar grupo:', error)
                 alert(`Erro: ${error.message}`)
             } else {
                 alert('Grupo criado com sucesso!')
+                setGroups([...groups, data])
                 setTitle('')
                 setBookTitle('')
                 setDescription('')
@@ -41,6 +51,72 @@ export default function AdminGroupManager() {
             alert('Erro ao criar grupo')
         } finally {
             setLoading(false)
+        }
+    }
+
+    const handleEditGroup = async (group: Group) => {
+        setEditingId(group.id)
+        setTitle(group.title)
+        setBookTitle(group.book_title)
+        setDescription(group.description || '')
+    }
+
+    const handleSaveEdit = async (groupId: string) => {
+        setLoading(true)
+
+        try {
+            const supabase = createClient()
+            const { error } = await supabase
+                .from('groups')
+                .update({
+                    title,
+                    book_title: bookTitle,
+                    description
+                })
+                .eq('id', groupId)
+
+            if (error) {
+                console.error('Erro ao editar grupo:', error)
+                alert(`Erro: ${error.message}`)
+            } else {
+                alert('Grupo atualizado com sucesso!')
+                setGroups(groups.map(g =>
+                    g.id === groupId
+                        ? { ...g, title, book_title: bookTitle, description }
+                        : g
+                ))
+                setEditingId(null)
+                setTitle('')
+                setBookTitle('')
+                setDescription('')
+                router.refresh()
+            }
+        } catch (error) {
+            console.error('Erro:', error)
+            alert('Erro ao editar grupo')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handleDeleteGroup = async (groupId: string) => {
+        if (!confirm('Tem certeza? Isso vai deletar todos os posts deste grupo!')) return
+
+        try {
+            const supabase = createClient()
+            const { error } = await supabase.from('groups').delete().eq('id', groupId)
+
+            if (error) {
+                console.error('Erro ao deletar grupo:', error)
+                alert(`Erro: ${error.message}`)
+            } else {
+                alert('Grupo deletado com sucesso!')
+                setGroups(groups.filter(g => g.id !== groupId))
+                router.refresh()
+            }
+        } catch (error) {
+            console.error('Erro:', error)
+            alert('Erro ao deletar grupo')
         }
     }
 
@@ -59,6 +135,7 @@ export default function AdminGroupManager() {
                 </button>
             </div>
 
+            {/* Create Form */}
             {showForm && (
                 <form onSubmit={handleCreateGroup} className="space-y-4 mt-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700">
                     <div>
@@ -121,6 +198,98 @@ export default function AdminGroupManager() {
                     </div>
                 </form>
             )}
+
+            {/* Groups List */}
+            <div className="mt-6 space-y-3">
+                {groups.map((group) => (
+                    <div
+                        key={group.id}
+                        className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700"
+                    >
+                        {editingId === group.id ? (
+                            // Edit Mode
+                            <div className="space-y-3">
+                                <input
+                                    type="text"
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                    className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    placeholder="Nome do Grupo"
+                                />
+                                <input
+                                    type="text"
+                                    value={bookTitle}
+                                    onChange={(e) => setBookTitle(e.target.value)}
+                                    className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    placeholder="Nome do Livro"
+                                />
+                                <textarea
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
+                                    rows={2}
+                                    className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    placeholder="Descrição"
+                                />
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => handleSaveEdit(group.id)}
+                                        disabled={loading}
+                                        className="flex items-center gap-2 px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 text-sm"
+                                    >
+                                        <Save size={14} />
+                                        Salvar
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setEditingId(null)
+                                            setTitle('')
+                                            setBookTitle('')
+                                            setDescription('')
+                                        }}
+                                        className="flex items-center gap-2 px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700 text-sm"
+                                    >
+                                        <X size={14} />
+                                        Cancelar
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            // View Mode
+                            <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                    <h3 className="font-semibold text-slate-900 dark:text-white">
+                                        {group.title}
+                                    </h3>
+                                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                                        Livro: {group.book_title}
+                                    </p>
+                                    {group.description && (
+                                        <p className="text-sm text-slate-500 dark:text-slate-500 mt-1">
+                                            {group.description}
+                                        </p>
+                                    )}
+                                </div>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => handleEditGroup(group)}
+                                        className="p-2 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-colors"
+                                        title="Editar"
+                                    >
+                                        <Edit2 size={16} />
+                                    </button>
+                                    <button
+                                        onClick={() => handleDeleteGroup(group.id)}
+                                        className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                                        title="Deletar"
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                ))}
+            </div>
         </div>
     )
 }

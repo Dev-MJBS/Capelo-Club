@@ -73,27 +73,9 @@ export default async function AdminPage() {
                     </div>
                 </div>
 
-                {/* Groups List */}
+                {/* Groups Manager */}
                 <div className="mt-8">
-                    <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Grupos Existentes</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {groups?.map((group) => (
-                            <div key={group.id} className="bg-white dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
-                                <h3 className="font-semibold text-slate-900 dark:text-white">{group.title}</h3>
-                                <p className="text-sm text-slate-600 dark:text-slate-400">{group.book_title}</p>
-                                <p className="text-xs text-slate-500 mt-2">{group.description}</p>
-                                <div className="flex gap-2 mt-4">
-                                    <Link
-                                        href={`/group/${group.id}`}
-                                        className="flex-1 text-center px-3 py-1 text-sm bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
-                                    >
-                                        Ver
-                                    </Link>
-                                    <DeleteGroupButton groupId={group.id} groupTitle={group.title} />
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                    <AdminGroupManager initialGroups={groups || []} />
                 </div>
             </main>
         </div>
