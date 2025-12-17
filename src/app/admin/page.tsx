@@ -38,6 +38,12 @@ export default async function AdminPage() {
         .select('*')
         .order('created_at', { ascending: false })
 
+    // Fetch all tags
+    const { data: tags } = await supabase
+        .from('tags')
+        .select('*')
+        .order('post_count', { ascending: false })
+
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
             <header className="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm border-b border-slate-200 dark:border-slate-800">
