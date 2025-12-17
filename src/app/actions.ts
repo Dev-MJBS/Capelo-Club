@@ -98,12 +98,13 @@ export async function toggleVerifiedStatus(userId: string, isVerified: boolean) 
 
 export async function createTweet(formData: FormData) {
     const supabase = await createClient()
-    
+
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { success: false, error: 'Not authenticated' }
 
     const content = formData.get('content') as string
     const imageFile = formData.get('image') as File | null
+    const tagIdsJson = formData.get('tagIds') as string | null
 
     if (!content && (!imageFile || imageFile.size === 0)) {
         return { success: false, error: 'Conteúdo vazio' }
@@ -113,25 +114,43 @@ export async function createTweet(formData: FormData) {
     if (imageFile && imageFile.size > 0) {
         const fileExt = imageFile.name.split('.').pop()
         const fileName = `tweet-${Date.now()}.${fileExt}`
-        
+
         const { error: uploadError } = await supabase.storage
             .from('post_images')
             .upload(fileName, imageFile)
-            
+
         if (uploadError) return { success: false, error: 'Erro ao fazer upload da imagem: ' + uploadError.message }
-        
+
         const { data } = supabase.storage.from('post_images').getPublicUrl(fileName)
         imageUrl = data.publicUrl
     }
 
-    const { error } = await supabase.from('posts').insert({
+    const { data: post, error } = await supabase.from('posts').insert({
         content,
         image_url: imageUrl,
         user_id: user.id,
         // group_id is null for tweets
-    })
+    }).select().single()
 
     if (error) return { success: false, error: error.message }
+
+    // Save tags if provided
+    if (tagIdsJson && post) {
+        try {
+            const tagIds = JSON.parse(tagIdsJson) as string[]
+            if (tagIds.length > 0) {
+                const tagInserts = tagIds.map(tagId => ({
+                    post_id: post.id,
+                    tag_id: tagId
+                }))
+
+                await supabase.from('post_tags').insert(tagInserts)
+            }
+        } catch (e) {
+            console.error('Error saving tags:', e)
+            // Don't fail the whole post if tags fail
+        }
+    }
 
     revalidatePath('/dashboard')
     return { success: true }

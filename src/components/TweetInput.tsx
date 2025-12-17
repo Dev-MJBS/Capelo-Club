@@ -4,12 +4,23 @@ import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Image as ImageIcon, Send, Loader2, X } from 'lucide-react'
 import { createTweet } from '@/app/actions'
+import TagSelector from './TagSelector'
+
+interface Tag {
+    id: string
+    name: string
+    slug: string
+    color: string
+    icon?: string
+    post_count: number
+}
 
 export default function TweetInput({ userAvatar }: { userAvatar?: string }) {
     const router = useRouter()
     const [content, setContent] = useState('')
     const [image, setImage] = useState<File | null>(null)
     const [imagePreview, setImagePreview] = useState<string | null>(null)
+    const [selectedTags, setSelectedTags] = useState<Tag[]>([])
     const [loading, setLoading] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -41,6 +52,10 @@ export default function TweetInput({ userAvatar }: { userAvatar?: string }) {
             if (image) {
                 formData.append('image', image)
             }
+            // Add tag IDs to formData
+            if (selectedTags.length > 0) {
+                formData.append('tagIds', JSON.stringify(selectedTags.map(t => t.id)))
+            }
 
             const result = await createTweet(formData)
 
@@ -49,6 +64,7 @@ export default function TweetInput({ userAvatar }: { userAvatar?: string }) {
             }
 
             setContent('')
+            setSelectedTags([])
             removeImage()
         } catch (error: any) {
             console.error(error)
@@ -63,9 +79,9 @@ export default function TweetInput({ userAvatar }: { userAvatar?: string }) {
             <form onSubmit={handleSubmit}>
                 <div className="flex gap-4">
                     <div className="flex-shrink-0">
-                        <img 
-                            src={userAvatar || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'} 
-                            alt="User" 
+                        <img
+                            src={userAvatar || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'}
+                            alt="User"
                             className="w-10 h-10 rounded-full object-cover"
                         />
                     </div>
@@ -77,7 +93,7 @@ export default function TweetInput({ userAvatar }: { userAvatar?: string }) {
                             maxLength={MAX_CHARS}
                             className="w-full bg-transparent border-none focus:ring-0 text-slate-900 dark:text-white placeholder-slate-500 text-lg resize-none min-h-[80px]"
                         />
-                        
+
                         {imagePreview && (
                             <div className="relative mt-2 mb-4 inline-block">
                                 <img src={imagePreview} alt="Preview" className="max-h-64 rounded-lg border border-slate-200 dark:border-slate-700" />
@@ -90,6 +106,15 @@ export default function TweetInput({ userAvatar }: { userAvatar?: string }) {
                                 </button>
                             </div>
                         )}
+
+                        {/* Tag Selector */}
+                        <div className="mb-3">
+                            <TagSelector
+                                selectedTags={selectedTags}
+                                onTagsChange={setSelectedTags}
+                                maxTags={3}
+                            />
+                        </div>
 
                         <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 mt-2">
                             <div className="flex items-center gap-2">
