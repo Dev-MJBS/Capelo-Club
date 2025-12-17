@@ -33,27 +33,29 @@ export default function QuickPostModal({ isOpen, onClose, preselectedTags = [], 
             console.log('User ID:', userId)
             console.log('Selected tags:', selectedTags)
 
-            // Create post - don't select to avoid column issues
-            const { data: post, error: postError } = await supabase
+            // Create post - no select to avoid any column issues
+            const { data, error: postError } = await supabase
                 .from('posts')
                 .insert({
                     content: content.trim(),
                     user_id: userId,
                 })
-                .select('id')
-                .single()
 
             if (postError) {
                 console.error('Error creating post:', postError)
                 throw new Error(`Erro ao criar post: ${postError.message}`)
             }
 
-            console.log('Post created with ID:', post?.id)
+            console.log('Post created successfully')
+
+            // Get the post ID from the response
+            // Supabase returns the inserted row even without select
+            const postId = (data as any)?.[0]?.id
 
             // Add tags if any
-            if (selectedTags.length > 0 && post) {
+            if (selectedTags.length > 0 && postId) {
                 const tagInserts = selectedTags.map(tag => ({
-                    post_id: post.id,
+                    post_id: postId,
                     tag_id: tag.id
                 }))
 
