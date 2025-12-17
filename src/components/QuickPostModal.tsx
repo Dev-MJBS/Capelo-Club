@@ -29,6 +29,10 @@ export default function QuickPostModal({ isOpen, onClose, preselectedTags = [], 
         try {
             const supabase = createClient()
 
+            console.log('Creating post with content:', content.trim())
+            console.log('User ID:', userId)
+            console.log('Selected tags:', selectedTags)
+
             // Create post
             const { data: post, error: postError } = await supabase
                 .from('posts')
@@ -39,7 +43,12 @@ export default function QuickPostModal({ isOpen, onClose, preselectedTags = [], 
                 .select()
                 .single()
 
-            if (postError) throw postError
+            if (postError) {
+                console.error('Error creating post:', postError)
+                throw new Error(`Erro ao criar post: ${postError.message}`)
+            }
+
+            console.log('Post created:', post)
 
             // Add tags if any
             if (selectedTags.length > 0 && post) {
@@ -48,21 +57,27 @@ export default function QuickPostModal({ isOpen, onClose, preselectedTags = [], 
                     tag_id: tag.id
                 }))
 
+                console.log('Adding tags:', tagInserts)
+
                 const { error: tagsError } = await supabase
                     .from('post_tags')
                     .insert(tagInserts)
 
-                if (tagsError) console.error('Error adding tags:', tagsError)
+                if (tagsError) {
+                    console.error('Error adding tags:', tagsError)
+                    // Don't throw, just log - post was created successfully
+                }
             }
 
             // Success
+            alert('Post criado com sucesso!')
             setContent('')
             setSelectedTags([])
             onClose()
             router.refresh()
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error creating post:', error)
-            alert('Erro ao criar post')
+            alert(error.message || 'Erro ao criar post')
         } finally {
             setLoading(false)
         }
