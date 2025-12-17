@@ -75,8 +75,14 @@ export default function QuickPostModal({ isOpen, onClose, preselectedTags = [], 
             alert('Post criado com sucesso!')
             setContent('')
             setSelectedTags([])
-            onClose()
+
+            // Refresh first, then close
             router.refresh()
+
+            // Wait a bit for refresh to complete
+            setTimeout(() => {
+                onClose()
+            }, 500)
         } catch (error: any) {
             console.error('Error creating post:', error)
             alert(error.message || 'Erro ao criar post')
