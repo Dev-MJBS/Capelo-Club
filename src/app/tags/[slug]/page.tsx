@@ -114,9 +114,15 @@ export default async function TagPage({ params }: PageProps) {
                 <div className="space-y-4">
                     {posts.length === 0 ? (
                         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-12 text-center">
-                            <p className="text-slate-600 dark:text-slate-400">
+                            <p className="text-slate-600 dark:text-slate-400 mb-4">
                                 Nenhum post com esta tag ainda.
                             </p>
+                            {user && (
+                                <p className="text-sm text-slate-500 mb-4">
+                                    Seja o primeiro a criar um post com <strong>{tag.name}</strong>!
+                                </p>
+                            )}
+                            {user && <CreatePostButton tag={tag} userId={user.id} />}
                         </div>
                     ) : (
                         posts.map((post: any) => (
