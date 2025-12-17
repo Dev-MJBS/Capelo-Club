@@ -26,9 +26,16 @@ export default async function Home() {
                         <BookOpen size={48} className="text-indigo-400 drop-shadow-lg" />
                     </div>
                     <h1 className="text-4xl font-extrabold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-cyan-300 drop-shadow-sm">Capelo's Club</h1>
-                    <p className="text-slate-200 mb-8 font-light text-lg">Sua comunidade exclusiva de leitura.</p>
-                    <div className="flex gap-4">
+                    <p className="text-slate-200 mb-2 font-light text-lg">Sua comunidade exclusiva de leitura.</p>
+                    <p className="text-indigo-300 mb-8 text-sm">🔒 Acesso apenas por convite</p>
+                    <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                         <LoginButton />
+                        <Link
+                            href="/register"
+                            className="px-6 py-3 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-lg hover:bg-white/20 transition font-medium text-center"
+                        >
+                            Tenho um Convite
+                        </Link>
                     </div>
                 </div>
             </div>
