@@ -23,9 +23,11 @@ export default function NotificationCenter({ userId }: { userId: string }) {
     const [notifications, setNotifications] = useState<Notification[]>([])
     const [unreadCount, setUnreadCount] = useState(0)
     const [loading, setLoading] = useState(false)
+    const [mounted, setMounted] = useState(false)
     const dropdownRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
+        setMounted(true)
         loadNotifications()
         subscribeToNotifications()
 
@@ -127,6 +129,17 @@ export default function NotificationCenter({ userId }: { userId: string }) {
         }
     }
 
+    // Prevent hydration mismatch
+    if (!mounted) {
+        return (
+            <div className="relative">
+                <button className="relative p-2 text-slate-600 dark:text-slate-400 rounded-lg">
+                    <Bell size={20} />
+                </button>
+            </div>
+        )
+    }
+
     return (
         <div className="relative" ref={dropdownRef}>
             {/* Bell Icon */}
@@ -185,8 +198,8 @@ export default function NotificationCenter({ userId }: { userId: string }) {
                                 <div
                                     key={notification.id}
                                     className={`border-b border-slate-100 dark:border-slate-800 last:border-0 transition-colors ${!notification.read
-                                            ? 'bg-indigo-50 dark:bg-indigo-950/20'
-                                            : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                                        ? 'bg-indigo-50 dark:bg-indigo-950/20'
+                                        : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'
                                         }`}
                                 >
                                     {notification.link ? (
