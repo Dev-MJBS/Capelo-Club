@@ -33,14 +33,14 @@ export default function QuickPostModal({ isOpen, onClose, preselectedTags = [], 
             console.log('User ID:', userId)
             console.log('Selected tags:', selectedTags)
 
-            // Create post
+            // Create post - don't select to avoid column issues
             const { data: post, error: postError } = await supabase
                 .from('posts')
                 .insert({
                     content: content.trim(),
                     user_id: userId,
                 })
-                .select()
+                .select('id')
                 .single()
 
             if (postError) {
@@ -48,7 +48,7 @@ export default function QuickPostModal({ isOpen, onClose, preselectedTags = [], 
                 throw new Error(`Erro ao criar post: ${postError.message}`)
             }
 
-            console.log('Post created:', post)
+            console.log('Post created with ID:', post?.id)
 
             // Add tags if any
             if (selectedTags.length > 0 && post) {
