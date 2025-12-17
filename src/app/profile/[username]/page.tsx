@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Calendar, Award, Heart, MessageCircle, FileText, Settings } from 'lucide-react'
 import BadgeDisplay from '@/components/BadgeDisplay'
-import Image from 'next/image'
 
 interface PageProps {
     params: Promise<{ username: string }>
@@ -26,9 +25,34 @@ export default async function UserProfilePage({ params }: PageProps) {
     const { data: { user } } = await supabase.auth.getUser()
     const isOwnProfile = user?.id === profile.id
 
-    // Get user statistics using the function
-    const { data: stats } = await supabase.rpc('get_user_stats', { user_uuid: profile.id })
-    const userStats = stats?.[0] || { posts_count: 0, likes_received: 0, comments_count: 0, member_days: 0 }
+    // Get user statistics directly
+    const { count: postsCount } = await supabase
+        .from('posts')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', profile.id)
+        .is('parent_id', null)
+
+    const { data: postsWithLikes } = await supabase
+        .from('posts')
+        .select('likes_count')
+        .eq('user_id', profile.id)
+
+    const likesReceived = postsWithLikes?.reduce((sum, post) => sum + (post.likes_count || 0), 0) || 0
+
+    const { count: commentsCount } = await supabase
+        .from('posts')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', profile.id)
+        .not('parent_id', 'is', null)
+
+    const memberDays = Math.floor((Date.now() - new Date(profile.created_at).getTime()) / (1000 * 60 * 60 * 24))
+
+    const userStats = {
+        posts_count: postsCount || 0,
+        likes_received: likesReceived,
+        comments_count: commentsCount || 0,
+        member_days: memberDays
+    }
 
     // Get user badges
     const { data: userBadges } = await supabase
@@ -90,12 +114,10 @@ export default async function UserProfilePage({ params }: PageProps) {
                         {/* Avatar */}
                         <div className="flex-shrink-0">
                             <div className="relative">
-                                <Image
+                                <img
                                     src={profile.avatar_url || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'}
                                     alt={profile.username}
-                                    width={120}
-                                    height={120}
-                                    className="rounded-full object-cover border-4 border-slate-200 dark:border-slate-700"
+                                    className="w-32 h-32 rounded-full object-cover border-4 border-slate-200 dark:border-slate-700"
                                 />
                                 {profile.is_verified && (
                                     <div className="absolute bottom-0 right-0 bg-blue-500 rounded-full p-1.5 border-2 border-white dark:border-slate-900">
