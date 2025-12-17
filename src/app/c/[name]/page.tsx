@@ -31,7 +31,7 @@ export default async function SubclubPage(props: { params: Promise<{ name: strin
         `)
         .eq('subclub_id', subclub.id)
         .is('parent_id', null)
-        .order('created_at', { ascending: false })
+        .order('id', { ascending: false })
 
     const { data: { user } } = await supabase.auth.getUser()
 
