@@ -4,11 +4,22 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
+import TagSelector from './TagSelector'
+
+interface Tag {
+    id: string
+    name: string
+    slug: string
+    color: string
+    icon?: string
+    post_count: number
+}
 
 export default function SubclubPostForm({ subclubName, subclubId }: { subclubName: string, subclubId: string }) {
     const router = useRouter()
     const [title, setTitle] = useState('')
     const [content, setContent] = useState('')
+    const [selectedTags, setSelectedTags] = useState<Tag[]>([])
     const [loading, setLoading] = useState(false)
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -24,15 +35,25 @@ export default function SubclubPostForm({ subclubName, subclubId }: { subclubNam
                 return
             }
 
-            const { error } = await supabase.from('posts').insert({
+            const { data: post, error } = await supabase.from('posts').insert({
                 subclub_id: subclubId,
                 user_id: user.id,
                 title,
                 content,
                 // parent_id is null for threads
-            })
+            }).select().single()
 
             if (error) throw error
+
+            // Save tags if provided
+            if (selectedTags.length > 0 && post) {
+                const tagInserts = selectedTags.map(tag => ({
+                    post_id: post.id,
+                    tag_id: tag.id
+                }))
+
+                await supabase.from('post_tags').insert(tagInserts)
+            }
 
             router.push(`/c/${subclubName}`)
             router.refresh()
@@ -66,6 +87,15 @@ export default function SubclubPostForm({ subclubName, subclubId }: { subclubNam
                         placeholder="Conteúdo do post..."
                         className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-transparent text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none min-h-[200px]"
                         required
+                    />
+                </div>
+
+                {/* Tag Selector */}
+                <div>
+                    <TagSelector
+                        selectedTags={selectedTags}
+                        onTagsChange={setSelectedTags}
+                        maxTags={5}
                     />
                 </div>
 
