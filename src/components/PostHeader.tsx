@@ -66,7 +66,7 @@ export default function PostHeader({ post, currentUserId, isAdmin = false }: Pos
                 <span>•</span>
                 <span className="flex items-center gap-1">
                     <Link
-                        href={`/profile/${post.user?.username}`}
+                        href={`/profile/${encodeURIComponent(post.user?.username || '')}`}
                         className="text-slate-700 dark:text-slate-300 flex items-center gap-1 font-medium hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                         onClick={(e) => e.stopPropagation()}
                     >

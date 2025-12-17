@@ -9,17 +9,29 @@ interface PageProps {
 }
 
 export default async function UserProfilePage({ params }: PageProps) {
-    const { username } = await params
+    const { username: encodedUsername } = await params
+    const username = decodeURIComponent(encodedUsername)
     const supabase = await createClient()
 
+    console.log('Loading profile for username:', username)
+
     // Fetch user profile
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('username', username)
         .single()
 
-    if (!profile) notFound()
+    if (profileError) {
+        console.error('Error loading profile:', profileError)
+    }
+
+    if (!profile) {
+        console.log('Profile not found for username:', username)
+        notFound()
+    }
+
+    console.log('Profile loaded successfully:', profile.username)
 
     // Get current user to check if viewing own profile
     const { data: { user } } = await supabase.auth.getUser()
