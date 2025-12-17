@@ -1,4 +1,3 @@
-import LoginButton from '@/components/LoginButton'
 import { BookOpen, Compass } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
@@ -29,7 +28,12 @@ export default async function Home() {
                     <p className="text-slate-200 mb-2 font-light text-lg">Sua comunidade exclusiva de leitura.</p>
                     <p className="text-indigo-300 mb-8 text-sm">🔒 Acesso apenas por convite</p>
                     <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                        <LoginButton />
+                        <Link
+                            href="/login"
+                            className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium text-center shadow-lg"
+                        >
+                            Fazer Login
+                        </Link>
                         <Link
                             href="/register"
                             className="px-6 py-3 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-lg hover:bg-white/20 transition font-medium text-center"
