@@ -86,7 +86,8 @@ export default function InviteRegisterPage() {
                 password: formData.password,
                 options: {
                     data: {
-                        username: formData.username
+                        username: formData.username,
+                        invite_code: inviteCode.trim().toUpperCase() // CRÍTICO: Passar código para validação no trigger
                     }
                 }
             })
