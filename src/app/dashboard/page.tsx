@@ -27,17 +27,26 @@ export default async function Dashboard() {
     // Fetch groups
     const { data: groups } = await supabase.from('groups').select('*').order('created_at', { ascending: false })
 
-    // Fetch recent posts (Tweets + Group Posts)
+    // Fetch recent posts (Tweets + Group Posts) with tags
     const { data: posts } = await supabase
         .from('posts')
         .select(`
             *,
             group:groups(id, title, book_title),
             subclub:subclubs(id, name, display_name),
-            user:profiles(username, avatar_url, is_verified)
+            user:profiles(username, avatar_url, is_verified),
+            post_tags(
+                tags(id, name, slug, color, icon)
+            )
         `)
         .order('created_at', { ascending: false })
         .limit(50)
+
+    // Transform posts to include tags
+    const transformedPosts = posts?.map(post => ({
+        ...post,
+        tags: post.post_tags?.map((pt: any) => pt.tags).filter(Boolean) || []
+    })) || []
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -55,19 +64,19 @@ export default async function Dashboard() {
                             {/* Optional: Filter buttons (Hot, New, Top) */}
                         </div>
 
-                        {(!posts || posts.length === 0) ? (
+                        {(!transformedPosts || transformedPosts.length === 0) ? (
                             <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-xl border border-dashed border-slate-300 dark:border-slate-700">
                                 <p className="text-slate-500 text-lg mb-2">Seu feed está vazio!</p>
                                 <p className="text-slate-400 text-sm">Seja o primeiro a publicar algo.</p>
                             </div>
                         ) : (
                             <div className="space-y-4">
-                                {posts.map((post) => {
+                                {transformedPosts.map((post) => {
                                     // Allow posts without group (tweets)
                                     if (!post.user) return null
                                     return (
                                         <ErrorBoundary key={post.id}>
-                                            <FeedPostCard 
+                                            <FeedPostCard
                                                 post={{
                                                     id: post.id,
                                                     title: post.title || '',
@@ -78,9 +87,10 @@ export default async function Dashboard() {
                                                     group: post.group,
                                                     subclub: post.subclub,
                                                     user: post.user,
-                                                    user_id: post.user_id
-                                                }} 
-                                                currentUserId={user.id} 
+                                                    user_id: post.user_id,
+                                                    tags: post.tags
+                                                }}
+                                                currentUserId={user.id}
                                                 isAdmin={!!profile?.is_admin}
                                             />
                                         </ErrorBoundary>
@@ -92,6 +102,29 @@ export default async function Dashboard() {
 
                     {/* Right Column: Sidebar (Groups) */}
                     <div className="lg:col-span-4 space-y-8">
+                        {/* Explore Tags CTA */}
+                        <div className="bg-gradient-to-r from-pink-600 to-rose-600 rounded-xl p-6 text-white shadow-lg">
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                                        <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                                    </svg>
+                                </div>
+                                <h3 className="font-bold text-lg">Explore por Tags</h3>
+                            </div>
+                            <p className="text-pink-100 text-sm mb-4">
+                                Descubra posts por categoria: Romance, Ficção Científica, Fantasia e muito mais!
+                            </p>
+                            <Link
+                                href="/tags"
+                                className="block w-full text-center bg-white text-pink-600 font-bold py-2 px-4 rounded-lg hover:bg-pink-50 transition-colors"
+                            >
+                                Ver Todas as Tags 🏷️
+                            </Link>
+                        </div>
+
+                        {/* Explore Subclubs CTA */}
                         {/* Explore Subclubs CTA */}
                         <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-6 text-white shadow-lg">
                             <div className="flex items-center gap-3 mb-3">
@@ -103,8 +136,8 @@ export default async function Dashboard() {
                             <p className="text-indigo-100 text-sm mb-4">
                                 Descubra novas comunidades, participe de discussões e encontre seu próximo livro favorito.
                             </p>
-                            <Link 
-                                href="/subclubs" 
+                            <Link
+                                href="/subclubs"
                                 className="block w-full text-center bg-white text-indigo-600 font-bold py-2 px-4 rounded-lg hover:bg-indigo-50 transition-colors"
                             >
                                 Ver Todos os Clubes
