@@ -30,7 +30,7 @@ export default function LikeButton({ postId, initialLikes, currentUserId }: Like
                 .eq('post_id', postId)
                 .eq('user_id', currentUserId)
                 .maybeSingle()
-            
+
             if (data) setLiked(true)
             setChecking(false)
         }
@@ -42,43 +42,57 @@ export default function LikeButton({ postId, initialLikes, currentUserId }: Like
         e.preventDefault()
         e.stopPropagation()
 
+        console.log('Like button clicked', { postId, currentUserId, liked, loading })
+
         if (loading) return
         if (!currentUserId) {
-            // Optional: Redirect to login or show toast
+            console.log('No user ID - user not logged in')
+            alert('Você precisa estar logado para curtir')
             return
         }
 
         setLoading(true)
-        
+
         // Optimistic update
         const previousLiked = liked
         const previousLikes = likes
-        
+
         setLiked(!previousLiked)
         setLikes(previousLiked ? previousLikes - 1 : previousLikes + 1)
 
         try {
             const supabase = createClient()
-            
+
             if (previousLiked) {
                 // Unlike
+                console.log('Unliking post...')
                 const { error } = await supabase
                     .from('post_likes')
                     .delete()
                     .eq('post_id', postId)
                     .eq('user_id', currentUserId)
-                
-                if (error) throw error
+
+                if (error) {
+                    console.error('Error unliking:', error)
+                    throw error
+                }
+                console.log('Unlike successful')
             } else {
                 // Like
+                console.log('Liking post...')
                 const { error } = await supabase
                     .from('post_likes')
                     .insert({ post_id: postId, user_id: currentUserId })
-                
-                if (error) throw error
+
+                if (error) {
+                    console.error('Error liking:', error)
+                    throw error
+                }
+                console.log('Like successful')
             }
         } catch (error) {
             console.error('Erro ao curtir post:', error)
+            alert('Erro ao curtir post. Veja o console para detalhes.')
             // Revert
             setLiked(previousLiked)
             setLikes(previousLikes)
@@ -91,11 +105,10 @@ export default function LikeButton({ postId, initialLikes, currentUserId }: Like
         <button
             onClick={handleLike}
             disabled={loading || checking}
-            className={`flex items-center gap-1.5 px-2 py-1 rounded-full transition-all ${
-                liked
+            className={`flex items-center gap-1.5 px-2 py-1 rounded-full transition-all ${liked
                     ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
                     : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
-            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
             title="Curtir post"
         >
             {loading ? (
