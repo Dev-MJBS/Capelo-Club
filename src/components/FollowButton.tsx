@@ -57,7 +57,10 @@ export default function FollowButton({
                     .eq('follower_id', currentUserId)
                     .eq('following_id', targetUserId)
 
-                if (error) throw error
+                if (error) {
+                    console.error('Erro ao deixar de seguir:', error)
+                    throw new Error(`Erro ao deixar de seguir: ${error.message}`)
+                }
                 setIsFollowing(false)
             } else {
                 // Seguir
@@ -68,14 +71,17 @@ export default function FollowButton({
                         following_id: targetUserId
                     })
 
-                if (error) throw error
+                if (error) {
+                    console.error('Erro ao seguir:', error)
+                    throw new Error(`Erro ao seguir: ${error.message}`)
+                }
                 setIsFollowing(true)
             }
 
             router.refresh()
-        } catch (error) {
+        } catch (error: any) {
             console.error('Erro ao seguir/deixar de seguir:', error)
-            alert('Erro ao processar ação')
+            alert(error.message || 'Erro ao processar ação. Verifique se a tabela follows existe no Supabase.')
         } finally {
             setLoading(false)
         }
