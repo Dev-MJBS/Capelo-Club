@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import FeedPostCard from '@/components/FeedPostCard'
 import TagBadge from '@/components/TagBadge'
+import CreatePostButton from '@/components/CreatePostButton'
 
 interface PageProps {
     params: Promise<{ slug: string }>
@@ -93,8 +94,9 @@ export default async function TagPage({ params }: PageProps) {
                         Voltar
                     </Link>
 
-                    <div className="flex items-center gap-4 mb-4">
+                    <div className="flex items-center justify-between mb-4">
                         <TagBadge tag={tag} size="lg" clickable={false} />
+                        {user && <CreatePostButton tag={tag} userId={user.id} />}
                     </div>
 
                     {tag.description && (
