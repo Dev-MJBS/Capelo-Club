@@ -252,12 +252,20 @@ export default async function UserProfilePage({ params }: PageProps) {
                                     href={post.subclub ? `/c/${post.subclub.name}/post/${post.id}` : `/post/${post.id}`}
                                     className="block p-4 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                                 >
-                                    <h3 className="font-semibold text-slate-900 dark:text-white mb-1">
-                                        {post.title || 'Sem título'}
-                                    </h3>
-                                    <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 mb-2">
-                                        {post.content}
-                                    </p>
+                                    {post.title ? (
+                                        <>
+                                            <h3 className="font-semibold text-slate-900 dark:text-white mb-1">
+                                                {post.title}
+                                            </h3>
+                                            <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 mb-2">
+                                                {post.content}
+                                            </p>
+                                        </>
+                                    ) : (
+                                        <p className="text-sm text-slate-900 dark:text-white line-clamp-3 mb-2">
+                                            {post.content}
+                                        </p>
+                                    )}
                                     <div className="flex items-center gap-4 text-xs text-slate-500">
                                         <span>{new Date(post.created_at).toLocaleDateString('pt-BR')}</span>
                                         <span className="flex items-center gap-1">
