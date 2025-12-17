@@ -8,6 +8,7 @@ import toast from 'react-hot-toast'
 import PostHeader from './PostHeader'
 import PostContent from './PostContent'
 import PostActions from './PostActions'
+import TagBadge from './TagBadge'
 
 export interface FeedPost {
     id: string
@@ -34,6 +35,13 @@ export interface FeedPost {
         is_verified?: boolean
     }
     user_id: string
+    tags?: Array<{
+        id: string
+        name: string
+        slug: string
+        color: string
+        icon?: string
+    }>
 }
 
 interface FeedPostCardProps {
@@ -160,6 +168,16 @@ export default function FeedPostCard({ post, currentUserId, isAdmin = false }: F
             <article className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all shadow-sm hover:shadow-md">
                 <PostHeader post={post} currentUserId={currentUserId} isAdmin={isAdmin} />
                 <PostContent post={post} />
+
+                {/* Tags */}
+                {post.tags && post.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-4" onClick={(e) => e.stopPropagation()}>
+                        {post.tags.map((tag) => (
+                            <TagBadge key={tag.id} tag={tag} size="sm" />
+                        ))}
+                    </div>
+                )}
+
                 <PostActions
                     post={post}
                     currentUserId={currentUserId}
