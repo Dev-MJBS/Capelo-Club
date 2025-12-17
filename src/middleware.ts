@@ -47,10 +47,40 @@ export async function updateSession(request: NextRequest) {
 
     const path = request.nextUrl.pathname
 
+    // Check if user is banned or kicked
+    if (user && !path.startsWith('/banned') && !path.startsWith('/kicked')) {
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('is_banned, banned_reason, kicked_until, kick_reason')
+            .eq('id', user.id)
+            .single()
+
+        // Redirect banned users
+        if (profile?.is_banned) {
+            const url = request.nextUrl.clone()
+            url.pathname = '/banned'
+            url.searchParams.set('reason', profile.banned_reason || 'Violação dos termos de uso')
+            return NextResponse.redirect(url)
+        }
+
+        // Redirect kicked users
+        if (profile?.kicked_until && new Date(profile.kicked_until) > new Date()) {
+            const url = request.nextUrl.clone()
+            url.pathname = '/kicked'
+            url.searchParams.set('until', profile.kicked_until)
+            url.searchParams.set('reason', profile.kick_reason || 'Comportamento inadequado')
+            return NextResponse.redirect(url)
+        }
+    }
+
     // Protected routes
     if (
         !user &&
-        (path.startsWith('/dashboard') || path.startsWith('/group'))
+        (path.startsWith('/dashboard') ||
+            path.startsWith('/group') ||
+            path.startsWith('/admin') ||
+            path.startsWith('/profile') ||
+            path.startsWith('/explore'))
     ) {
         const url = request.nextUrl.clone()
         url.pathname = '/'
