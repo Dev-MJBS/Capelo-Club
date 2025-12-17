@@ -32,12 +32,16 @@ export default function FollowButton({
 
     const checkFollowStatus = async () => {
         const supabase = createClient()
-        const { data } = await supabase
+        const { data, error } = await supabase
             .from('follows')
             .select('id')
             .eq('follower_id', currentUserId)
             .eq('following_id', targetUserId)
-            .single()
+            .maybeSingle()
+
+        if (error) {
+            console.error('Erro ao verificar status de seguidor:', error)
+        }
 
         setIsFollowing(!!data)
     }
