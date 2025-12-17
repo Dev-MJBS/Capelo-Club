@@ -50,7 +50,7 @@ export default async function UserProfilePage({ params }: PageProps) {
     const badges = userBadges?.map(ub => ub.badges).filter(Boolean) || []
 
     // Get recent posts
-    const { data: recentPosts } = await supabase
+    const { data: posts } = await supabase
         .from('posts')
         .select(`
       id,
@@ -65,6 +65,12 @@ export default async function UserProfilePage({ params }: PageProps) {
         .is('parent_id', null)
         .order('created_at', { ascending: false })
         .limit(10)
+
+    // Transform posts to handle subclub as single object
+    const recentPosts = posts?.map(post => ({
+        ...post,
+        subclub: Array.isArray(post.subclub) ? post.subclub[0] : post.subclub
+    })) || []
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
