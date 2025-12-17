@@ -71,11 +71,16 @@ export default async function AdminPage() {
                             <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">{groups?.length || 0}</p>
                         </div>
 
+                        <div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Total de Tags</h3>
+                            <p className="text-3xl font-bold text-cyan-600 dark:text-cyan-400">{tags?.length || 0}</p>
+                        </div>
+
                         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
                             <p className="text-sm text-blue-700 dark:text-blue-300">
                                 <span className="font-semibold">Você é admin! 👑</span>
                                 <br />
-                                Apenas você pode criar e deletar grupos.
+                                Gerencie grupos e tags da comunidade.
                             </p>
                         </div>
                     </div>
