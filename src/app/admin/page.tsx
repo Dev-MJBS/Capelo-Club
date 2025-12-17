@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import AdminGroupManager from '@/components/AdminGroupManager'
 import AdminTagManager from '@/components/AdminTagManager'
+import InviteManager from '@/components/InviteManager'
+import ModerationPanel from '@/components/ModerationPanel'
 import DeleteGroupButton from '@/components/DeleteGroupButton'
 import { ArrowLeft } from 'lucide-react'
 
@@ -45,6 +47,12 @@ export default async function AdminPage() {
         .select('*')
         .order('post_count', { ascending: false })
 
+    // Fetch invite codes
+    const { data: inviteCodes } = await supabase
+        .from('invite_codes')
+        .select('*')
+        .order('created_at', { ascending: false })
+
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
             <header className="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm border-b border-slate-200 dark:border-slate-800">
@@ -60,12 +68,19 @@ export default async function AdminPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Manager Column */}
                     <div className="lg:col-span-2 space-y-8">
+                        <InviteManager initialCodes={inviteCodes || []} />
+                        <ModerationPanel currentUserId={user.id} />
                         <AdminGroupManager initialGroups={groups || []} />
                         <AdminTagManager initialTags={tags || []} />
                     </div>
 
                     {/* Stats Column */}
                     <div className="space-y-4">
+                        <div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Códigos de Convite</h3>
+                            <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">{inviteCodes?.length || 0}</p>
+                        </div>
+
                         <div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
                             <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Total de Grupos</h3>
                             <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">{groups?.length || 0}</p>
@@ -80,7 +95,7 @@ export default async function AdminPage() {
                             <p className="text-sm text-blue-700 dark:text-blue-300">
                                 <span className="font-semibold">Você é admin! 👑</span>
                                 <br />
-                                Gerencie grupos e tags da comunidade.
+                                Gerencie convites, moderação, grupos e tags.
                             </p>
                         </div>
                     </div>
