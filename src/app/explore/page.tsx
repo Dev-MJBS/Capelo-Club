@@ -1,9 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { TrendingUp, Users, Hash, Sparkles, ArrowRight } from 'lucide-react'
-import Image from 'next/image'
 import TagBadge from '@/components/TagBadge'
 import FollowButton from '@/components/FollowButton'
+import UserAvatar from '@/components/UserAvatar'
 import { redirect } from 'next/navigation'
 
 export default async function ExplorePage() {
@@ -113,12 +113,10 @@ export default async function ExplorePage() {
                                                 className="block bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all"
                                             >
                                                 <div className="flex items-start gap-3">
-                                                    <Image
-                                                        src={profile?.avatar_url || '/default-avatar.png'}
-                                                        alt={profile?.username || 'User'}
-                                                        width={40}
-                                                        height={40}
-                                                        className="rounded-full"
+                                                    <UserAvatar
+                                                        src={profile?.avatar_url}
+                                                        username={profile?.username || 'User'}
+                                                        size={40}
                                                     />
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-center gap-2 mb-1">
@@ -204,12 +202,10 @@ export default async function ExplorePage() {
                                         <div key={suggestedUser.id} className="p-4">
                                             <div className="flex items-start gap-3 mb-3">
                                                 <Link href={`/profile/${suggestedUser.username}`}>
-                                                    <Image
-                                                        src={suggestedUser.avatar_url || '/default-avatar.png'}
-                                                        alt={suggestedUser.username}
-                                                        width={40}
-                                                        height={40}
-                                                        className="rounded-full"
+                                                    <UserAvatar
+                                                        src={suggestedUser.avatar_url}
+                                                        username={suggestedUser.username}
+                                                        size={40}
                                                     />
                                                 </Link>
                                                 <div className="flex-1 min-w-0">
