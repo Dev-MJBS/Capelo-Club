@@ -12,7 +12,7 @@ interface Tag {
     slug: string
     color: string
     icon?: string
-    post_count: number
+    post_count?: number
 }
 
 export default function TweetInput({ userAvatar }: { userAvatar?: string }) {
