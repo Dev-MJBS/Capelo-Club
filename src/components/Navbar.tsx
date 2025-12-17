@@ -6,11 +6,12 @@ import { ModeToggle } from '@/components/mode-toggle'
 import { type User as SupabaseUser } from '@supabase/supabase-js'
 import NotificationCenter from './NotificationCenter'
 import Logo from './Logo'
+import GlobalSearch from './GlobalSearch'
 
 export default function Navbar({ user, isAdmin, onOpenMobileMenu }: { user: SupabaseUser, isAdmin?: boolean, onOpenMobileMenu?: () => void }) {
     return (
         <header className="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm border-b border-slate-200 dark:border-slate-800">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                     {onOpenMobileMenu && (
                         <button onClick={onOpenMobileMenu} className="lg:hidden p-2 -ml-2 text-slate-600 dark:text-slate-400">
@@ -18,6 +19,11 @@ export default function Navbar({ user, isAdmin, onOpenMobileMenu }: { user: Supa
                         </button>
                     )}
                     <Logo size="md" showText animated />
+                </div>
+
+                {/* Search - Hidden on mobile */}
+                <div className="hidden md:block flex-1 max-w-xl">
+                    <GlobalSearch />
                 </div>
 
                 <div className="flex items-center gap-2 sm:gap-4">
