@@ -1,7 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Calendar, Award, Heart, MessageCircle, FileText, Settings } from 'lucide-react'
+import { ArrowLeft, Calendar, MapPin, BookOpen, Settings, MessageCircle, Heart, Award, FileText } from 'lucide-react'
+import Image from 'next/image'
+import FollowButton from '@/components/FollowButton'
+import FollowStats from '@/components/FollowStats'
 import BadgeDisplay from '@/components/BadgeDisplay'
 
 interface PageProps {
@@ -153,7 +156,7 @@ export default async function UserProfilePage({ params }: PageProps) {
                                         Membro desde {new Date(profile.created_at).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
                                     </div>
                                 </div>
-                                {isOwnProfile && (
+                                {isOwnProfile ? (
                                     <Link
                                         href="/settings/profile"
                                         className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-2 text-sm font-medium"
@@ -161,8 +164,20 @@ export default async function UserProfilePage({ params }: PageProps) {
                                         <Settings size={16} />
                                         Editar Perfil
                                     </Link>
+                                ) : user && (
+                                    <FollowButton
+                                        targetUserId={profile.id}
+                                        currentUserId={user.id}
+                                    />
                                 )}
                             </div>
+
+                            {/* Follow Stats */}
+                            <FollowStats
+                                username={profile.username}
+                                followersCount={profile.followers_count || 0}
+                                followingCount={profile.following_count || 0}
+                            />
 
                             {/* Bio */}
                             {profile.bio && (
