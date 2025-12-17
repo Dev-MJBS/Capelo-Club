@@ -7,6 +7,8 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { PlusCircle, Compass } from 'lucide-react'
 import TweetInput from '@/components/TweetInput'
+import FeedTabs from '@/components/FeedTabs'
+import FollowingFeed from '@/components/FollowingFeed'
 
 export default async function Dashboard() {
     const supabase = await createClient()
@@ -59,45 +61,52 @@ export default async function Dashboard() {
                     <div className="lg:col-span-8 space-y-6">
                         <TweetInput userAvatar={profile?.avatar_url} />
 
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Feed</h2>
-                            {/* Optional: Filter buttons (Hot, New, Top) */}
-                        </div>
-
-                        {(!transformedPosts || transformedPosts.length === 0) ? (
-                            <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-xl border border-dashed border-slate-300 dark:border-slate-700">
-                                <p className="text-slate-500 text-lg mb-2">Seu feed está vazio!</p>
-                                <p className="text-slate-400 text-sm">Seja o primeiro a publicar algo.</p>
-                            </div>
-                        ) : (
-                            <div className="space-y-4">
-                                {transformedPosts.map((post) => {
-                                    // Allow posts without group (tweets)
-                                    if (!post.user) return null
-                                    return (
-                                        <ErrorBoundary key={post.id}>
-                                            <FeedPostCard
-                                                post={{
-                                                    id: post.id,
-                                                    title: post.title || '',
-                                                    content: post.content,
-                                                    created_at: post.created_at,
-                                                    likes_count: post.likes_count,
-                                                    image_url: post.image_url,
-                                                    group: post.group,
-                                                    subclub: post.subclub,
-                                                    user: post.user,
-                                                    user_id: post.user_id,
-                                                    tags: post.tags
-                                                }}
-                                                currentUserId={user.id}
-                                                isAdmin={!!profile?.is_admin}
-                                            />
-                                        </ErrorBoundary>
-                                    )
-                                })}
-                            </div>
-                        )}
+                        <FeedTabs
+                            allFeedContent={
+                                <>
+                                    {(!transformedPosts || transformedPosts.length === 0) ? (
+                                        <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-xl border border-dashed border-slate-300 dark:border-slate-700">
+                                            <p className="text-slate-500 text-lg mb-2">Seu feed está vazio!</p>
+                                            <p className="text-slate-400 text-sm">Seja o primeiro a publicar algo.</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-4">
+                                            {transformedPosts.map((post) => {
+                                                // Allow posts without group (tweets)
+                                                if (!post.user) return null
+                                                return (
+                                                    <ErrorBoundary key={post.id}>
+                                                        <FeedPostCard
+                                                            post={{
+                                                                id: post.id,
+                                                                title: post.title || '',
+                                                                content: post.content,
+                                                                created_at: post.created_at,
+                                                                likes_count: post.likes_count,
+                                                                image_url: post.image_url,
+                                                                group: post.group,
+                                                                subclub: post.subclub,
+                                                                user: post.user,
+                                                                user_id: post.user_id,
+                                                                tags: post.tags
+                                                            }}
+                                                            currentUserId={user.id}
+                                                            isAdmin={!!profile?.is_admin}
+                                                        />
+                                                    </ErrorBoundary>
+                                                )
+                                            })}
+                                        </div>
+                                    )}
+                                </>
+                            }
+                            followingFeedContent={
+                                <FollowingFeed
+                                    userId={user.id}
+                                    isAdmin={!!profile?.is_admin}
+                                />
+                            }
+                        />
                     </div>
 
                     {/* Right Column: Sidebar (Groups) */}
