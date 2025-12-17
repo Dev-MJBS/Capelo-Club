@@ -15,8 +15,32 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Capelo's Club",
-  description: "Sua comunidade exclusiva de leitura. Conecte-se com leitores apaixonados e discuta seus livros favoritos.",
+  title: {
+    default: 'Capelo Club - Comunidade de Leitores',
+    template: '%s | Capelo Club'
+  },
+  description: 'A maior comunidade de leitores do Brasil. Discuta livros, compartilhe resenhas e conecte-se com outros leitores.',
+  keywords: ['livros', 'leitura', 'comunidade', 'resenhas', 'discussão', 'literatura'],
+  icons: {
+    icon: [
+      { url: '/images/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/images/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/images/favicon.ico', sizes: 'any' }
+    ],
+    apple: [
+      { url: '/images/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }
+    ]
+  },
+  manifest: '/images/site.webmanifest',
+  openGraph: {
+    type: 'website',
+    locale: 'pt_BR',
+    url: 'https://cclub.com.br',
+    title: 'Capelo Club - Comunidade de Leitores',
+    description: 'A maior comunidade de leitores do Brasil',
+    siteName: 'Capelo Club',
+    images: [{ url: '/images/logo.png', width: 1200, height: 630 }]
+  }
 };
 
 import { ThemeProvider } from "@/components/theme-provider"
