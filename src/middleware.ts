@@ -47,13 +47,19 @@ export async function updateSession(request: NextRequest) {
 
     const path = request.nextUrl.pathname
 
-    // Check if user is banned or kicked
+    // Check if user needs validation or is banned/kicked
     if (user && !path.startsWith('/banned') && !path.startsWith('/kicked') && !path.startsWith('/validate-invite')) {
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
             .from('profiles')
-            .select('is_banned, banned_reason, kicked_until, kick_reason')
+            .select('id, is_banned, banned_reason, kicked_until, kick_reason')
             .eq('id', user.id)
             .maybeSingle()
+
+        // Se deu erro na query, deixa passar (evita loop)
+        if (profileError) {
+            console.error('Middleware profile check error:', profileError)
+            return supabaseResponse
+        }
 
         // Se não tem perfil, precisa validar convite
         if (!profile) {
