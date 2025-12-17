@@ -38,6 +38,11 @@ CREATE INDEX IF NOT EXISTS idx_badges_slug ON public.badges(slug);
 ALTER TABLE public.badges ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_badges ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Badges are viewable by everyone" ON public.badges;
+DROP POLICY IF EXISTS "User badges are viewable by everyone" ON public.user_badges;
+DROP POLICY IF EXISTS "Only authenticated users can earn badges" ON public.user_badges;
+
 -- Everyone can view badges
 CREATE POLICY "Badges are viewable by everyone"
     ON public.badges FOR SELECT
