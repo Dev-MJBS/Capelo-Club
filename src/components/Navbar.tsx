@@ -5,6 +5,7 @@ import { LogOut, User, Menu, Bell, Settings } from 'lucide-react'
 import { ModeToggle } from '@/components/mode-toggle'
 import { type User as SupabaseUser } from '@supabase/supabase-js'
 import NotificationCenter from './NotificationCenter'
+import Logo from './Logo'
 
 export default function Navbar({ user, isAdmin, onOpenMobileMenu }: { user: SupabaseUser, isAdmin?: boolean, onOpenMobileMenu?: () => void }) {
     return (
@@ -16,9 +17,7 @@ export default function Navbar({ user, isAdmin, onOpenMobileMenu }: { user: Supa
                             <Menu size={24} />
                         </button>
                     )}
-                    <Link href="/dashboard" className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-cyan-600">
-                        Capelo Club
-                    </Link>
+                    <Logo size="md" showText animated />
                 </div>
 
                 <div className="flex items-center gap-2 sm:gap-4">
