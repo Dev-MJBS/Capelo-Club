@@ -11,7 +11,7 @@ interface Tag {
     slug: string
     color: string
     icon?: string
-    post_count: number
+    post_count?: number
 }
 
 interface TagSelectorProps {
@@ -142,7 +142,7 @@ export default function TagSelector({ selectedTags, onTagsChange, maxTags = 5 }:
                                                     <TagBadge tag={tag} size="sm" clickable={false} />
                                                 </div>
                                                 <span className="text-xs text-slate-500">
-                                                    {tag.post_count} {tag.post_count === 1 ? 'post' : 'posts'}
+                                                    {tag.post_count || 0} {(tag.post_count || 0) === 1 ? 'post' : 'posts'}
                                                 </span>
                                             </button>
                                         ))}
