@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Users, Plus, ArrowLeft } from 'lucide-react'
 import BookOfTheMonthCard from '@/components/BookOfTheMonthCard'
+import TagBadge from '@/components/TagBadge'
 
 export default async function SubclubPage(props: { params: Promise<{ name: string }> }) {
     const params = await props.params;
@@ -23,14 +24,17 @@ export default async function SubclubPage(props: { params: Promise<{ name: strin
         .from('posts')
         .select(`
             *,
-            profiles:user_id ( username, avatar_url, is_verified )
+            profiles:user_id ( username, avatar_url, is_verified ),
+            post_tags(
+                tags(id, name, slug, color, icon)
+            )
         `)
         .eq('subclub_id', subclub.id)
         .is('parent_id', null)
         .order('created_at', { ascending: false })
 
     const { data: { user } } = await supabase.auth.getUser()
-    
+
     let isAdmin = false
     let currentBook = null
 
@@ -50,7 +54,7 @@ export default async function SubclubPage(props: { params: Promise<{ name: strin
             .select('*')
             .eq('is_current', true)
             .single()
-        
+
         currentBook = book
     }
 
@@ -83,7 +87,7 @@ export default async function SubclubPage(props: { params: Promise<{ name: strin
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {/* Main Feed */}
                     <div className="md:col-span-2 space-y-4">
-                        
+
                         {/* Book of the Month Display */}
                         {currentBook && (
                             <BookOfTheMonthCard book={currentBook} isAdmin={isAdmin} />
@@ -99,25 +103,39 @@ export default async function SubclubPage(props: { params: Promise<{ name: strin
                             </Link>
                         </div>
 
-                        {posts?.map(post => (
-                            <div key={post.id} className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 transition shadow-sm">
-                                <Link href={`/c/${name}/post/${post.id}`}>
-                                    <div className="flex items-center gap-2 mb-2 text-xs text-slate-500">
-                                        {post.profiles?.avatar_url && (
-                                            <img src={post.profiles.avatar_url} className="w-5 h-5 rounded-full" alt="" />
+                        {posts?.map(post => {
+                            const postTags = post.post_tags?.map((pt: any) => pt.tags).filter(Boolean) || []
+                            return (
+                                <div key={post.id} className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 transition shadow-sm">
+                                    <Link href={`/c/${name}/post/${post.id}`}>
+                                        <div className="flex items-center gap-2 mb-2 text-xs text-slate-500">
+                                            {post.profiles?.avatar_url && (
+                                                <img src={post.profiles.avatar_url} className="w-5 h-5 rounded-full" alt="" />
+                                            )}
+                                            <span className="font-semibold text-slate-700 dark:text-slate-300">{post.profiles?.username}</span>
+                                            <span>•</span>
+                                            <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                                        </div>
+                                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{post.title || 'Sem título'}</h3>
+                                        <p className="text-slate-600 dark:text-slate-400 text-sm line-clamp-3 mb-3">{post.content}</p>
+
+                                        {/* Tags */}
+                                        {postTags.length > 0 && (
+                                            <div className="flex flex-wrap gap-2 mb-3" onClick={(e) => e.stopPropagation()}>
+                                                {postTags.map((tag: any) => (
+                                                    <TagBadge key={tag.id} tag={tag} size="sm" />
+                                                ))}
+                                            </div>
                                         )}
-                                        <span className="font-semibold text-slate-700 dark:text-slate-300">{post.profiles?.username}</span>
-                                        <span>•</span>
-                                        <span>{new Date(post.created_at).toLocaleDateString()}</span>
-                                    </div>
-                                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{post.title || 'Sem título'}</h3>
-                                    <p className="text-slate-600 dark:text-slate-400 text-sm line-clamp-3 mb-3">{post.content}</p>
-                                    <div className="flex gap-4 text-xs text-slate-500 font-medium">
-                                        <span>{post.likes_count || 0} Likes</span>
-                                    </div>
-                                </Link>
-                            </div>
-                        ))}
+
+                                        <div className="flex gap-4 text-xs text-slate-500 font-medium">
+                                            <span>{post.likes_count || 0} Likes</span>
+                                        </div>
+                                    </Link>
+                                </div>
+                            )
+                        })}
+
 
                         {(!posts || posts.length === 0) && (
                             <div className="text-center py-10 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
