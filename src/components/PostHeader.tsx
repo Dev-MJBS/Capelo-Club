@@ -65,7 +65,11 @@ export default function PostHeader({ post, currentUserId, isAdmin = false }: Pos
 
                 <span>•</span>
                 <span className="flex items-center gap-1">
-                    <span className="text-slate-700 dark:text-slate-300 flex items-center gap-1 font-medium">
+                    <Link
+                        href={`/profile/${post.user?.username}`}
+                        className="text-slate-700 dark:text-slate-300 flex items-center gap-1 font-medium hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         {post.user?.avatar_url && (
                             <img
                                 src={post.user.avatar_url}
@@ -77,16 +81,16 @@ export default function PostHeader({ post, currentUserId, isAdmin = false }: Pos
                         {post.user?.is_verified && (
                             <VerifiedBadge size={14} />
                         )}
-                        {isAdmin && (
-                            <div onClick={(e) => e.stopPropagation()}>
-                                <VerifyUserButton
-                                    userId={post.user_id}
-                                    isVerified={!!post.user?.is_verified}
-                                    isAdmin={isAdmin}
-                                />
-                            </div>
-                        )}
-                    </span>
+                    </Link>
+                    {isAdmin && (
+                        <div onClick={(e) => e.stopPropagation()}>
+                            <VerifyUserButton
+                                userId={post.user_id}
+                                isVerified={!!post.user?.is_verified}
+                                isAdmin={isAdmin}
+                            />
+                        </div>
+                    )}
                 </span>
                 <span>•</span>
                 <span className="flex items-center gap-1">
