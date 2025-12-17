@@ -133,23 +133,22 @@ export default async function Dashboard() {
                             </Link>
                         </div>
 
-                        {/* Explore Subclubs CTA */}
-                        {/* Explore Subclubs CTA */}
+                        {/* Explore CTA */}
                         <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-6 text-white shadow-lg">
                             <div className="flex items-center gap-3 mb-3">
                                 <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
                                     <Compass size={24} className="text-white" />
                                 </div>
-                                <h3 className="font-bold text-lg">Explore Subclubes</h3>
+                                <h3 className="font-bold text-lg">Explorar</h3>
                             </div>
                             <p className="text-indigo-100 text-sm mb-4">
-                                Descubra novas comunidades, participe de discussões e encontre seu próximo livro favorito.
+                                Descubra posts em alta, tags populares e novos usuários para seguir.
                             </p>
                             <Link
-                                href="/subclubs"
+                                href="/explore"
                                 className="block w-full text-center bg-white text-indigo-600 font-bold py-2 px-4 rounded-lg hover:bg-indigo-50 transition-colors"
                             >
-                                Ver Todos os Clubes
+                                Explorar Agora 🔍
                             </Link>
                         </div>
 
