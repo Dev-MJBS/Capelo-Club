@@ -5,6 +5,7 @@ import AdminGroupManager from '@/components/AdminGroupManager'
 import AdminTagManager from '@/components/AdminTagManager'
 import InviteManager from '@/components/InviteManager'
 import ModerationPanel from '@/components/ModerationPanel'
+import PasswordResetPanel from '@/components/PasswordResetPanel'
 import DeleteGroupButton from '@/components/DeleteGroupButton'
 import { ArrowLeft } from 'lucide-react'
 
@@ -69,6 +70,7 @@ export default async function AdminPage() {
                     {/* Manager Column */}
                     <div className="lg:col-span-2 space-y-8">
                         <InviteManager initialCodes={inviteCodes || []} />
+                        <PasswordResetPanel currentUserId={user.id} />
                         <ModerationPanel currentUserId={user.id} />
                         <AdminGroupManager initialGroups={groups || []} />
                         <AdminTagManager initialTags={tags || []} />
