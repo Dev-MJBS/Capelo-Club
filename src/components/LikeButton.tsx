@@ -3,6 +3,7 @@
 import { Heart, Loader2 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { motion } from 'framer-motion'
 
 interface LikeButtonProps {
     postId: string
@@ -102,21 +103,39 @@ export default function LikeButton({ postId, initialLikes, currentUserId }: Like
     }
 
     return (
-        <button
+        <motion.button
             onClick={handleLike}
             disabled={loading || checking}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             className={`flex items-center gap-1.5 px-2 py-1 rounded-full transition-all ${liked
-                    ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
             title="Curtir post"
         >
             {loading ? (
                 <Loader2 size={16} className="animate-spin" />
             ) : (
-                <Heart size={16} fill={liked ? 'currentColor' : 'none'} />
+                <motion.div
+                    animate={liked ? {
+                        scale: [1, 1.3, 1],
+                        rotate: [0, -10, 10, 0]
+                    } : {}}
+                    transition={{ duration: 0.4 }}
+                >
+                    <Heart size={16} fill={liked ? 'currentColor' : 'none'} />
+                </motion.div>
             )}
-            <span className="text-sm font-medium">{likes}</span>
-        </button>
+            <motion.span
+                className="text-sm font-medium"
+                key={likes}
+                initial={{ scale: 1 }}
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 0.3 }}
+            >
+                {likes}
+            </motion.span>
+        </motion.button>
     )
 }
