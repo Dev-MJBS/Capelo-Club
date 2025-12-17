@@ -332,7 +332,7 @@ export default function InviteRegisterPage() {
                 <div className="text-center mt-6">
                     <p className="text-sm text-slate-600 dark:text-slate-400">
                         Já tem uma conta?{' '}
-                        <a href="/" className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
+                        <a href="/login" className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
                             Fazer login
                         </a>
                     </p>
