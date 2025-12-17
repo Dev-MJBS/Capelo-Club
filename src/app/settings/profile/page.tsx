@@ -75,8 +75,21 @@ export default function EditProfilePage() {
 
             if (error) throw error
 
+            // Buscar username do perfil
+            const { data: profileData } = await supabase
+                .from('profiles')
+                .select('username')
+                .eq('id', user.id)
+                .single()
+
             toast.success('Perfil atualizado com sucesso!')
-            router.push(`/profile/${user.user_metadata.username}`)
+
+            if (profileData?.username) {
+                router.push(`/profile/${profileData.username}`)
+            } else {
+                router.push('/dashboard')
+            }
+
             router.refresh()
         } catch (error: any) {
             console.error('Error updating profile:', error)
