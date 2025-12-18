@@ -36,7 +36,7 @@ export async function createSubclub(prevState: any, formData: FormData) {
         }
     }
 
-    const { data: subclub, error: dbError } = await supabase.from('subclubs').insert({
+    const { data: subclub, error: dbError } = await (supabase.from('subclubs') as any).insert({
         name,
         display_name: displayName,
         description,
