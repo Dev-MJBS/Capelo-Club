@@ -85,7 +85,7 @@ export async function toggleVerifiedStatus(userId: string, isVerified: boolean) 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { success: false, error: 'Unauthorized' }
 
-    const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
+    const { data: profile } = await (supabase.from('profiles') as any).select('is_admin').eq('id', user.id).single()
     if (!profile?.is_admin) return { success: false, error: 'Forbidden' }
 
     const { error } = await supabase.from('profiles').update({ is_verified: isVerified }).eq('id', userId)
