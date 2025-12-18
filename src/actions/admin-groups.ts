@@ -35,11 +35,12 @@ export async function createGroupAction(data: GroupFormData) {
         created_at: new Date().toISOString(),
     }
 
-    const { error, data: newGroup } = await (supabase
+    // @ts-ignore - Supabase type inference issue
+    const { error, data: newGroup } = await supabase
         .from('groups')
         .insert(insertPayload)
         .select()
-        .single() as any)
+        .single()
 
     if (error) return { success: false, error: error.message }
 
@@ -69,10 +70,11 @@ export async function updateGroupAction(id: string, data: GroupFormData) {
         description: data.description || ''
     }
 
-    const { error } = await (supabase
+    // @ts-ignore - Supabase type inference issue
+    const { error } = await supabase
         .from('groups')
         .update(updatePayload)
-        .eq('id', id) as any)
+        .eq('id', id)
 
     if (error) return { success: false, error: error.message }
 
@@ -91,7 +93,8 @@ export async function deleteGroupAction(id: string) {
     const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single() as { data: { is_admin: boolean | null } | null }
     if (!profile?.is_admin) return { success: false, error: 'Forbidden' }
 
-    const { error } = await (supabase.from('groups').delete().eq('id', id) as any)
+    // @ts-ignore - Supabase type inference issue
+    const { error } = await supabase.from('groups').delete().eq('id', id)
 
     if (error) return { success: false, error: error.message }
 
