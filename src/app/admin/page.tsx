@@ -16,8 +16,8 @@ export default async function AdminPage() {
     if (!user) redirect('/')
 
     // Verificar se é admin
-    const { data: profile } = await supabase
-        .from('profiles')
+    const { data: profile } = await (supabase
+        .from('profiles') as any)
         .select('is_admin')
         .eq('id', user.id)
         .single()

@@ -11,7 +11,7 @@ export default async function SubclubsPage({ searchParams }: { searchParams: Pro
     const { data: { user } } = await supabase.auth.getUser()
 
     // Fetch user profile for navbar
-    const { data: profile } = user ? await supabase.from('profiles').select('is_admin').eq('id', user.id).single() : { data: null }
+    const { data: profile } = user ? await (supabase.from('profiles') as any).select('is_admin').eq('id', user.id).single() : { data: null }
 
     let subclubsQuery = supabase
         .from('subclubs')

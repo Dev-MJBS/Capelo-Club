@@ -11,7 +11,7 @@ export default async function NotificationsPage() {
     if (!user) redirect('/')
 
     // Fetch user profile for navbar
-    const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
+    const { data: profile } = await (supabase.from('profiles') as any).select('is_admin').eq('id', user.id).single()
 
     // Fetch notifications
     const { data: notifications, error } = await supabase
