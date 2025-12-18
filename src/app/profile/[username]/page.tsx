@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { getProfileByUsername, getUserStats, getUserBadges, getUserRecentPosts } from '@/lib/data/profile'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Calendar, MapPin, BookOpen, Settings, MessageCircle, Heart, Award, FileText } from 'lucide-react'
@@ -16,18 +17,10 @@ export default async function UserProfilePage({ params }: PageProps) {
     const username = decodeURIComponent(encodedUsername)
     const supabase = await createClient()
 
-    console.log('Loading profile for username:', username)
-
-    // Fetch user profile
-    const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('username', username)
-        .single()
-
-    if (profileError) {
-        console.error('Error loading profile:', profileError)
-    }
+    const [profile, { user }] = await Promise.all([
+        getProfileByUsername(username),
+        supabase.auth.getUser()
+    ])
 
     if (!profile) {
         console.log('Profile not found for username:', username)
@@ -36,80 +29,16 @@ export default async function UserProfilePage({ params }: PageProps) {
 
     console.log('Profile loaded successfully:', profile.username)
 
-    // Get current user to check if viewing own profile
-    const { data: { user } } = await supabase.auth.getUser()
     const isOwnProfile = user?.id === profile.id
 
-    // Get user statistics directly
-    const { count: postsCount } = await supabase
-        .from('posts')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', profile.id)
-        .is('parent_id', null)
-
-    const { data: postsWithLikes } = await supabase
-        .from('posts')
-        .select('likes_count')
-        .eq('user_id', profile.id)
-
-    const likesReceived = postsWithLikes?.reduce((sum, post) => sum + (post.likes_count || 0), 0) || 0
-
-    const { count: commentsCount } = await supabase
-        .from('posts')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', profile.id)
-        .not('parent_id', 'is', null)
+    const [userStats, badges, recentPosts] = await Promise.all([
+        getUserStats(profile.id),
+        getUserBadges(profile.id),
+        getUserRecentPosts(profile.id)
+    ])
 
     const memberDays = Math.floor((Date.now() - new Date(profile.created_at).getTime()) / (1000 * 60 * 60 * 24))
-
-    const userStats = {
-        posts_count: postsCount || 0,
-        likes_received: likesReceived,
-        comments_count: commentsCount || 0,
-        member_days: memberDays
-    }
-
-    // Get user badges
-    const { data: userBadges } = await supabase
-        .from('user_badges')
-        .select(`
-      earned_at,
-      badges (
-        id,
-        name,
-        slug,
-        description,
-        icon,
-        color
-      )
-    `)
-        .eq('user_id', profile.id)
-        .order('earned_at', { ascending: false })
-
-    const badges = userBadges?.map(ub => ub.badges).filter(Boolean) || []
-
-    // Get recent posts
-    const { data: posts } = await supabase
-        .from('posts')
-        .select(`
-      id,
-      title,
-      content,
-      created_at,
-      likes_count,
-      parent_id,
-      subclub:subclubs(name, display_name)
-    `)
-        .eq('user_id', profile.id)
-        .is('parent_id', null)
-        .order('created_at', { ascending: false })
-        .limit(10)
-
-    // Transform posts to handle subclub as single object
-    const recentPosts = posts?.map(post => ({
-        ...post,
-        subclub: Array.isArray(post.subclub) ? post.subclub[0] : post.subclub
-    })) || []
+    const statsWithMemberDays = { ...userStats, member_days: memberDays }
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -210,7 +139,7 @@ export default async function UserProfilePage({ params }: PageProps) {
                                         <span>Posts</span>
                                     </div>
                                     <div className="text-2xl font-bold text-slate-900 dark:text-white">
-                                        {userStats.posts_count}
+                                        {statsWithMemberDays.posts_count}
                                     </div>
                                 </div>
                                 <div className="text-center p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
@@ -219,7 +148,7 @@ export default async function UserProfilePage({ params }: PageProps) {
                                         <span>Curtidas</span>
                                     </div>
                                     <div className="text-2xl font-bold text-slate-900 dark:text-white">
-                                        {userStats.likes_received}
+                                        {statsWithMemberDays.likes_received}
                                     </div>
                                 </div>
                                 <div className="text-center p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
@@ -228,7 +157,7 @@ export default async function UserProfilePage({ params }: PageProps) {
                                         <span>Comentários</span>
                                     </div>
                                     <div className="text-2xl font-bold text-slate-900 dark:text-white">
-                                        {userStats.comments_count}
+                                        {statsWithMemberDays.comments_count}
                                     </div>
                                 </div>
                             </div>

@@ -61,12 +61,16 @@ export async function updateSession(request: NextRequest) {
             return supabaseResponse
         }
 
-        // Se não tem perfil, precisa validar convite
+        // Se não tem perfil, o trigger de criação automática deve lidar. 
+        // Se falhar ou for usuário antigo sem perfil, idealmente redirecionaríamos para um setup,
+        // mas para "abrir" o clube, vamos deixar passar. O dashboard pode mostrar avatar default.
+        /*
         if (!profile) {
             const url = request.nextUrl.clone()
             url.pathname = '/validate-invite'
             return NextResponse.redirect(url)
         }
+        */
 
         // Redirect banned users
         if (profile.is_banned) {

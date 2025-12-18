@@ -25,9 +25,9 @@ export default async function Home() {
                         <BookOpen size={48} className="text-indigo-400 drop-shadow-lg" />
                     </div>
                     <h1 className="text-4xl font-extrabold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-cyan-300 drop-shadow-sm">Capelo's Club</h1>
-                    <p className="text-slate-200 mb-2 font-light text-lg">Sua comunidade exclusiva de leitura.</p>
-                    <p className="text-indigo-300 mb-8 text-sm">🔒 Acesso apenas por convite</p>
-                    <div className="flex flex-col gap-4 w-full max-w-sm">
+                    <p className="text-slate-200 mb-2 font-light text-lg">A comunidade aberta para apaixonados por leitura.</p>
+                    <p className="text-indigo-300 mb-8 text-sm">✨ Agora aberto para todos</p>
+                    <div className="flex flex-col gap-3 w-full max-w-sm">
                         <Link
                             href="/login"
                             className="px-6 py-3 bg-white text-slate-900 rounded-lg hover:bg-slate-100 transition font-medium text-center shadow-lg flex items-center justify-center gap-2"
@@ -39,6 +39,9 @@ export default async function Home() {
                                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                             </svg>
                             Entrar com Google
+                        </Link>
+                        <Link href="/login" className="text-sm text-center text-slate-300 hover:text-white underline">
+                            Ver mais opções de login
                         </Link>
                     </div>
                 </div>

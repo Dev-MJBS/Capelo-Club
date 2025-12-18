@@ -1,124 +1,31 @@
 'use client'
 
-import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { Plus, Trash2, Loader2, Edit2, X, Save } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { useAdminGroups } from '@/hooks/useAdminGroups'
+import { Database } from '@/types/database.types'
 
-interface Group {
-    id: string
-    title: string
-    book_title: string
-    description: string | null
-}
+type Group = Database['public']['Tables']['groups']['Row']
 
 export default function AdminGroupManager({ initialGroups }: { initialGroups: Group[] }) {
-    const [groups, setGroups] = useState<Group[]>(initialGroups)
-    const [showForm, setShowForm] = useState(false)
-    const [editingId, setEditingId] = useState<string | null>(null)
-    const [loading, setLoading] = useState(false)
-    const [title, setTitle] = useState('')
-    const [bookTitle, setBookTitle] = useState('')
-    const [description, setDescription] = useState('')
-    const router = useRouter()
-
-    const handleCreateGroup = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setLoading(true)
-
-        try {
-            const supabase = createClient()
-            const { data, error } = await supabase.from('groups').insert({
-                title,
-                book_title: bookTitle,
-                description
-            }).select().single()
-
-            if (error) {
-                console.error('Erro ao criar grupo:', error)
-                alert(`Erro: ${error.message}`)
-            } else {
-                alert('Grupo criado com sucesso!')
-                setGroups([...groups, data])
-                setTitle('')
-                setBookTitle('')
-                setDescription('')
-                setShowForm(false)
-                router.refresh()
-            }
-        } catch (error) {
-            console.error('Erro:', error)
-            alert('Erro ao criar grupo')
-        } finally {
-            setLoading(false)
-        }
-    }
-
-    const handleEditGroup = async (group: Group) => {
-        setEditingId(group.id)
-        setTitle(group.title)
-        setBookTitle(group.book_title)
-        setDescription(group.description || '')
-    }
-
-    const handleSaveEdit = async (groupId: string) => {
-        setLoading(true)
-
-        try {
-            const supabase = createClient()
-            const { error } = await supabase
-                .from('groups')
-                .update({
-                    title,
-                    book_title: bookTitle,
-                    description
-                })
-                .eq('id', groupId)
-
-            if (error) {
-                console.error('Erro ao editar grupo:', error)
-                alert(`Erro: ${error.message}`)
-            } else {
-                alert('Grupo atualizado com sucesso!')
-                setGroups(groups.map(g =>
-                    g.id === groupId
-                        ? { ...g, title, book_title: bookTitle, description }
-                        : g
-                ))
-                setEditingId(null)
-                setTitle('')
-                setBookTitle('')
-                setDescription('')
-                router.refresh()
-            }
-        } catch (error) {
-            console.error('Erro:', error)
-            alert('Erro ao editar grupo')
-        } finally {
-            setLoading(false)
-        }
-    }
-
-    const handleDeleteGroup = async (groupId: string) => {
-        if (!confirm('Tem certeza? Isso vai deletar todos os posts deste grupo!')) return
-
-        try {
-            const supabase = createClient()
-            const { error } = await supabase.from('groups').delete().eq('id', groupId)
-
-            if (error) {
-                console.error('Erro ao deletar grupo:', error)
-                alert(`Erro: ${error.message}`)
-            } else {
-                alert('Grupo deletado com sucesso!')
-                setGroups(groups.filter(g => g.id !== groupId))
-                router.refresh()
-            }
-        } catch (error) {
-            console.error('Erro:', error)
-            alert('Erro ao deletar grupo')
-        }
-    }
+    const {
+        groups,
+        showForm,
+        setShowForm,
+        editingId,
+        setEditingId,
+        loading,
+        title,
+        setTitle,
+        bookTitle,
+        setBookTitle,
+        description,
+        setDescription,
+        handleCreateGroup,
+        handleEditGroup,
+        handleSaveEdit,
+        handleDeleteGroup,
+        resetForm
+    } = useAdminGroups(initialGroups)
 
     return (
         <div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
@@ -190,7 +97,7 @@ export default function AdminGroupManager({ initialGroups }: { initialGroups: Gr
                         </button>
                         <button
                             type="button"
-                            onClick={() => setShowForm(false)}
+                            onClick={resetForm}
                             className="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors font-medium"
                         >
                             Cancelar
@@ -232,7 +139,7 @@ export default function AdminGroupManager({ initialGroups }: { initialGroups: Gr
                                 />
                                 <div className="flex gap-2">
                                     <button
-                                        onClick={() => handleSaveEdit(group.id)}
+                                        onClick={handleSaveEdit}
                                         disabled={loading}
                                         className="flex items-center gap-2 px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 text-sm"
                                     >
@@ -240,12 +147,7 @@ export default function AdminGroupManager({ initialGroups }: { initialGroups: Gr
                                         Salvar
                                     </button>
                                     <button
-                                        onClick={() => {
-                                            setEditingId(null)
-                                            setTitle('')
-                                            setBookTitle('')
-                                            setDescription('')
-                                        }}
+                                        onClick={resetForm}
                                         className="flex items-center gap-2 px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700 text-sm"
                                     >
                                         <X size={14} />
