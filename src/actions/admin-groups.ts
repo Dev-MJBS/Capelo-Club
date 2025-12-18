@@ -15,7 +15,7 @@ export type GroupFormData = z.infer<typeof GroupSchema>
 export async function createGroupAction(data: GroupFormData) {
     const result = GroupSchema.safeParse(data)
     if (!result.success) {
-        return { success: false, error: result.error.errors[0].message }
+        return { success: false, error: result.error.issues[0].message }
     }
 
     const supabase = await createClient()
@@ -50,7 +50,7 @@ export async function createGroupAction(data: GroupFormData) {
 export async function updateGroupAction(id: string, data: GroupFormData) {
     const result = GroupSchema.safeParse(data)
     if (!result.success) {
-        return { success: false, error: result.error.errors[0].message }
+        return { success: false, error: result.error.issues[0].message }
     }
 
     const supabase = await createClient()
