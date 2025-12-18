@@ -67,7 +67,7 @@ export default async function AdminDashboard() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {posts?.map((post) => (
+                                {(posts ?? []).map((post: any) => (
                                     <tr key={post.id} className="border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
                                         <td className="px-6 py-4">
                                             <div>
