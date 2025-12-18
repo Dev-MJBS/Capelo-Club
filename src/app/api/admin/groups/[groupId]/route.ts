@@ -18,8 +18,8 @@ export async function DELETE(
             )
         }
 
-        const { data: profile } = await supabase
-            .from('profiles')
+        const { data: profile } = await (supabase
+            .from('profiles') as any)
             .select('is_admin')
             .eq('id', user.id)
             .single()
