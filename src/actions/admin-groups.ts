@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
+import { Database } from '@/types/database.types'
 
 const GroupSchema = z.object({
     title: z.string().min(1, "Nome do grupo é obrigatório"),
@@ -27,16 +28,16 @@ export async function createGroupAction(data: GroupFormData) {
     const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single() as { data: { is_admin: boolean | null } | null }
     if (!profile?.is_admin) return { success: false, error: 'Forbidden' }
 
+    const insertPayload: Database['public']['Tables']['groups']['Insert'] = {
+        title: data.title,
+        book_title: data.book_title,
+        description: data.description || '',
+        created_at: new Date().toISOString(),
+    }
+
     const { error, data: newGroup } = await supabase
         .from('groups')
-        .insert({
-            title: data.title,
-            book_title: data.book_title,
-            description: data.description || '',
-            // Assuming creator_id is needed or RLS handles it. 
-            // In mocking types, I saw creator_id.
-            created_at: new Date().toISOString(),
-        })
+        .insert(insertPayload)
         .select()
         .single()
 
@@ -62,13 +63,15 @@ export async function updateGroupAction(id: string, data: GroupFormData) {
     const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single() as { data: { is_admin: boolean | null } | null }
     if (!profile?.is_admin) return { success: false, error: 'Forbidden' }
 
+    const updatePayload: Database['public']['Tables']['groups']['Update'] = {
+        title: data.title,
+        book_title: data.book_title,
+        description: data.description || ''
+    }
+
     const { error } = await supabase
         .from('groups')
-        .update({
-            title: data.title,
-            book_title: data.book_title,
-            description: data.description || ''
-        })
+        .update(updatePayload)
         .eq('id', id)
 
     if (error) return { success: false, error: error.message }
