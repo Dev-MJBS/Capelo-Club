@@ -125,7 +125,7 @@ export async function createTweet(formData: FormData) {
         imageUrl = data.publicUrl
     }
 
-    const { data: post, error } = await supabase.from('posts').insert({
+    const { data: post, error } = await (supabase.from('posts') as any).insert({
         content,
         image_url: imageUrl,
         user_id: user.id,
@@ -144,7 +144,7 @@ export async function createTweet(formData: FormData) {
                     tag_id: tagId
                 }))
 
-                await supabase.from('post_tags').insert(tagInserts)
+                await (supabase.from('post_tags') as any).insert(tagInserts)
             }
         } catch (e) {
             console.error('Error saving tags:', e)
@@ -163,7 +163,7 @@ export async function updateGroup(groupId: string, formData: FormData) {
     if (!user) return { success: false, error: 'Not authenticated' }
 
     // Check if admin
-    const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
+    const { data: profile } = await (supabase.from('profiles') as any).select('is_admin').eq('id', user.id).single()
     if (!profile?.is_admin) return { success: false, error: 'Forbidden' }
 
     const title = formData.get('title') as string
@@ -172,7 +172,7 @@ export async function updateGroup(groupId: string, formData: FormData) {
 
     if (!title || !bookTitle) return { success: false, error: 'Campos obrigatórios faltando' }
 
-    const { error } = await supabase.from('groups').update({
+    const { error } = await (supabase.from('groups') as any).update({
         title,
         book_title: bookTitle,
         description
