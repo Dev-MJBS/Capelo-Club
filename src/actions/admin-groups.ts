@@ -35,9 +35,7 @@ export async function createGroupAction(data: GroupFormData) {
         created_at: new Date().toISOString(),
     }
 
-    // @ts-ignore - Supabase type inference issue
-    const { error, data: newGroup } = await supabase
-        .from('groups')
+    const { error, data: newGroup } = await (supabase.from('groups') as any)
         .insert(insertPayload)
         .select()
         .single()
@@ -70,9 +68,7 @@ export async function updateGroupAction(id: string, data: GroupFormData) {
         description: data.description || ''
     }
 
-    // @ts-ignore - Supabase type inference issue
-    const { error } = await supabase
-        .from('groups')
+    const { error } = await (supabase.from('groups') as any)
         .update(updatePayload)
         .eq('id', id)
 
@@ -93,8 +89,7 @@ export async function deleteGroupAction(id: string) {
     const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single() as { data: { is_admin: boolean | null } | null }
     if (!profile?.is_admin) return { success: false, error: 'Forbidden' }
 
-    // @ts-ignore - Supabase type inference issue
-    const { error } = await supabase.from('groups').delete().eq('id', id)
+    const { error } = await (supabase.from('groups') as any).delete().eq('id', id)
 
     if (error) return { success: false, error: error.message }
 
