@@ -28,18 +28,18 @@ export async function createGroupAction(data: GroupFormData) {
     const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single() as { data: { is_admin: boolean | null } | null }
     if (!profile?.is_admin) return { success: false, error: 'Forbidden' }
 
-    const insertPayload: Database['public']['Tables']['groups']['Insert'] = {
+    const insertPayload = {
         title: data.title,
         book_title: data.book_title,
         description: data.description || '',
         created_at: new Date().toISOString(),
     }
 
-    const { error, data: newGroup } = await supabase
+    const { error, data: newGroup } = await (supabase
         .from('groups')
         .insert(insertPayload)
         .select()
-        .single()
+        .single() as any)
 
     if (error) return { success: false, error: error.message }
 
@@ -63,16 +63,16 @@ export async function updateGroupAction(id: string, data: GroupFormData) {
     const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single() as { data: { is_admin: boolean | null } | null }
     if (!profile?.is_admin) return { success: false, error: 'Forbidden' }
 
-    const updatePayload: Database['public']['Tables']['groups']['Update'] = {
+    const updatePayload = {
         title: data.title,
         book_title: data.book_title,
         description: data.description || ''
     }
 
-    const { error } = await supabase
+    const { error } = await (supabase
         .from('groups')
         .update(updatePayload)
-        .eq('id', id)
+        .eq('id', id) as any)
 
     if (error) return { success: false, error: error.message }
 
@@ -91,7 +91,7 @@ export async function deleteGroupAction(id: string) {
     const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single() as { data: { is_admin: boolean | null } | null }
     if (!profile?.is_admin) return { success: false, error: 'Forbidden' }
 
-    const { error } = await supabase.from('groups').delete().eq('id', id)
+    const { error } = await (supabase.from('groups').delete().eq('id', id) as any)
 
     if (error) return { success: false, error: error.message }
 
