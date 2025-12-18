@@ -49,8 +49,8 @@ export async function updateSession(request: NextRequest) {
 
     // Check if user needs validation or is banned/kicked
     if (user && !path.startsWith('/banned') && !path.startsWith('/kicked') && !path.startsWith('/validate-invite')) {
-        const { data: profile, error: profileError } = await supabase
-            .from('profiles')
+        const { data: profile, error: profileError } = await (supabase
+            .from('profiles') as any)
             .select('id, is_banned, banned_reason, kicked_until, kick_reason')
             .eq('id', user.id)
             .maybeSingle()

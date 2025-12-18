@@ -19,8 +19,8 @@ export default async function BannedPage({
     }
 
     // Verificar se realmente está banido
-    const { data: profile } = await supabase
-        .from('profiles')
+    const { data: profile } = await (supabase
+        .from('profiles') as any)
         .select('is_banned, banned_reason, banned_at')
         .eq('id', user.id)
         .single()
