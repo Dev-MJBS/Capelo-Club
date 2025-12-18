@@ -24,7 +24,7 @@ export async function createGroupAction(data: GroupFormData) {
     if (!user) return { success: false, error: 'Unauthorized' }
 
     // Check admin
-    const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
+    const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single() as { data: { is_admin: boolean | null } | null }
     if (!profile?.is_admin) return { success: false, error: 'Forbidden' }
 
     const { error, data: newGroup } = await supabase
@@ -59,7 +59,7 @@ export async function updateGroupAction(id: string, data: GroupFormData) {
     if (!user) return { success: false, error: 'Unauthorized' }
 
     // Check admin
-    const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
+    const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single() as { data: { is_admin: boolean | null } | null }
     if (!profile?.is_admin) return { success: false, error: 'Forbidden' }
 
     const { error } = await supabase
@@ -85,7 +85,7 @@ export async function deleteGroupAction(id: string) {
     if (!user) return { success: false, error: 'Unauthorized' }
 
     // Check admin
-    const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
+    const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single() as { data: { is_admin: boolean | null } | null }
     if (!profile?.is_admin) return { success: false, error: 'Forbidden' }
 
     const { error } = await supabase.from('groups').delete().eq('id', id)
