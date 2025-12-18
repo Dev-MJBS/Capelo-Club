@@ -176,7 +176,7 @@ export default async function ExplorePage() {
                                     {popularTags && popularTags.length > 0 ? (
                                         popularTags.map((tag: any) => (
                                             <Link key={tag.id} href={`/tags/${tag.slug}`}>
-                                                <TagBadge tag={tag} />
+                                                <TagBadge tag={tag} showCount />
                                             </Link>
                                         ))
                                     ) : (
