@@ -11,8 +11,8 @@ export default async function SubclubPage(props: { params: Promise<{ name: strin
     const supabase = await createClient()
 
     // Fetch subclub details
-    const { data: subclub } = await supabase
-        .from('subclubs')
+    const { data: subclub } = await (supabase
+        .from('subclubs') as any)
         .select('*')
         .eq('name', name)
         .single()
@@ -20,8 +20,8 @@ export default async function SubclubPage(props: { params: Promise<{ name: strin
     if (!subclub) notFound()
 
     // Fetch posts for this subclub
-    const { data: posts } = await supabase
-        .from('posts')
+    const { data: posts } = await (supabase
+        .from('posts') as any)
         .select(`
             *,
             profiles:user_id ( username, avatar_url, is_verified ),
@@ -39,8 +39,8 @@ export default async function SubclubPage(props: { params: Promise<{ name: strin
     let currentBook = null
 
     if (user) {
-        const { data: profile } = await supabase
-            .from('profiles')
+        const { data: profile } = await (supabase
+            .from('profiles') as any)
             .select('is_admin')
             .eq('id', user.id)
             .single()
@@ -49,8 +49,8 @@ export default async function SubclubPage(props: { params: Promise<{ name: strin
 
     // Special logic for 'livro-do-mes'
     if (name === 'livro-do-mes') {
-        const { data: book } = await supabase
-            .from('book_of_the_month')
+        const { data: book } = await (supabase
+            .from('book_of_the_month') as any)
             .select('*')
             .eq('is_current', true)
             .single()
