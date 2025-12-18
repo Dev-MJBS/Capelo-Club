@@ -50,7 +50,7 @@ export async function createSubclub(prevState: any, formData: FormData) {
     }
 
     // Add owner as moderator/member
-    await supabase.from('subclub_members').insert({
+    await (supabase.from('subclub_members') as any).insert({
         subclub_id: subclub.id,
         user_id: user.id,
         role: 'moderator'
