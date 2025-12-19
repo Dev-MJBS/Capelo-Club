@@ -45,7 +45,7 @@ export default async function Dashboard() {
         .limit(50)
 
     // Transform posts to include tags
-    const transformedPosts = posts?.map(post => ({
+    const transformedPosts = posts?.map((post: any) => ({
         ...post,
         tags: post.post_tags?.map((pt: any) => pt.tags).filter(Boolean) || []
     })) || []
