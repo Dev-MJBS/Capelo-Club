@@ -103,8 +103,8 @@ export default async function SubclubPage(props: { params: Promise<{ name: strin
                             </Link>
                         </div>
 
-                        {posts?.map(post => {
-                            const postTags = post.post_tags?.map((pt: any) => pt.tags).filter(Boolean) || []
+                        {posts?.map((post: any) => {
+                                const postTags = post.post_tags?.map((pt: any) => pt.tags).filter(Boolean) || []
                             return (
                                 <div key={post.id} className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 transition shadow-sm">
                                     <Link href={`/c/${name}/post/${post.id}`}>
