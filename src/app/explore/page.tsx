@@ -19,7 +19,7 @@ export default async function ExplorePage() {
     const sevenDaysAgo = new Date()
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
 
-    const { data: trendingPosts } = await supabase
+    const { data: trendingPosts } = await (supabase
         .from('posts')
         .select(`
       id,
@@ -32,7 +32,7 @@ export default async function ExplorePage() {
         .is('parent_id', null)
         .gte('id', sevenDaysAgo.toISOString())
         .order('likes_count', { ascending: false })
-        .limit(10)
+        .limit(10) as any)
 
     // Tags populares
     const { data: popularTags } = await supabase

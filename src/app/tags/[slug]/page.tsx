@@ -26,7 +26,7 @@ export default async function TagPage({ params }: PageProps) {
     }
 
     // Fetch posts with this tag
-    const { data: postTags } = await supabase
+    const { data: postTags } = await (supabase
         .from('post_tags')
         .select(`
       post_id,
@@ -60,7 +60,7 @@ export default async function TagPage({ params }: PageProps) {
       )
     `)
         .eq('tag_id', tag.id)
-        .order('created_at', { ascending: false })
+        .order('created_at', { ascending: false }) as any)
 
     const posts = postTags
         ?.map((pt: any) => ({

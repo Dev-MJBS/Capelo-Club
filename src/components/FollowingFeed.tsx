@@ -41,7 +41,7 @@ export default function FollowingFeed({ userId, isAdmin }: FollowingFeedProps) {
             const followingIds = follows.map(f => f.following_id)
 
             // Buscar posts dos usuários seguidos
-            const { data: followingPosts, error } = await supabase
+            const { data: followingPosts, error } = await (supabase
                 .from('posts')
                 .select(`
           *,
@@ -73,7 +73,7 @@ export default function FollowingFeed({ userId, isAdmin }: FollowingFeedProps) {
                 .in('user_id', followingIds)
                 .is('parent_id', null)
                 .order('id', { ascending: false })
-                .limit(50)
+                .limit(50) as any)
 
             if (error) {
                 console.error('Erro ao carregar posts:', error)

@@ -27,7 +27,7 @@ export default function InfiniteFeed({ currentUserId, isAdmin = false, groupId, 
         const from = pageParam * POSTS_PER_PAGE
         const to = from + POSTS_PER_PAGE - 1
 
-        let query = supabase
+        let query = (supabase
             .from('posts')
             .select(`
         id,
@@ -59,7 +59,7 @@ export default function InfiniteFeed({ currentUserId, isAdmin = false, groupId, 
       `)
             .is('parent_id', null) // Only top-level posts
             .order('created_at', { ascending: false })
-            .range(from, to)
+            .range(from, to) as any)
 
         if (groupId) {
             query = query.eq('group_id', groupId)
