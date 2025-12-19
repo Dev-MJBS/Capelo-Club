@@ -15,8 +15,8 @@ export default async function SubmitPostPage(props: { params: Promise<{ name: st
     const { name } = params
     const supabase = await createClient()
 
-    const { data: subclub } = await supabase
-        .from('subclubs')
+    const { data: subclub } = await (supabase
+        .from('subclubs') as any)
         .select('id, name, display_name')
         .eq('name', name)
         .single()
