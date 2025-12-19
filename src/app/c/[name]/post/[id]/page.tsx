@@ -15,8 +15,8 @@ export default async function SubclubPostPage(props: { params: Promise<{ name: s
     const { data: { user } } = await supabase.auth.getUser()
 
     // Fetch post and subclub
-    const { data: post } = await supabase
-        .from('posts')
+    const { data: post } = await (supabase
+        .from('posts') as any)
         .select(`
             *,
             subclubs!inner ( name, display_name ),
@@ -60,8 +60,8 @@ export default async function SubclubPostPage(props: { params: Promise<{ name: s
     // I'll stick to a potentially inefficient fetch for MVP: fetch by subclub_id order by created_at.
     // Since we are just starting, it's empty.
 
-    const { data: rawComments } = await supabase
-        .from('posts')
+    const { data: rawComments } = await (supabase
+        .from('posts') as any)
         .select(`
             *,
             profiles:user_id ( username, avatar_url, is_verified )
@@ -110,8 +110,8 @@ export default async function SubclubPostPage(props: { params: Promise<{ name: s
     // But for "Capelo's Club" MVP, maybe acceptable?
     // I'll fetch last 500 posts of subclub.
 
-    const { data: allSubclubPosts } = await supabase
-        .from('posts')
+    const { data: allSubclubPosts } = await (supabase
+        .from('posts') as any)
         .select(`
             *,
             profiles:user_id ( username, avatar_url, is_verified )
