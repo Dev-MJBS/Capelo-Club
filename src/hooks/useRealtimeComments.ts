@@ -56,7 +56,7 @@ export function useRealtimeComments({
                 setLoading(true)
                 setError(null)
 
-                let query = supabase
+                let query = (supabase
                     .from('posts')
                     .select(`
             id,
@@ -76,7 +76,7 @@ export function useRealtimeComments({
             )
           `)
                     .eq('parent_id', postId)
-                    .order('created_at', { ascending: true })
+                    .order('created_at', { ascending: true }) as any)
 
                 if (groupId) {
                     query = query.eq('group_id', groupId)

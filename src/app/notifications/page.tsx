@@ -14,7 +14,7 @@ export default async function NotificationsPage() {
     const { data: profile } = await (supabase.from('profiles') as any).select('is_admin').eq('id', user.id).single()
 
     // Fetch notifications
-    const { data: notifications, error } = await supabase
+    const { data: notifications, error } = await (supabase
         .from('notifications')
         .select(`
             *,
@@ -23,7 +23,7 @@ export default async function NotificationsPage() {
         `)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
-        .limit(50)
+        .limit(50) as any)
 
     if (error) {
         console.error('Error fetching notifications:', error)

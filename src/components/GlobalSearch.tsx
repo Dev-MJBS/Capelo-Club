@@ -34,7 +34,7 @@ export default function GlobalSearch() {
 
         try {
             // Buscar posts
-            const { data: posts } = await supabase
+            const { data: posts } = await (supabase
                 .from('posts')
                 .select(`
           id,
@@ -46,7 +46,7 @@ export default function GlobalSearch() {
                 .or(`title.ilike.%${searchQuery}%,content.ilike.%${searchQuery}%`)
                 .is('parent_id', null)
                 .order('likes_count', { ascending: false })
-                .limit(5)
+                .limit(5) as any)
 
             // Buscar usuários
             const { data: users } = await supabase
