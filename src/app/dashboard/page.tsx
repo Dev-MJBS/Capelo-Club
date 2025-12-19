@@ -30,8 +30,8 @@ export default async function Dashboard() {
     const { data: groups } = await supabase.from('groups').select('*').order('created_at', { ascending: false })
 
     // Fetch recent posts (Tweets + Group Posts) with tags
-    const { data: posts } = await supabase
-        .from('posts')
+    const { data: posts } = await (supabase
+        .from('posts') as any)
         .select(`
             *,
             group:groups(id, title, book_title),
