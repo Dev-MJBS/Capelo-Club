@@ -48,7 +48,7 @@ export default function CreatePostPage() {
                 return
             }
 
-            const { data, error } = await supabase.from('posts').insert({
+            const { data, error } = await (supabase.from('posts') as any).insert({
                 group_id: selectedGroupId,
                 user_id: user.id,
                 title,
