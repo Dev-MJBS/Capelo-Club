@@ -38,19 +38,35 @@ function getMonthSlug(date: Date): string {
 }
 
 export async function getVotingState(): Promise<VotingState> {
+    const supabase = await createClient()
     const now = new Date()
+
+    // 1. Check for manual overrides in voting_settings
+    const { data: override } = await (supabase
+        .from('voting_settings') as any)
+        .select('*')
+        .neq('status', 'closed')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+    if (override) {
+        const targetDate = new Date(override.target_month_date)
+        return {
+            status: override.status,
+            targetMonthDate: override.target_month_date,
+            targetMonthSlug: getMonthSlug(targetDate)
+        }
+    }
+
+    // 2. Default automatic logic
     const day = now.getDate()
-
-    // Logic:
-    // Nomination: 26, 27, 28
-    // Voting: 26..End, 1
-
     let status: 'nomination' | 'voting' | 'closed' = 'closed'
 
     if (day >= 26 || day === 1) {
         status = 'voting'
         if (day >= 26 && day <= 28) {
-            status = 'nomination' // Nomination implies voting is also open, but UI might emphasize nomination
+            status = 'nomination'
         }
     }
 
@@ -272,7 +288,135 @@ export async function updateCurrentBook(formData: FormData) {
     if (error) return { success: false, error: error.message }
 
     revalidatePath('/c/livro-do-mes')
+    revalidatePath('/dashboard')
+    revalidatePath('/admin')
     return { success: true }
 }
+
+export async function deleteBookOfMonth(id: string) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Unauthorized')
+
+    const { data: profile } = await (supabase.from('profiles') as any).select('is_admin').eq('id', user.id).single()
+    if (!profile?.is_admin) throw new Error('Forbidden')
+
+    const { error } = await (supabase.from('book_of_the_month') as any).delete().eq('id', id)
+    if (error) throw error
+
+    revalidatePath('/c/livro-do-mes')
+    revalidatePath('/dashboard')
+    revalidatePath('/admin')
+}
+
+export async function deleteNomination(id: string) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Unauthorized')
+
+    const { data: profile } = await (supabase.from('profiles') as any).select('is_admin').eq('id', user.id).single()
+    if (!profile?.is_admin) throw new Error('Forbidden')
+
+    const { error } = await (supabase.from('monthly_nominations') as any).delete().eq('id', id)
+    if (error) throw error
+
+    revalidatePath('/livro-do-mes/votacao')
+    revalidatePath('/admin')
+}
+
+export async function setVotingStatus(targetMonthDate: string, status: 'nomination' | 'voting' | 'closed') {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Unauthorized')
+
+    const { data: profile } = await (supabase.from('profiles') as any).select('is_admin').eq('id', user.id).single()
+    if (!profile?.is_admin) throw new Error('Forbidden')
+
+    if (status === 'closed') {
+        // If closing, we just delete any override for this month (or all)
+        await (supabase.from('voting_settings') as any).delete().eq('target_month_date', targetMonthDate)
+    } else {
+        const { error } = await (supabase.from('voting_settings') as any).upsert({
+            target_month_date: targetMonthDate,
+            status: status,
+            updated_at: new Date().toISOString()
+        })
+        if (error) throw error
+    }
+
+    revalidatePath('/livro-do-mes/votacao')
+    revalidatePath('/admin')
+}
+
+export async function createDirectWinner(targetMonthDate: string, bookData: {
+    title: string
+    author: string
+    isbn?: string
+    cover_url?: string
+    openlibrary_key: string
+}) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Unauthorized')
+
+    const { data: profile } = await (supabase.from('profiles') as any).select('is_admin').eq('id', user.id).single()
+    if (!profile?.is_admin) throw new Error('Forbidden')
+
+    const date = new Date(targetMonthDate)
+    const slug = getMonthSlug(date)
+
+    const { error } = await (supabase.from('book_of_the_month') as any).upsert({
+        month_date: targetMonthDate,
+        slug: slug,
+        book_title: bookData.title,
+        book_author: bookData.author,
+        book_isbn: bookData.isbn,
+        book_cover_url: bookData.cover_url,
+        book_description: 'Escolha da Administração.',
+        openlibrary_key: bookData.openlibrary_key,
+        winner_votes: 0,
+        selected_at: new Date().toISOString()
+    })
+
+    if (error) throw error
+
+    revalidatePath('/c/livro-do-mes')
+    revalidatePath('/dashboard')
+    revalidatePath('/admin')
+}
+
+export async function nominateBookAdmin(targetMonthDate: string, bookData: {
+    title: string
+    author: string
+    isbn?: string
+    cover_url?: string
+    openlibrary_key: string
+}) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Unauthorized')
+
+    const { data: profile } = await (supabase.from('profiles') as any).select('is_admin').eq('id', user.id).single()
+    if (!profile?.is_admin) throw new Error('Forbidden')
+
+    const { error } = await (supabase.from('monthly_nominations') as any).insert({
+        target_month_date: targetMonthDate,
+        book_title: bookData.title,
+        book_author: bookData.author,
+        book_isbn: bookData.isbn,
+        book_cover_url: bookData.cover_url,
+        openlibrary_key: bookData.openlibrary_key,
+        nominated_by: user.id
+    })
+
+    if (error) {
+        if (error.code === '23505') throw new Error('Este livro já foi indicado para este mês.')
+        throw error
+    }
+
+    revalidatePath('/livro-do-mes/votacao')
+    revalidatePath('/admin')
+}
+
 
 

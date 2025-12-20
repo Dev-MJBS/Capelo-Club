@@ -6,8 +6,9 @@ import AdminTagManager from '@/components/AdminTagManager'
 import InviteManager from '@/components/InviteManager'
 import ModerationPanel from '@/components/ModerationPanel'
 import PasswordResetPanel from '@/components/PasswordResetPanel'
-import DeleteGroupButton from '@/components/DeleteGroupButton'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, BookOpen } from 'lucide-react'
+import BookOfMonthManager from '@/components/BookOfMonthManager'
+import { getVotingState } from '@/app/livro-do-mes/actions'
 
 export default async function AdminPage() {
     const supabase = await createClient()
@@ -54,6 +55,24 @@ export default async function AdminPage() {
         .select('*')
         .order('created_at', { ascending: false })
 
+    // Fetch Book of the Month data
+    const { data: booksOfMonth } = await supabase
+        .from('book_of_the_month')
+        .select('*')
+        .order('month_date', { ascending: false })
+
+    const votingState = await getVotingState()
+
+    const { data: nominationsData } = await (supabase
+        .from('monthly_nominations') as any)
+        .select('*, votes:monthly_votes(count)')
+        .eq('target_month_date', votingState.targetMonthDate || '')
+
+    const nominations = nominationsData?.map((n: any) => ({
+        ...n,
+        vote_count: n.votes?.[0]?.count || 0
+    })) || []
+
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
             <header className="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm border-b border-slate-200 dark:border-slate-800">
@@ -70,6 +89,11 @@ export default async function AdminPage() {
                     {/* Manager Column */}
                     <div className="lg:col-span-2 space-y-8">
                         <InviteManager initialCodes={inviteCodes || []} />
+                        <BookOfMonthManager
+                            currentBooks={booksOfMonth || []}
+                            nominations={nominations}
+                            votingState={votingState}
+                        />
                         <PasswordResetPanel currentUserId={user.id} />
                         <ModerationPanel currentUserId={user.id} />
                         <AdminGroupManager initialGroups={groups || []} />
@@ -93,6 +117,11 @@ export default async function AdminPage() {
                             <p className="text-3xl font-bold text-cyan-600 dark:text-cyan-400">{tags?.length || 0}</p>
                         </div>
 
+                        <div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Livros do Mês</h3>
+                            <p className="text-3xl font-bold text-amber-600 dark:text-amber-400">{booksOfMonth?.length || 0}</p>
+                        </div>
+
                         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
                             <p className="text-sm text-blue-700 dark:text-blue-300">
                                 <span className="font-semibold">Você é admin! 👑</span>
@@ -103,10 +132,6 @@ export default async function AdminPage() {
                     </div>
                 </div>
 
-                {/* Groups Manager */}
-                <div className="mt-8">
-                    <AdminGroupManager initialGroups={groups || []} />
-                </div>
             </main>
         </div>
     )
