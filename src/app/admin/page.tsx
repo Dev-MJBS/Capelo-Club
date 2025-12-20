@@ -1,13 +1,13 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import AdminGroupManager from '@/components/AdminGroupManager'
-import AdminTagManager from '@/components/AdminTagManager'
 import InviteManager from '@/components/InviteManager'
 import ModerationPanel from '@/components/ModerationPanel'
 import PasswordResetPanel from '@/components/PasswordResetPanel'
-import { ArrowLeft, BookOpen } from 'lucide-react'
+import { ArrowLeft, BookOpen, ExternalLink, Hash } from 'lucide-react'
 import BookOfMonthManager from '@/components/BookOfMonthManager'
+import AdminSubclubManager from '@/components/AdminSubclubManager'
+import AdminTagManager from '@/components/AdminTagManager'
 import { getVotingState } from '@/app/livro-do-mes/actions'
 
 export default async function AdminPage() {
@@ -37,9 +37,9 @@ export default async function AdminPage() {
         )
     }
 
-    // Fetch all groups
-    const { data: groups } = await supabase
-        .from('groups')
+    // Fetch all subclubs
+    const { data: subclubs } = await supabase
+        .from('subclubs')
         .select('*')
         .order('created_at', { ascending: false })
 
@@ -56,22 +56,33 @@ export default async function AdminPage() {
         .order('created_at', { ascending: false })
 
     // Fetch Book of the Month data
-    const { data: booksOfMonth } = await supabase
-        .from('book_of_the_month')
-        .select('*')
-        .order('month_date', { ascending: false })
+    let booksOfMonth: any[] = []
+    let nominations: any[] = []
+    let votingState: any = { status: 'closed', targetMonthDate: null, targetMonthSlug: null }
 
-    const votingState = await getVotingState()
+    try {
+        const { data: bData } = await (supabase
+            .from('book_of_the_month') as any)
+            .select('*')
+            .order('month_date', { ascending: false })
+        booksOfMonth = bData || []
 
-    const { data: nominationsData } = await (supabase
-        .from('monthly_nominations') as any)
-        .select('*, votes:monthly_votes(count)')
-        .eq('target_month_date', votingState.targetMonthDate || '')
+        votingState = await getVotingState()
 
-    const nominations = nominationsData?.map((n: any) => ({
-        ...n,
-        vote_count: n.votes?.[0]?.count || 0
-    })) || []
+        if (votingState.targetMonthDate) {
+            const { data: nData } = await (supabase
+                .from('monthly_nominations') as any)
+                .select('*, votes:monthly_votes(count)')
+                .eq('target_month_date', votingState.targetMonthDate)
+
+            nominations = nData?.map((n: any) => ({
+                ...n,
+                vote_count: n.votes?.[0]?.count || n.votes?.count || 0
+            })) || []
+        }
+    } catch (e) {
+        console.error('Error fetching Book of Month data for Admin:', e)
+    }
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
@@ -94,9 +105,17 @@ export default async function AdminPage() {
                             nominations={nominations}
                             votingState={votingState}
                         />
+                        <div className="flex justify-end mt-2">
+                            <Link
+                                href="/livro-do-mes/votacao"
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-all text-xs font-bold border border-indigo-100 dark:border-indigo-800/50"
+                            >
+                                <ExternalLink size={14} /> Acessar Página do Livro do Mês
+                            </Link>
+                        </div>
                         <PasswordResetPanel currentUserId={user.id} />
                         <ModerationPanel currentUserId={user.id} />
-                        <AdminGroupManager initialGroups={groups || []} />
+                        <AdminSubclubManager initialSubclubs={(subclubs as any) || []} />
                         <AdminTagManager initialTags={tags || []} />
                     </div>
 
@@ -108,8 +127,8 @@ export default async function AdminPage() {
                         </div>
 
                         <div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
-                            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Total de Grupos</h3>
-                            <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">{groups?.length || 0}</p>
+                            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Total de Subclubs</h3>
+                            <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">{subclubs?.length || 0}</p>
                         </div>
 
                         <div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">

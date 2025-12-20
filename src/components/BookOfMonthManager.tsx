@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Calendar, Trash2, Edit2, Plus, Loader2, Save, X, BookOpen, Crown } from 'lucide-react'
+import { Calendar, Trash2, Edit2, Plus, Loader2, Save, X, BookOpen, Trophy } from 'lucide-react'
 import {
     deleteBookOfMonth,
     updateCurrentBook,
@@ -213,7 +213,7 @@ export default function BookOfMonthManager({ currentBooks, nominations, votingSt
 
                         <div className="pt-6 border-t border-slate-100 dark:border-slate-800 space-y-4">
                             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                                <Crown size={14} className="text-amber-500" /> Seleção Direta (Vencer)
+                                <Trophy size={14} className="text-amber-500" /> Seleção Direta (Vencer)
                             </h3>
                             <BookSearch onSelect={handleDirectWinner} />
                         </div>

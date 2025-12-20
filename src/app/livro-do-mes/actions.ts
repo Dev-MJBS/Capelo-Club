@@ -42,21 +42,25 @@ export async function getVotingState(): Promise<VotingState> {
     const now = new Date()
 
     // 1. Check for manual overrides in voting_settings
-    const { data: override } = await (supabase
-        .from('voting_settings') as any)
-        .select('*')
-        .neq('status', 'closed')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle()
+    try {
+        const { data: override } = await (supabase
+            .from('voting_settings') as any)
+            .select('*')
+            .neq('status', 'closed')
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle()
 
-    if (override) {
-        const targetDate = new Date(override.target_month_date)
-        return {
-            status: override.status,
-            targetMonthDate: override.target_month_date,
-            targetMonthSlug: getMonthSlug(targetDate)
+        if (override) {
+            const targetDate = new Date(override.target_month_date)
+            return {
+                status: override.status,
+                targetMonthDate: override.target_month_date,
+                targetMonthSlug: getMonthSlug(targetDate)
+            }
         }
+    } catch (e) {
+        console.error('getVotingState: voting_settings check failed', e)
     }
 
     // 2. Default automatic logic
