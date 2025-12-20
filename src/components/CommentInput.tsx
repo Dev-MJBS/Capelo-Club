@@ -19,7 +19,7 @@ export default function CommentInput({ groupId, subclubId, parentId }: { groupId
         const { data: { user } } = await supabase.auth.getUser()
 
         if (user) {
-            const { error } = await supabase.from('posts').insert({
+            const { error } = await (supabase.from('posts') as any).insert({
                 group_id: groupId || null,
                 subclub_id: subclubId || null,
                 user_id: user.id,

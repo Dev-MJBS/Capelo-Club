@@ -31,7 +31,7 @@ export default function InviteRegisterPage() {
         try {
             const supabase = createClient()
 
-            const { data, error } = await supabase
+            const { data, error } = await (supabase as any)
                 .rpc('validate_invite_code', { invite_code: inviteCode.trim().toUpperCase() })
 
             if (error) throw error
@@ -99,7 +99,7 @@ export default function InviteRegisterPage() {
             }
 
             // Marcar código como usado
-            const { error: useError } = await supabase
+            const { error: useError } = await (supabase as any)
                 .rpc('use_invite_code', {
                     invite_code: inviteCode.trim().toUpperCase(),
                     user_id: authData.user.id
@@ -110,8 +110,8 @@ export default function InviteRegisterPage() {
             }
 
             // Atualizar perfil com username
-            const { error: profileError } = await supabase
-                .from('profiles')
+            const { error: profileError } = await (supabase
+                .from('profiles') as any)
                 .update({ username: formData.username })
                 .eq('id', authData.user.id)
 

@@ -22,12 +22,12 @@ export default async function SubclubsPage({ searchParams }: { searchParams: Pro
         subclubsQuery = subclubsQuery.or(`name.ilike.%${query}%,display_name.ilike.%${query}%,description.ilike.%${query}%`)
     }
 
-    const { data: subclubs } = await subclubsQuery
+    const { data: subclubs } = await (subclubsQuery as any)
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-            {user && <Navbar user={user} isAdmin={profile?.is_admin} />}
-            
+            {user && <Navbar user={user} isAdmin={profile?.is_admin ?? undefined} />}
+
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                     <div>
@@ -39,22 +39,22 @@ export default async function SubclubsPage({ searchParams }: { searchParams: Pro
                         </div>
                         <p className="text-slate-600 dark:text-slate-400">Descubra comunidades e participe das discussões.</p>
                     </div>
-                    
+
                     <div className="flex items-center gap-4">
                         <form className="relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 name="q"
-                                placeholder="Buscar clubes..." 
+                                placeholder="Buscar clubes..."
                                 defaultValue={query}
                                 className="pl-10 pr-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-indigo-500 outline-none w-full md:w-64"
                             />
                         </form>
-                        
+
                         {user && (
-                            <Link 
-                                href="/subclubs/create" 
+                            <Link
+                                href="/subclubs/create"
                                 className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-full font-medium hover:bg-indigo-700 transition shadow-sm whitespace-nowrap"
                             >
                                 <Plus size={18} /> Criar Clube
@@ -65,8 +65,8 @@ export default async function SubclubsPage({ searchParams }: { searchParams: Pro
 
                 {subclubs && subclubs.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {subclubs.map(subclub => (
-                            <SubclubCard 
+                        {subclubs.map((subclub: any) => (
+                            <SubclubCard
                                 key={subclub.id}
                                 id={subclub.id}
                                 name={subclub.name}

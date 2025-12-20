@@ -19,7 +19,15 @@ export default async function TagPage({ params }: PageProps) {
         .from('tags')
         .select('*')
         .eq('slug', slug)
-        .single()
+        .single<{
+            id: string
+            name: string
+            slug: string
+            description: string | null
+            color: string
+            post_count: number
+            created_at: string
+        }>()
 
     if (tagError || !tag) {
         notFound()
@@ -79,7 +87,7 @@ export default async function TagPage({ params }: PageProps) {
         .from('profiles')
         .select('is_admin')
         .eq('id', user.id)
-        .single()).data?.is_admin || false : false
+        .single<{ is_admin: boolean | null }>()).data?.is_admin || false : false
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950">

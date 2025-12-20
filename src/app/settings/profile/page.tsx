@@ -38,7 +38,14 @@ export default function EditProfilePage() {
                 .from('profiles')
                 .select('bio, favorite_book, favorite_genre, website_url, twitter_handle, instagram_handle')
                 .eq('id', user.id)
-                .single()
+                .single<{
+                    bio: string | null
+                    favorite_book: string | null
+                    favorite_genre: string | null
+                    website_url: string | null
+                    twitter_handle: string | null
+                    instagram_handle: string | null
+                }>()
 
             if (error) throw error
 
@@ -68,8 +75,8 @@ export default function EditProfilePage() {
 
             if (!user) throw new Error('Not authenticated')
 
-            const { error } = await supabase
-                .from('profiles')
+            const { error } = await (supabase
+                .from('profiles') as any)
                 .update(profile)
                 .eq('id', user.id)
 
@@ -80,7 +87,7 @@ export default function EditProfilePage() {
                 .from('profiles')
                 .select('username')
                 .eq('id', user.id)
-                .single()
+                .single<{ username: string | null }>()
 
             toast.success('Perfil atualizado com sucesso!')
 

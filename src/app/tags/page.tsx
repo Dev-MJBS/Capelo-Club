@@ -7,10 +7,10 @@ export default async function TagsPage() {
     const supabase = await createClient()
 
     // Fetch all tags
-    const { data: tags } = await supabase
+    const { data: tags } = await (supabase
         .from('tags')
         .select('*')
-        .order('post_count', { ascending: false })
+        .order('post_count', { ascending: false }) as any)
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -35,7 +35,7 @@ export default async function TagsPage() {
 
                 {/* Tags Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {tags?.map((tag) => (
+                    {tags?.map((tag: any) => (
                         <Link
                             key={tag.id}
                             href={`/tags/${tag.slug}`}

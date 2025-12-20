@@ -17,7 +17,7 @@ export default async function UserProfilePage({ params }: PageProps) {
     const username = decodeURIComponent(encodedUsername)
     const supabase = await createClient()
 
-    const [profile, { user }] = await Promise.all([
+    const [profile, { data: { user } }] = await Promise.all([
         getProfileByUsername(username),
         supabase.auth.getUser()
     ])
@@ -60,7 +60,7 @@ export default async function UserProfilePage({ params }: PageProps) {
                             <div className="relative">
                                 <img
                                     src={profile.avatar_url || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'}
-                                    alt={profile.username}
+                                    alt={profile.username ?? ''}
                                     className="w-32 h-32 rounded-full object-cover border-4 border-slate-200 dark:border-slate-700"
                                 />
                                 {profile.is_verified && (
@@ -103,7 +103,7 @@ export default async function UserProfilePage({ params }: PageProps) {
 
                             {/* Follow Stats */}
                             <FollowStats
-                                username={profile.username}
+                                username={profile.username ?? ''}
                                 followersCount={profile.followers_count || 0}
                                 followingCount={profile.following_count || 0}
                             />
@@ -190,7 +190,7 @@ export default async function UserProfilePage({ params }: PageProps) {
 
                     {recentPosts && recentPosts.length > 0 ? (
                         <div className="space-y-4">
-                            {recentPosts.map((post) => (
+                            {recentPosts.map((post: any) => (
                                 <Link
                                     key={post.id}
                                     href={post.subclub ? `/c/${post.subclub.name}/post/${post.id}` : `/post/${post.id}`}

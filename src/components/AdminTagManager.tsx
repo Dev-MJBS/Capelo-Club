@@ -50,7 +50,7 @@ export default function AdminTagManager({ initialTags }: { initialTags: Tag[] })
 
         try {
             const supabase = createClient()
-            const { data, error } = await supabase.from('tags').insert({
+            const { data, error } = await (supabase.from('tags') as any).insert({
                 name,
                 slug,
                 color,
@@ -90,8 +90,8 @@ export default function AdminTagManager({ initialTags }: { initialTags: Tag[] })
 
         try {
             const supabase = createClient()
-            const { error } = await supabase
-                .from('tags')
+            const { error } = await (supabase
+                .from('tags') as any)
                 .update({
                     name,
                     slug,
@@ -127,7 +127,7 @@ export default function AdminTagManager({ initialTags }: { initialTags: Tag[] })
 
         try {
             const supabase = createClient()
-            const { error } = await supabase.from('tags').delete().eq('id', tagId)
+            const { error } = await (supabase.from('tags') as any).delete().eq('id', tagId)
 
             if (error) {
                 console.error('Erro ao deletar tag:', error)

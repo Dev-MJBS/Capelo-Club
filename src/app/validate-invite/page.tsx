@@ -35,7 +35,7 @@ export default function ValidateInvitePage() {
             .from('profiles')
             .select('id')
             .eq('id', user.id)
-            .single()
+            .single<{ id: string }>()
 
         if (profile) {
             // Já tem perfil, pode entrar
@@ -57,7 +57,7 @@ export default function ValidateInvitePage() {
             const supabase = createClient()
 
             // Validar código
-            const { data: isValid, error: validateError } = await supabase
+            const { data: isValid, error: validateError } = await (supabase as any)
                 .rpc('validate_invite_code', { invite_code: inviteCode.trim().toUpperCase() })
 
             if (validateError) throw validateError
@@ -70,8 +70,8 @@ export default function ValidateInvitePage() {
             // Criar perfil
             const username = user.user_metadata.full_name?.split(' ')[0] || user.email?.split('@')[0] || 'user'
 
-            const { error: profileError } = await supabase
-                .from('profiles')
+            const { error: profileError } = await (supabase
+                .from('profiles') as any)
                 .insert({
                     id: user.id,
                     username: username,
@@ -81,7 +81,7 @@ export default function ValidateInvitePage() {
             if (profileError) throw profileError
 
             // Marcar código como usado
-            await supabase.rpc('use_invite_code', {
+            await (supabase as any).rpc('use_invite_code', {
                 invite_code: inviteCode.trim().toUpperCase(),
                 user_id: user.id
             })

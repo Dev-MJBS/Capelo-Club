@@ -18,7 +18,12 @@ export default async function ProfilePage() {
         .from('profiles')
         .select('*')
         .eq('id', user.id)
-        .single()
+        .single<{
+            id: string
+            username: string | null
+            avatar_url: string | null
+            [key: string]: any
+        }>()
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
