@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { Users, Plus, ArrowLeft } from 'lucide-react'
+import { Users, Plus, ArrowLeft, User } from 'lucide-react'
 import BookOfTheMonthCard from '@/components/BookOfTheMonthCard'
 import TagBadge from '@/components/TagBadge'
 
@@ -104,13 +104,17 @@ export default async function SubclubPage(props: { params: Promise<{ name: strin
                         </div>
 
                         {posts?.map((post: any) => {
-                                const postTags = post.post_tags?.map((pt: any) => pt.tags).filter(Boolean) || []
+                            const postTags = post.post_tags?.map((pt: any) => pt.tags).filter(Boolean) || []
                             return (
                                 <div key={post.id} className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 transition shadow-sm">
                                     <Link href={`/c/${name}/post/${post.id}`}>
                                         <div className="flex items-center gap-2 mb-2 text-xs text-slate-500">
-                                            {post.profiles?.avatar_url && (
-                                                <img src={post.profiles.avatar_url} className="w-5 h-5 rounded-full" alt="" />
+                                            {post.profiles?.avatar_url ? (
+                                                <img src={post.profiles.avatar_url} className="w-5 h-5 rounded-full object-cover" alt="" />
+                                            ) : (
+                                                <div className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+                                                    <User size={10} className="text-slate-500" />
+                                                </div>
                                             )}
                                             <span className="font-semibold text-slate-700 dark:text-slate-300">{post.profiles?.username}</span>
                                             <span>•</span>

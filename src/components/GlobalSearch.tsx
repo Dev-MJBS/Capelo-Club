@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Search, X, Loader2, TrendingUp, Users, Hash, BookOpen } from 'lucide-react'
+import { Search, X, Loader2, TrendingUp, Users, Hash, BookOpen, User } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Image from 'next/image'
@@ -155,8 +155,8 @@ export default function GlobalSearch() {
                                     <button
                                         onClick={() => setActiveTab('all')}
                                         className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap ${activeTab === 'all'
-                                                ? 'bg-indigo-600 text-white'
-                                                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                            ? 'bg-indigo-600 text-white'
+                                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                                             }`}
                                     >
                                         Todos ({totalResults})
@@ -165,8 +165,8 @@ export default function GlobalSearch() {
                                         <button
                                             onClick={() => setActiveTab('posts')}
                                             className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap flex items-center gap-1.5 ${activeTab === 'posts'
-                                                    ? 'bg-indigo-600 text-white'
-                                                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                                ? 'bg-indigo-600 text-white'
+                                                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                                                 }`}
                                         >
                                             <BookOpen size={14} />
@@ -177,8 +177,8 @@ export default function GlobalSearch() {
                                         <button
                                             onClick={() => setActiveTab('users')}
                                             className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap flex items-center gap-1.5 ${activeTab === 'users'
-                                                    ? 'bg-indigo-600 text-white'
-                                                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                                ? 'bg-indigo-600 text-white'
+                                                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                                                 }`}
                                         >
                                             <Users size={14} />
@@ -189,8 +189,8 @@ export default function GlobalSearch() {
                                         <button
                                             onClick={() => setActiveTab('tags')}
                                             className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap flex items-center gap-1.5 ${activeTab === 'tags'
-                                                    ? 'bg-indigo-600 text-white'
-                                                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                                ? 'bg-indigo-600 text-white'
+                                                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                                                 }`}
                                         >
                                             <Hash size={14} />
@@ -201,8 +201,8 @@ export default function GlobalSearch() {
                                         <button
                                             onClick={() => setActiveTab('subclubs')}
                                             className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap ${activeTab === 'subclubs'
-                                                    ? 'bg-indigo-600 text-white'
-                                                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                                ? 'bg-indigo-600 text-white'
+                                                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                                                 }`}
                                         >
                                             Subclubs ({results.subclubs.length})
@@ -225,13 +225,19 @@ export default function GlobalSearch() {
                                                         className="block p-3 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition"
                                                     >
                                                         <div className="flex items-start gap-3">
-                                                            <Image
-                                                                src={post.profiles?.avatar_url || '/default-avatar.png'}
-                                                                alt={post.profiles?.username || 'User'}
-                                                                width={32}
-                                                                height={32}
-                                                                className="rounded-full"
-                                                            />
+                                                            {post.profiles?.avatar_url ? (
+                                                                <Image
+                                                                    src={post.profiles.avatar_url}
+                                                                    alt={post.profiles.username}
+                                                                    width={32}
+                                                                    height={32}
+                                                                    className="rounded-full object-cover"
+                                                                />
+                                                            ) : (
+                                                                <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+                                                                    <User size={16} className="text-slate-500" />
+                                                                </div>
+                                                            )}
                                                             <div className="flex-1 min-w-0">
                                                                 {post.title && (
                                                                     <h4 className="font-semibold text-slate-900 dark:text-white truncate">
@@ -267,13 +273,19 @@ export default function GlobalSearch() {
                                                         className="block p-3 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition"
                                                     >
                                                         <div className="flex items-center gap-3">
-                                                            <Image
-                                                                src={user.avatar_url || '/default-avatar.png'}
-                                                                alt={user.username}
-                                                                width={40}
-                                                                height={40}
-                                                                className="rounded-full"
-                                                            />
+                                                            {user.avatar_url ? (
+                                                                <Image
+                                                                    src={user.avatar_url}
+                                                                    alt={user.username}
+                                                                    width={40}
+                                                                    height={40}
+                                                                    className="rounded-full object-cover"
+                                                                />
+                                                            ) : (
+                                                                <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+                                                                    <User size={20} className="text-slate-500" />
+                                                                </div>
+                                                            )}
                                                             <div className="flex-1 min-w-0">
                                                                 <h4 className="font-semibold text-slate-900 dark:text-white">
                                                                     @{user.username}

@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Clock } from 'lucide-react'
+import { Clock, User } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import VerifiedBadge from './VerifiedBadge'
@@ -70,12 +70,16 @@ export default function PostHeader({ post, currentUserId, isAdmin = false }: Pos
                         className="text-slate-700 dark:text-slate-300 flex items-center gap-1 font-medium hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        {post.user?.avatar_url && (
+                        {post.user?.avatar_url ? (
                             <img
                                 src={post.user.avatar_url}
                                 alt={post.user.username}
                                 className="w-5 h-5 rounded-full object-cover"
                             />
+                        ) : (
+                            <div className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+                                <User size={10} className="text-slate-500" />
+                            </div>
                         )}
                         {post.user?.username || 'user'}
                         {post.user?.is_verified && (

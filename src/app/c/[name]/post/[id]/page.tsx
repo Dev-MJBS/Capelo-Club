@@ -149,9 +149,11 @@ export default async function SubclubPostPage(props: { params: Promise<{ name: s
                 <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 mb-8 shadow-sm">
                     <div className="flex items-center gap-2 mb-4">
                         {post.profiles?.avatar_url ? (
-                            <img src={post.profiles.avatar_url} className="w-8 h-8 rounded-full" />
+                            <img src={post.profiles.avatar_url} className="w-8 h-8 rounded-full object-cover" />
                         ) : (
-                            <div className="w-8 h-8 rounded-full bg-slate-200" />
+                            <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+                                <User size={16} className="text-slate-500" />
+                            </div>
                         )}
                         <div>
                             <div className="text-sm font-bold text-slate-900 dark:text-white">{post.profiles?.username}</div>

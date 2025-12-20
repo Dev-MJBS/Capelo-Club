@@ -136,7 +136,9 @@ export default async function GroupPage(props: { params: Promise<{ id: string }>
                                                         className="w-5 h-5 rounded-full object-cover"
                                                     />
                                                 ) : (
-                                                    <User size={14} />
+                                                    <div className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+                                                        <User size={10} className="text-slate-500" />
+                                                    </div>
                                                 )}
                                                 <span className="flex items-center gap-1">
                                                     {author?.username || 'Usuário Desconhecido'}

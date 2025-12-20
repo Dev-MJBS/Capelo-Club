@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getProfileByUsername, getUserStats, getUserBadges, getUserRecentPosts } from '@/lib/data/profile'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Calendar, MapPin, BookOpen, Settings, MessageCircle, Heart, Award, FileText } from 'lucide-react'
+import { ArrowLeft, Calendar, MapPin, BookOpen, Settings, MessageCircle, Heart, Award, FileText, User } from 'lucide-react'
 import Image from 'next/image'
 import FollowButton from '@/components/FollowButton'
 import FollowStats from '@/components/FollowStats'
@@ -58,11 +58,17 @@ export default async function UserProfilePage({ params }: PageProps) {
                         {/* Avatar */}
                         <div className="flex-shrink-0">
                             <div className="relative">
-                                <img
-                                    src={profile.avatar_url || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'}
-                                    alt={profile.username ?? ''}
-                                    className="w-32 h-32 rounded-full object-cover border-4 border-slate-200 dark:border-slate-700"
-                                />
+                                {profile.avatar_url ? (
+                                    <img
+                                        src={profile.avatar_url}
+                                        alt={profile.username ?? ''}
+                                        className="w-32 h-32 rounded-full object-cover border-4 border-slate-200 dark:border-slate-700"
+                                    />
+                                ) : (
+                                    <div className="w-32 h-32 rounded-full bg-slate-100 dark:bg-slate-800 border-4 border-slate-200 dark:border-slate-700 flex items-center justify-center">
+                                        <User size={64} className="text-slate-400 dark:text-slate-600" />
+                                    </div>
+                                )}
                                 {profile.is_verified && (
                                     <div className="absolute bottom-0 right-0 bg-blue-500 rounded-full p-1.5 border-2 border-white dark:border-slate-900">
                                         <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">

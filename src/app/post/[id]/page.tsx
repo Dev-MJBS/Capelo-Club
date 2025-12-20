@@ -108,9 +108,13 @@ export default async function GlobalPostPage(props: { params: Promise<{ id: stri
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
                                     {mainPost.profiles?.avatar_url ? (
-                                        <img src={mainPost.profiles.avatar_url} alt={mainPost.profiles.username} className="w-full h-full object-cover" />
+                                        <img
+                                            src={mainPost.profiles.avatar_url}
+                                            alt={mainPost.profiles.username}
+                                            className="w-full h-full object-cover"
+                                        />
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-slate-400">
+                                        <div className="w-full h-full flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-400">
                                             <User size={20} />
                                         </div>
                                     )}

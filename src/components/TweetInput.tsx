@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
-import { Image as ImageIcon, Send, Loader2, X } from 'lucide-react'
+import { Image as ImageIcon, Send, Loader2, X, User } from 'lucide-react'
 import { createTweet } from '@/app/actions'
 import TagSelector from './TagSelector'
 
@@ -80,11 +80,17 @@ export default function TweetInput({ userAvatar }: { userAvatar?: string }) {
             <form onSubmit={handleSubmit}>
                 <div className="flex gap-4">
                     <div className="flex-shrink-0">
-                        <img
-                            src={userAvatar || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'}
-                            alt="User"
-                            className="w-10 h-10 rounded-full object-cover"
-                        />
+                        {userAvatar ? (
+                            <img
+                                src={userAvatar}
+                                alt="User"
+                                className="w-10 h-10 rounded-full object-cover"
+                            />
+                        ) : (
+                            <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+                                <User size={20} className="text-slate-500" />
+                            </div>
+                        )}
                     </div>
                     <div className="flex-1">
                         <textarea

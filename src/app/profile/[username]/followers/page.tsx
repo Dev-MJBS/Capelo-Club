@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Users } from 'lucide-react'
+import { ArrowLeft, Users, User } from 'lucide-react'
 import Image from 'next/image'
 import FollowButton from '@/components/FollowButton'
 
@@ -88,13 +88,19 @@ export default async function FollowersPage({ params }: PageProps) {
                                             href={`/profile/${follower.username}`}
                                             className="flex items-center gap-3 flex-1 min-w-0"
                                         >
-                                            <Image
-                                                src={follower.avatar_url || '/default-avatar.png'}
-                                                alt={follower.username}
-                                                width={48}
-                                                height={48}
-                                                className="rounded-full"
-                                            />
+                                            {follower.avatar_url ? (
+                                                <Image
+                                                    src={follower.avatar_url}
+                                                    alt={follower.username}
+                                                    width={48}
+                                                    height={48}
+                                                    className="rounded-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+                                                    <User size={24} className="text-slate-500" />
+                                                </div>
+                                            )}
                                             <div className="flex-1 min-w-0">
                                                 <h3 className="font-semibold text-slate-900 dark:text-white truncate">
                                                     @{follower.username}
