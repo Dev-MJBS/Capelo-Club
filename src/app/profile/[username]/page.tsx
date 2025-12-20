@@ -29,6 +29,17 @@ export default async function UserProfilePage({ params }: PageProps) {
         notFound()
     }
 
+    // Check if current user is admin
+    let isAdmin = false
+    if (user) {
+        const { data: currentUserProfile } = await (supabase
+            .from('profiles') as any)
+            .select('is_admin')
+            .eq('id', user.id)
+            .single()
+        isAdmin = !!currentUserProfile?.is_admin
+    }
+
     console.log('Profile loaded successfully:', profile.username)
 
     const isOwnProfile = user?.id === profile.id
