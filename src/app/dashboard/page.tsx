@@ -5,7 +5,7 @@ import FeedPostCard from '@/components/FeedPostCard'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { PlusCircle, Compass } from 'lucide-react'
+import { PlusCircle, Compass, BookOpen } from 'lucide-react'
 import TweetInput from '@/components/TweetInput'
 import FeedTabs from '@/components/FeedTabs'
 import FollowingFeed from '@/components/FollowingFeed'
@@ -164,6 +164,25 @@ export default async function Dashboard() {
                                 className="block w-full text-center bg-white text-indigo-600 font-bold py-2 px-4 rounded-lg hover:bg-indigo-50 transition-colors"
                             >
                                 Explorar Agora 🔍
+                            </Link>
+                        </div>
+
+                        {/* Livro do Mês CTA */}
+                        <div className="bg-gradient-to-r from-amber-600 to-orange-600 rounded-xl p-6 text-white shadow-lg">
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                                    <BookOpen size={24} className="text-white" />
+                                </div>
+                                <h3 className="font-bold text-lg">Livro do Mês</h3>
+                            </div>
+                            <p className="text-amber-100 text-sm mb-4">
+                                Confira a leitura do mês e participe das discussões sobre o livro escolhido.
+                            </p>
+                            <Link
+                                href="/livro-do-mes/votacao"
+                                className="block w-full text-center bg-white text-amber-600 font-bold py-2 px-4 rounded-lg hover:bg-amber-50 transition-colors"
+                            >
+                                Ver Livro do Mês 📖
                             </Link>
                         </div>
 

@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import Image from 'next/image'
 import Link from 'next/link'
 import TagBadge from './TagBadge'
+import AvatarImage from './AvatarImage'
 
 type SearchType = 'all' | 'posts' | 'users' | 'tags' | 'subclubs'
 
@@ -225,19 +226,11 @@ export default function GlobalSearch() {
                                                         className="block p-3 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition"
                                                     >
                                                         <div className="flex items-start gap-3">
-                                                            {post.profiles?.avatar_url && post.profiles.avatar_url !== '/default-avatar.png' ? (
-                                                                <Image
-                                                                    src={post.profiles.avatar_url}
-                                                                    alt={post.profiles.username}
-                                                                    width={32}
-                                                                    height={32}
-                                                                    className="rounded-full object-cover"
-                                                                />
-                                                            ) : (
-                                                                <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
-                                                                    <User size={16} className="text-slate-500" />
-                                                                </div>
-                                                            )}
+                                                            <AvatarImage
+                                                                src={post.profiles?.avatar_url}
+                                                                alt={post.profiles?.username || 'User'}
+                                                                size="sm"
+                                                            />
                                                             <div className="flex-1 min-w-0">
                                                                 {post.title && (
                                                                     <h4 className="font-semibold text-slate-900 dark:text-white truncate">
@@ -273,19 +266,11 @@ export default function GlobalSearch() {
                                                         className="block p-3 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition"
                                                     >
                                                         <div className="flex items-center gap-3">
-                                                            {user.avatar_url && user.avatar_url !== '/default-avatar.png' ? (
-                                                                <Image
-                                                                    src={user.avatar_url}
-                                                                    alt={user.username}
-                                                                    width={40}
-                                                                    height={40}
-                                                                    className="rounded-full object-cover"
-                                                                />
-                                                            ) : (
-                                                                <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
-                                                                    <User size={20} className="text-slate-500" />
-                                                                </div>
-                                                            )}
+                                                            <AvatarImage
+                                                                src={user.avatar_url}
+                                                                alt={user.username}
+                                                                size="md"
+                                                            />
                                                             <div className="flex-1 min-w-0">
                                                                 <h4 className="font-semibold text-slate-900 dark:text-white">
                                                                     @{user.username}

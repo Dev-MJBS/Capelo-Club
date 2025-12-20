@@ -73,6 +73,28 @@ export default async function Home() {
                 </section>
             )}
 
+            {/* Livro do Mês Section */}
+            <section className="w-full max-w-6xl mx-auto px-4 py-12">
+                <div className="bg-gradient-to-r from-amber-600 to-orange-600 rounded-2xl p-8 text-white shadow-lg">
+                    <div className="flex items-center gap-4 mb-4">
+                        <div className="p-3 bg-white/20 rounded-lg backdrop-blur-sm">
+                            <BookOpen size={32} className="text-white" />
+                        </div>
+                        <div>
+                            <h2 className="text-3xl font-bold">Livro do Mês</h2>
+                            <p className="text-amber-100">Leitura recomendada e discussões da comunidade</p>
+                        </div>
+                    </div>
+                    <p className="text-amber-100 mb-6">Descubra qual é o livro do mês escolhido pela nossa comunidade. Participe da votação, leia junto com outros membros e compartilhe suas opiniões!</p>
+                    <Link
+                        href="/livro-do-mes/votacao"
+                        className="inline-block bg-white text-amber-600 font-bold py-3 px-6 rounded-lg hover:bg-amber-50 transition-colors"
+                    >
+                        Acessar Livro do Mês 📖
+                    </Link>
+                </div>
+            </section>
+
             <footer className="mt-auto py-8 text-slate-400 text-sm w-full text-center border-t border-slate-200 dark:border-slate-800">
                 © 2025 Capelo's Club. Inspire-se.
             </footer>

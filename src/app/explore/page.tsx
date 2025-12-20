@@ -4,6 +4,7 @@ import { TrendingUp, Users, Hash, Sparkles, ArrowRight, User } from 'lucide-reac
 import Image from 'next/image'
 import TagBadge from '@/components/TagBadge'
 import FollowButton from '@/components/FollowButton'
+import AvatarImage from '@/components/AvatarImage'
 import { redirect } from 'next/navigation'
 
 export default async function ExplorePage() {
@@ -114,19 +115,11 @@ export default async function ExplorePage() {
                                                 className="block bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all"
                                             >
                                                 <div className="flex items-start gap-3">
-                                                    {profile?.avatar_url && profile.avatar_url !== '/default-avatar.png' ? (
-                                                        <Image
-                                                            src={profile.avatar_url}
-                                                            alt={profile.username}
-                                                            width={40}
-                                                            height={40}
-                                                            className="rounded-full object-cover"
-                                                        />
-                                                    ) : (
-                                                        <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
-                                                            <User size={20} className="text-slate-500" />
-                                                        </div>
-                                                    )}
+                                                    <AvatarImage
+                                                        src={profile?.avatar_url}
+                                                        alt={profile?.username || 'User'}
+                                                        size="md"
+                                                    />
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-center gap-2 mb-1">
                                                             <span className="font-semibold text-slate-900 dark:text-white">
@@ -211,19 +204,11 @@ export default async function ExplorePage() {
                                         <div key={suggestedUser.id} className="p-4">
                                             <div className="flex items-start gap-3 mb-3">
                                                 <Link href={`/profile/${suggestedUser.username}`}>
-                                                    {suggestedUser.avatar_url && suggestedUser.avatar_url !== '/default-avatar.png' ? (
-                                                        <Image
-                                                            src={suggestedUser.avatar_url}
-                                                            alt={suggestedUser.username}
-                                                            width={40}
-                                                            height={40}
-                                                            className="rounded-full object-cover"
-                                                        />
-                                                    ) : (
-                                                        <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
-                                                            <User size={20} className="text-slate-500" />
-                                                        </div>
-                                                    )}
+                                                    <AvatarImage
+                                                        src={suggestedUser.avatar_url}
+                                                        alt={suggestedUser.username}
+                                                        size="md"
+                                                    />
                                                 </Link>
                                                 <div className="flex-1 min-w-0">
                                                     <Link
