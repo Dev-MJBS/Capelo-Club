@@ -18,12 +18,17 @@ export default async function FollowersPage({ params }: PageProps) {
         .from('profiles')
         .select('id, username, avatar_url, followers_count')
         .eq('username', username)
-        .single()
+        .single<{
+            id: string
+            username: string | null
+            avatar_url: string | null
+            followers_count: number | null
+        }>()
 
     if (!profile) notFound()
 
     // Buscar seguidores
-    const { data: followers } = await supabase
+    const { data: followers } = await (supabase
         .from('follows')
         .select(`
       follower_id,
@@ -38,7 +43,7 @@ export default async function FollowersPage({ params }: PageProps) {
       )
     `)
         .eq('following_id', profile.id)
-        .order('created_at', { ascending: false })
+        .order('created_at', { ascending: false }) as any)
 
     const { data: { user } } = await supabase.auth.getUser()
 

@@ -11,7 +11,11 @@ export default async function NotificationsPage() {
     if (!user) redirect('/')
 
     // Fetch user profile for navbar
-    const { data: profile } = await (supabase.from('profiles') as any).select('is_admin').eq('id', user.id).single()
+    const { data: profile } = await (supabase
+        .from('profiles') as any)
+        .select('is_admin')
+        .eq('id', user.id)
+        .single()
 
     // Fetch notifications
     const { data: notifications, error } = await (supabase
@@ -31,16 +35,16 @@ export default async function NotificationsPage() {
 
     // Mark as read
     if (notifications && notifications.length > 0) {
-        const unreadIds = notifications.filter(n => !n.read).map(n => n.id)
+        const unreadIds = notifications.filter((n: any) => !n.read).map((n: any) => n.id)
         if (unreadIds.length > 0) {
-            await supabase.from('notifications').update({ read: true }).in('id', unreadIds)
+            await (supabase.from('notifications') as any).update({ read: true }).in('id', unreadIds)
         }
     }
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-            <Navbar user={user} isAdmin={profile?.is_admin} />
-            
+            <Navbar user={user} isAdmin={profile?.is_admin ?? undefined} />
+
             <main className="max-w-2xl mx-auto px-4 py-8">
                 <div className="flex items-center gap-4 mb-6">
                     <Link href="/dashboard" className="text-slate-500 hover:text-slate-900 dark:hover:text-white">
@@ -50,22 +54,20 @@ export default async function NotificationsPage() {
                 </div>
 
                 <div className="space-y-4">
-                    {notifications?.map((notification) => (
-                        <Link 
-                            key={notification.id} 
+                    {notifications?.map((notification: any) => (
+                        <Link
+                            key={notification.id}
                             href={notification.post?.group_id ? `/group/${notification.post.group_id}/post/${notification.post_id}` : '#'}
-                            className={`block p-4 rounded-xl border transition-colors ${
-                                notification.read 
-                                    ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800' 
-                                    : 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800'
-                            }`}
+                            className={`block p-4 rounded-xl border transition-colors ${notification.read
+                                ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'
+                                : 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800'
+                                }`}
                         >
                             <div className="flex items-start gap-3">
-                                <div className={`p-2 rounded-full ${
-                                    notification.type === 'like' 
-                                        ? 'bg-pink-100 text-pink-600 dark:bg-pink-900/30 dark:text-pink-400' 
-                                        : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
-                                }`}>
+                                <div className={`p-2 rounded-full ${notification.type === 'like'
+                                    ? 'bg-pink-100 text-pink-600 dark:bg-pink-900/30 dark:text-pink-400'
+                                    : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                                    }`}>
                                     {notification.type === 'like' ? <Heart size={16} /> : <MessageSquare size={16} />}
                                 </div>
                                 <div>

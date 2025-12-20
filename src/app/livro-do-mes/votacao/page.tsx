@@ -12,18 +12,22 @@ export default async function VotingPage() {
         redirect('/auth/login?next=/livro-do-mes/votacao')
     }
 
-    const { data: profile } = await supabase.from('profiles').select('is_admin, is_verified').eq('id', user.id).single()
-    
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_admin, is_verified')
+        .eq('id', user.id)
+        .single<{ is_admin: boolean | null; is_verified: boolean | null }>()
+
     const state = await getVotingState()
     const nominees = await getNominees()
     const userVoteId = await getUserVote()
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-            <Navbar user={user} isAdmin={profile?.is_admin} />
-            
+            <Navbar user={user} isAdmin={profile?.is_admin ?? undefined} />
+
             <main className="max-w-3xl mx-auto px-4 py-8">
-                <VotingInterface 
+                <VotingInterface
                     state={state}
                     nominees={nominees}
                     userVoteId={userVoteId}

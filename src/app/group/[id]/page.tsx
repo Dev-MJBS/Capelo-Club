@@ -21,10 +21,25 @@ export default async function GroupPage(props: { params: Promise<{ id: string }>
         .from('profiles')
         .select('is_admin')
         .eq('id', user.id)
-        .single()
+        .single<{ is_admin: boolean | null }>()
 
     // Fetch group details
-    const { data: group } = await supabase.from('groups').select('*').eq('id', id).single()
+    const { data: group } = await supabase
+        .from('groups')
+        .select('*')
+        .eq('id', id)
+        .single<{
+            id: string
+            title: string
+            book_title: string
+            description: string | null
+            cover_image: string | null
+            created_at: string
+            creator_id: string | null
+            members_count: number | null
+            is_private: boolean | null
+            slug: string | null
+        }>()
     if (!group) notFound()
 
     // Fetch threads (posts with no parent)
@@ -34,11 +49,31 @@ export default async function GroupPage(props: { params: Promise<{ id: string }>
         .eq('group_id', id)
         .is('parent_id', null)
         .order('created_at', { ascending: false })
+        .returns<Array<{
+            id: string
+            user_id: string
+            title: string
+            content: string
+            created_at: string
+            likes_count: number
+            group_id: string | null
+            parent_id: string | null
+            image_url: string | null
+        }>>()
 
     // Manually fetch profiles since we didn't set up explicit FK reference in schema for easy join (my bad, but fixing via code)
     const userIds = posts ? [...new Set(posts.map(p => p.user_id))] : []
     const { data: profiles } = userIds.length > 0
-        ? await supabase.from('profiles').select('id, username, avatar_url, is_verified').in('id', userIds)
+        ? await supabase
+            .from('profiles')
+            .select('id, username, avatar_url, is_verified')
+            .in('id', userIds)
+            .returns<Array<{
+                id: string
+                username: string | null
+                avatar_url: string | null
+                is_verified: boolean | null
+            }>>()
         : { data: [] }
 
     const profilesMap = new Map(profiles?.map(p => [p.id, p]))
@@ -95,9 +130,9 @@ export default async function GroupPage(props: { params: Promise<{ id: string }>
                                         <div className="flex items-center gap-4">
                                             <span className="flex items-center gap-1.5">
                                                 {author?.avatar_url ? (
-                                                    <img 
-                                                        src={author.avatar_url} 
-                                                        alt={author.username} 
+                                                    <img
+                                                        src={author.avatar_url}
+                                                        alt={author.username ?? ''}
                                                         className="w-5 h-5 rounded-full object-cover"
                                                     />
                                                 ) : (
@@ -116,9 +151,9 @@ export default async function GroupPage(props: { params: Promise<{ id: string }>
                                             </span>
                                         </div>
                                         <div className="flex items-center gap-4">
-                                            <GroupPostCardActions 
-                                                postId={post.id} 
-                                                isOwner={isOwner} 
+                                            <GroupPostCardActions
+                                                postId={post.id}
+                                                isOwner={isOwner}
                                                 initialLikes={post.likes_count}
                                                 currentUserId={user.id}
                                                 isAdmin={!!profile?.is_admin}

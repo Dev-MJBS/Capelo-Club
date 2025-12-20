@@ -30,7 +30,11 @@ export default async function ThreadPage(props: { params: Promise<{ id: string, 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/')
 
-    const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single<{ is_admin: boolean | null }>()
     const isAdmin = !!profile?.is_admin
 
     // Fetch the main post
@@ -38,7 +42,17 @@ export default async function ThreadPage(props: { params: Promise<{ id: string, 
         .from('posts')
         .select('*')
         .eq('id', postId)
-        .single()
+        .single<{
+            id: string
+            user_id: string
+            title: string | null
+            content: string
+            parent_id: string | null
+            created_at: string
+            likes_count: number
+            group_id: string | null
+            image_url: string | null
+        }>()
 
     if (!mainPost) notFound()
 
@@ -48,11 +62,31 @@ export default async function ThreadPage(props: { params: Promise<{ id: string, 
         .select('*')
         .eq('group_id', groupId)
         .order('created_at', { ascending: true })
+        .returns<Array<{
+            id: string
+            user_id: string
+            title: string | null
+            content: string
+            parent_id: string | null
+            created_at: string
+            likes_count: number
+            group_id: string | null
+            image_url: string | null
+        }>>()
 
     // Fetch profiles for all authors
     const userIds = allGroupPosts ? [...new Set(allGroupPosts.map(p => p.user_id))] : []
     const { data: profiles } = userIds.length > 0
-        ? await supabase.from('profiles').select('id, username, avatar_url, is_verified').in('id', userIds)
+        ? await supabase
+            .from('profiles')
+            .select('id, username, avatar_url, is_verified')
+            .in('id', userIds)
+            .returns<Array<{
+                id: string
+                username: string | null
+                avatar_url: string | null
+                is_verified: boolean | null
+            }>>()
         : { data: [] }
     const profilesMap = new Map(profiles?.map(p => [p.id, p]))
 
@@ -97,9 +131,9 @@ export default async function ThreadPage(props: { params: Promise<{ id: string, 
                     <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">{rootPost.title || 'Discussão'}</h1>
                     <div className="flex items-center gap-2 mb-6">
                         {rootPost.profiles?.avatar_url ? (
-                            <img 
-                                src={rootPost.profiles.avatar_url} 
-                                alt={rootPost.profiles.username} 
+                            <img
+                                src={rootPost.profiles.avatar_url}
+                                alt={rootPost.profiles.username}
                                 className="w-10 h-10 rounded-full object-cover"
                             />
                         ) : (
@@ -114,10 +148,10 @@ export default async function ThreadPage(props: { params: Promise<{ id: string, 
                                     <VerifiedBadge size={16} />
                                 )}
                                 {isAdmin && (
-                                    <VerifyUserButton 
-                                        userId={rootPost.user_id} 
-                                        isVerified={!!rootPost.profiles?.is_verified} 
-                                        isAdmin={isAdmin} 
+                                    <VerifyUserButton
+                                        userId={rootPost.user_id}
+                                        isVerified={!!rootPost.profiles?.is_verified}
+                                        isAdmin={isAdmin}
                                     />
                                 )}
                             </span>

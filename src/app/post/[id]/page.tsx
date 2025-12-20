@@ -29,35 +29,39 @@ export default async function GlobalPostPage(props: { params: Promise<{ id: stri
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/')
 
-    const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single<{ is_admin: boolean | null }>()
     const isAdmin = !!profile?.is_admin
 
     // Fetch the main post
-    const { data: mainPost } = await supabase
+    const { data: mainPost } = await (supabase
         .from('posts')
         .select(`
             *,
             profiles:user_id (username, avatar_url, is_verified)
         `)
         .eq('id', postId)
-        .single()
+        .single() as any)
 
     if (!mainPost) notFound()
 
     // Fetch all global posts (group_id is null) to build the tree
     // This is an optimization trade-off. For a large app, we'd need a better query (recursive CTE or path enumeration).
-    const { data: allGlobalPosts } = await supabase
+    const { data: allGlobalPosts } = await (supabase
         .from('posts')
         .select(`
             *,
             profiles:user_id (username, avatar_url, is_verified)
         `)
         .is('group_id', null)
-        .order('created_at', { ascending: true })
+        .order('created_at', { ascending: true }) as any)
 
     // Build the tree
     const postMap = new Map<string, Post>()
-    
+
     // Initialize map
     allGlobalPosts?.forEach((post: any) => {
         postMap.set(post.id, { ...post, children: [] })
@@ -118,10 +122,10 @@ export default async function GlobalPostPage(props: { params: Promise<{ id: stri
                                         </span>
                                         {mainPost.profiles?.is_verified && <VerifiedBadge />}
                                         {isAdmin && (
-                                            <VerifyUserButton 
-                                                userId={mainPost.user_id} 
-                                                isVerified={!!mainPost.profiles?.is_verified} 
-                                                isAdmin={isAdmin} 
+                                            <VerifyUserButton
+                                                userId={mainPost.user_id}
+                                                isVerified={!!mainPost.profiles?.is_verified}
+                                                isAdmin={isAdmin}
                                             />
                                         )}
                                     </div>
@@ -135,7 +139,7 @@ export default async function GlobalPostPage(props: { params: Promise<{ id: stri
                                     </span>
                                 </div>
                             </div>
-                            
+
                             {user.id === mainPost.user_id && (
                                 <DeletePostButton postId={mainPost.id} />
                             )}
@@ -146,19 +150,19 @@ export default async function GlobalPostPage(props: { params: Promise<{ id: stri
                                 {mainPost.content}
                             </p>
                             {mainPost.image_url && (
-                                <img 
-                                    src={mainPost.image_url} 
-                                    alt="Post attachment" 
+                                <img
+                                    src={mainPost.image_url}
+                                    alt="Post attachment"
                                     className="mt-4 rounded-lg max-h-96 object-cover w-full"
                                 />
                             )}
                         </div>
 
                         <div className="flex items-center gap-4 pt-4 border-t border-slate-100 dark:border-slate-800">
-                            <LikeButton 
-                                postId={mainPost.id} 
-                                initialLikes={mainPost.likes_count} 
-                                currentUserId={user.id} 
+                            <LikeButton
+                                postId={mainPost.id}
+                                initialLikes={mainPost.likes_count}
+                                currentUserId={user.id}
                             />
                         </div>
                     </div>
@@ -173,10 +177,10 @@ export default async function GlobalPostPage(props: { params: Promise<{ id: stri
 
                 <div className="space-y-4">
                     {postTree?.children?.map((child) => (
-                        <CommentNode 
-                            key={child.id} 
-                            post={child} 
-                            depth={0} 
+                        <CommentNode
+                            key={child.id}
+                            post={child}
+                            depth={0}
                             groupId={null}
                             currentUserId={user.id}
                             isAdmin={isAdmin}

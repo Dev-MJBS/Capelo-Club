@@ -24,10 +24,25 @@ export default async function Dashboard() {
         .from('profiles')
         .select('is_admin, avatar_url')
         .eq('id', user.id)
-        .single()
+        .single<{ is_admin: boolean | null; avatar_url: string | null }>()
 
     // Fetch groups
-    const { data: groups } = await supabase.from('groups').select('*').order('created_at', { ascending: false })
+    const { data: groups } = await supabase
+        .from('groups')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .returns<Array<{
+            id: string
+            title: string
+            book_title: string
+            description: string | null
+            cover_image: string | null
+            created_at: string
+            creator_id: string | null
+            members_count: number | null
+            is_private: boolean | null
+            slug: string | null
+        }>>()
 
     // Fetch recent posts (Tweets + Group Posts) with tags
     const { data: posts } = await (supabase
@@ -52,14 +67,14 @@ export default async function Dashboard() {
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-            <Navbar user={user} isAdmin={profile?.is_admin} />
+            <Navbar user={user} isAdmin={profile?.is_admin ?? undefined} />
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
                     {/* Left/Main Column: Feed */}
                     <div className="lg:col-span-8 space-y-6">
-                        <TweetInput userAvatar={profile?.avatar_url} />
+                        <TweetInput userAvatar={profile?.avatar_url ?? undefined} />
 
                         <FeedTabs
                             allFeedContent={
@@ -71,7 +86,7 @@ export default async function Dashboard() {
                                         </div>
                                     ) : (
                                         <div className="space-y-4">
-                                            {transformedPosts.map((post) => {
+                                            {transformedPosts.map((post: any) => {
                                                 // Allow posts without group (tweets)
                                                 if (!post.user) return null
                                                 return (
@@ -172,8 +187,8 @@ export default async function Dashboard() {
                                             id={group.id}
                                             title={group.title}
                                             bookTitle={group.book_title}
-                                            description={group.description}
-                                            memberCount={group.members_count}
+                                            description={group.description ?? ''}
+                                            memberCount={group.members_count ?? undefined}
                                         />
                                     </div>
                                 ))}

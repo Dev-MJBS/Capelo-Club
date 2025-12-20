@@ -40,13 +40,13 @@ function getMonthSlug(date: Date): string {
 export async function getVotingState(): Promise<VotingState> {
     const now = new Date()
     const day = now.getDate()
-    
+
     // Logic:
     // Nomination: 26, 27, 28
     // Voting: 26..End, 1
-    
+
     let status: 'nomination' | 'voting' | 'closed' = 'closed'
-    
+
     if (day >= 26 || day === 1) {
         status = 'voting'
         if (day >= 26 && day <= 28) {
@@ -55,7 +55,7 @@ export async function getVotingState(): Promise<VotingState> {
     }
 
     const targetDate = getTargetMonthDate(now)
-    
+
     if (targetDate.getTime() === new Date(0).getTime()) {
         return { status: 'closed', targetMonthDate: null, targetMonthSlug: null }
     }
@@ -76,7 +76,7 @@ export async function nominateBook(bookData: {
 }) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
-    
+
     if (!user) throw new Error('Unauthorized')
 
     const state = await getVotingState()
@@ -85,12 +85,16 @@ export async function nominateBook(bookData: {
     }
 
     // Check verification
-    const { data: profile } = await supabase.from('profiles').select('is_verified').eq('id', user.id).single()
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_verified')
+        .eq('id', user.id)
+        .single<{ is_verified: boolean | null }>()
     if (!profile?.is_verified) {
         throw new Error('Apenas usuários verificados podem indicar livros.')
     }
 
-    const { error } = await supabase.from('monthly_nominations').insert({
+    const { error } = await (supabase.from('monthly_nominations') as any).insert({
         target_month_date: state.targetMonthDate,
         book_title: bookData.title,
         book_author: bookData.author,
@@ -112,7 +116,7 @@ export async function nominateBook(bookData: {
 export async function voteForBook(nominationId: string) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
-    
+
     if (!user) throw new Error('Unauthorized')
 
     const state = await getVotingState()
@@ -120,7 +124,7 @@ export async function voteForBook(nominationId: string) {
         throw new Error('Votação encerrada.')
     }
 
-    const { error } = await supabase.from('monthly_votes').insert({
+    const { error } = await (supabase.from('monthly_votes') as any).insert({
         nomination_id: nominationId,
         user_id: user.id,
         target_month_date: state.targetMonthDate
@@ -138,16 +142,16 @@ export async function voteForBook(nominationId: string) {
 export async function getNominees() {
     const supabase = await createClient()
     const state = await getVotingState()
-    
+
     if (!state.targetMonthDate) return []
 
     // Get nominations and vote counts
     // Supabase doesn't support count relations easily in one query without raw SQL or view, 
     // but we can fetch votes separately or use .select('*, votes:monthly_votes(count)') if setup?
     // Standard PostgREST: select=*,monthly_votes(count)
-    
-    const { data, error } = await supabase
-        .from('monthly_nominations')
+
+    const { data, error } = await (supabase
+        .from('monthly_nominations') as any)
         .select(`
             *,
             nominator:profiles!nominated_by(username, is_verified),
@@ -157,9 +161,9 @@ export async function getNominees() {
         .order('created_at', { ascending: true })
 
     if (error) console.error(error)
-    
+
     // Transform to include vote count property
-    return data?.map(n => ({
+    return data?.map((n: any) => ({
         ...n,
         vote_count: n.votes?.[0]?.count || 0
     })) || []
@@ -173,8 +177,8 @@ export async function getUserVote() {
     const state = await getVotingState()
     if (!state.targetMonthDate) return null
 
-    const { data } = await supabase
-        .from('monthly_votes')
+    const { data } = await (supabase
+        .from('monthly_votes') as any)
         .select('nomination_id')
         .eq('user_id', user.id)
         .eq('target_month_date', state.targetMonthDate)
@@ -186,16 +190,20 @@ export async function getUserVote() {
 export async function adminPickWinner(nominationId: string) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
-    
+
     if (!user) throw new Error('Unauthorized')
 
     // Check admin
-    const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single<{ is_admin: boolean | null }>()
     if (!profile?.is_admin) throw new Error('Forbidden')
 
     // Get nomination details
-    const { data: nomination } = await supabase
-        .from('monthly_nominations')
+    const { data: nomination } = await (supabase
+        .from('monthly_nominations') as any)
         .select('*')
         .eq('id', nominationId)
         .single()
@@ -203,8 +211,8 @@ export async function adminPickWinner(nominationId: string) {
     if (!nomination) throw new Error('Nomination not found')
 
     // Get vote count
-    const { count } = await supabase
-        .from('monthly_votes')
+    const { count } = await (supabase
+        .from('monthly_votes') as any)
         .select('*', { count: 'exact', head: true })
         .eq('nomination_id', nominationId)
 
@@ -213,7 +221,7 @@ export async function adminPickWinner(nominationId: string) {
     const date = new Date(nomination.target_month_date)
     const slug = getMonthSlug(date)
 
-    const { error } = await supabase.from('book_of_the_month').upsert({
+    const { error } = await (supabase.from('book_of_the_month') as any).upsert({
         month_date: nomination.target_month_date,
         slug: slug,
         book_title: nomination.book_title,
@@ -236,10 +244,14 @@ export async function adminPickWinner(nominationId: string) {
 export async function updateCurrentBook(formData: FormData) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
-    
+
     if (!user) return { success: false, error: 'Unauthorized' }
 
-    const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single<{ is_admin: boolean | null }>()
     if (!profile?.is_admin) return { success: false, error: 'Forbidden' }
 
     const id = formData.get('id') as string
@@ -250,7 +262,7 @@ export async function updateCurrentBook(formData: FormData) {
 
     if (!id || !title || !author) return { success: false, error: 'Missing fields' }
 
-    const { error } = await supabase.from('book_of_the_month').update({
+    const { error } = await (supabase.from('book_of_the_month') as any).update({
         book_title: title,
         book_author: author,
         book_description: description,

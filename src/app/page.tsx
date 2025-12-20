@@ -7,8 +7,8 @@ export default async function Home() {
     const supabase = await createClient()
 
     // Fetch official subclubs
-    const { data: officialSubclubs } = await supabase
-        .from('subclubs')
+    const { data: officialSubclubs } = await (supabase
+        .from('subclubs') as any)
         .select('*')
         .eq('is_official', true)
         .limit(6)
@@ -58,7 +58,7 @@ export default async function Home() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {officialSubclubs.map(subclub => (
+                        {officialSubclubs.map((subclub: any) => (
                             <SubclubCard
                                 key={subclub.id}
                                 id={subclub.id}

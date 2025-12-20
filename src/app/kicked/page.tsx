@@ -22,7 +22,7 @@ export default async function KickedPage({
         .from('profiles')
         .select('kicked_until, kick_reason')
         .eq('id', user.id)
-        .single()
+        .single<{ kicked_until: string | null; kick_reason: string | null }>()
 
     // Se não estiver kickado ou o kick expirou, redirecionar para dashboard
     if (!profile?.kicked_until || new Date(profile.kicked_until) <= new Date()) {

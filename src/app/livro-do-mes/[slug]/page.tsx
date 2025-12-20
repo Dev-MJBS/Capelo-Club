@@ -19,10 +19,10 @@ export default async function BookOfTheMonthPage(props: { params: Promise<{ slug
             'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'
         ]
         const currentSlug = `${months[now.getMonth()]}-${now.getFullYear()}`
-        
+
         // Check if exists
         const { data: exists } = await supabase.from('book_of_the_month').select('slug').eq('slug', currentSlug).single()
-        
+
         if (exists) {
             redirect(`/livro-do-mes/${currentSlug}`)
         } else {
@@ -37,7 +37,18 @@ export default async function BookOfTheMonthPage(props: { params: Promise<{ slug
         .from('book_of_the_month')
         .select('*')
         .eq('slug', slug)
-        .single()
+        .single<{
+            id: string
+            slug: string
+            book_title: string
+            book_author: string
+            book_description: string | null
+            book_cover_url: string | null
+            month: string
+            year: number
+            created_at: string
+            winner_id: string | null
+        }>()
 
     if (!book) {
         // If not found, maybe it's a future month or just invalid
@@ -45,7 +56,7 @@ export default async function BookOfTheMonthPage(props: { params: Promise<{ slug
     }
 
     // Fetch Discussions
-    const { data: posts } = await supabase
+    const { data: posts } = await (supabase
         .from('posts')
         .select(`
             *,
@@ -53,20 +64,24 @@ export default async function BookOfTheMonthPage(props: { params: Promise<{ slug
             user:profiles(username, avatar_url, is_verified)
         `)
         .eq('book_of_the_month_id', book.id)
-        .order('created_at', { ascending: false })
+        .order('created_at', { ascending: false }) as any)
 
     // Fetch user profile for navbar
-    const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user?.id).single()
+    const { data: profile } = user ? await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single<{ is_admin: boolean | null }>() : { data: null }
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-            {user && <Navbar user={user} isAdmin={profile?.is_admin} />}
-            
+            {user && <Navbar user={user} isAdmin={profile?.is_admin ?? undefined} />}
+
             {/* Hero Section */}
             <div className="bg-slate-900 text-white relative overflow-hidden">
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=2690&auto=format&fit=crop')] bg-cover bg-center opacity-20"></div>
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent"></div>
-                
+
                 <div className="max-w-5xl mx-auto px-4 py-16 relative z-10 flex flex-col md:flex-row gap-8 items-center md:items-start">
                     <div className="w-48 md:w-64 flex-shrink-0 shadow-2xl rounded-lg overflow-hidden transform rotate-3 hover:rotate-0 transition-transform duration-500">
                         {book.book_cover_url ? (
@@ -77,28 +92,28 @@ export default async function BookOfTheMonthPage(props: { params: Promise<{ slug
                             </div>
                         )}
                     </div>
-                    
+
                     <div className="flex-1 text-center md:text-left">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-sm font-medium mb-4">
                             <Calendar size={14} />
                             <span className="capitalize">{slug.replace('-', ' ')}</span>
                         </div>
-                        
+
                         <h1 className="text-3xl md:text-5xl font-bold mb-2">{book.book_title}</h1>
                         <p className="text-xl text-slate-300 mb-6">por {book.book_author}</p>
-                        
+
                         <div className="prose prose-invert max-w-none text-slate-400 mb-8">
                             {book.book_description || 'Nenhuma descrição disponível.'}
                         </div>
 
                         <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                            <Link 
+                            <Link
                                 href={`/create-post?bookId=${book.id}`}
                                 className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold transition-colors flex items-center gap-2"
                             >
                                 <MessageSquare size={20} /> Iniciar Discussão
                             </Link>
-                            <Link 
+                            <Link
                                 href="/livro-do-mes/votacao"
                                 className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
                             >
@@ -120,8 +135,8 @@ export default async function BookOfTheMonthPage(props: { params: Promise<{ slug
 
                 <div className="space-y-6">
                     {posts && posts.length > 0 ? (
-                        posts.map(post => (
-                            <FeedPostCard 
+                        posts.map((post: any) => (
+                            <FeedPostCard
                                 key={post.id}
                                 post={{
                                     id: post.id,
@@ -143,7 +158,7 @@ export default async function BookOfTheMonthPage(props: { params: Promise<{ slug
                             <MessageSquare size={48} className="mx-auto text-slate-300 mb-4" />
                             <p className="text-slate-500 font-medium">Nenhuma discussão iniciada ainda.</p>
                             <p className="text-slate-400 text-sm mb-6">Seja o primeiro a compartilhar sua opinião sobre este livro!</p>
-                            <Link 
+                            <Link
                                 href={`/create-post?bookId=${book.id}`}
                                 className="text-indigo-600 hover:underline font-medium"
                             >

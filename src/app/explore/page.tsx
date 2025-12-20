@@ -46,6 +46,7 @@ export default async function ExplorePage() {
         .from('follows')
         .select('following_id')
         .eq('follower_id', user.id)
+        .returns<Array<{ following_id: string }>>()
 
     const followingIdsList = followingIds?.map(f => f.following_id) || []
 
@@ -176,7 +177,7 @@ export default async function ExplorePage() {
                                     {popularTags && popularTags.length > 0 ? (
                                         popularTags.map((tag: any) => (
                                             <Link key={tag.id} href={`/tags/${tag.slug}`}>
-                                                <TagBadge tag={tag} showCount />
+                                                <TagBadge tag={tag} />
                                             </Link>
                                         ))
                                     ) : (
