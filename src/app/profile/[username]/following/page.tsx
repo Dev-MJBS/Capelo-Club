@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { ArrowLeft, UserPlus, User } from 'lucide-react'
 import Image from 'next/image'
 import FollowButton from '@/components/FollowButton'
+import AvatarImage from '@/components/AvatarImage'
 
 interface PageProps {
     params: Promise<{ username: string }>
@@ -88,19 +89,11 @@ export default async function FollowingPage({ params }: PageProps) {
                                             href={`/profile/${followedUser.username}`}
                                             className="flex items-center gap-3 flex-1 min-w-0"
                                         >
-                                            {followedUser.avatar_url && followedUser.avatar_url !== '/default-avatar.png' ? (
-                                                <Image
-                                                    src={followedUser.avatar_url}
-                                                    alt={followedUser.username}
-                                                    width={48}
-                                                    height={48}
-                                                    className="rounded-full object-cover"
-                                                />
-                                            ) : (
-                                                <div className="w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
-                                                    <User size={24} className="text-slate-500" />
-                                                </div>
-                                            )}
+                                            <AvatarImage
+                                                src={followedUser.avatar_url}
+                                                alt={followedUser.username}
+                                                size="lg"
+                                            />
                                             <div className="flex-1 min-w-0">
                                                 <h3 className="font-semibold text-slate-900 dark:text-white truncate">
                                                     @{followedUser.username}

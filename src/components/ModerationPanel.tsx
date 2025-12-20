@@ -6,6 +6,7 @@ import { UserX, Ban, Shield, Clock, AlertTriangle, User } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import AvatarImage from './AvatarImage'
 
 interface ModerationPanelProps {
     currentUserId: string
@@ -173,19 +174,11 @@ export default function ModerationPanel({ currentUserId }: ModerationPanelProps)
                                 }}
                                 className="w-full p-3 flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition text-left"
                             >
-                                {user.avatar_url && user.avatar_url !== '/default-avatar.png' ? (
-                                    <Image
-                                        src={user.avatar_url}
-                                        alt={user.username}
-                                        width={32}
-                                        height={32}
-                                        className="rounded-full object-cover"
-                                    />
-                                ) : (
-                                    <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
-                                        <User size={16} className="text-slate-500" />
-                                    </div>
-                                )}
+                                <AvatarImage
+                                    src={user.avatar_url}
+                                    alt={user.username}
+                                    size="sm"
+                                />
                                 <div className="flex-1">
                                     <p className="font-semibold text-slate-900 dark:text-white">
                                         @{user.username}
@@ -208,19 +201,11 @@ export default function ModerationPanel({ currentUserId }: ModerationPanelProps)
                 <div className="mb-6 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-3">
-                            {selectedUser.avatar_url && selectedUser.avatar_url !== '/default-avatar.png' ? (
-                                <Image
-                                    src={selectedUser.avatar_url}
-                                    alt={selectedUser.username}
-                                    width={48}
-                                    height={48}
-                                    className="rounded-full object-cover"
-                                />
-                            ) : (
-                                <div className="w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
-                                    <User size={24} className="text-slate-500" />
-                                </div>
-                            )}
+                            <AvatarImage
+                                src={selectedUser.avatar_url}
+                                alt={selectedUser.username}
+                                size="lg"
+                            />
                             <div>
                                 <p className="font-bold text-slate-900 dark:text-white">
                                     @{selectedUser.username}
