@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Pencil, Save, X, Loader2, BookOpen } from 'lucide-react'
 import { updateCurrentBook } from '@/app/livro-do-mes/actions'
 import { useRouter } from 'next/navigation'
+import toast from 'react-hot-toast'
 
 interface BookOfTheMonthCardProps {
     book: {
@@ -41,7 +42,7 @@ export default function BookOfTheMonthCard({ book, isAdmin }: BookOfTheMonthCard
             setIsEditing(false)
             router.refresh()
         } else {
-            alert('Erro ao atualizar livro: ' + result.error)
+            toast.error('Erro ao atualizar livro: ' + result.error)
         }
         setLoading(false)
     }
@@ -57,12 +58,12 @@ export default function BookOfTheMonthCard({ book, isAdmin }: BookOfTheMonthCard
                         <X size={20} />
                     </button>
                 </div>
-                
+
                 <div className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Título</label>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             className="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800"
@@ -70,8 +71,8 @@ export default function BookOfTheMonthCard({ book, isAdmin }: BookOfTheMonthCard
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Autor</label>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             value={author}
                             onChange={(e) => setAuthor(e.target.value)}
                             className="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800"
@@ -79,8 +80,8 @@ export default function BookOfTheMonthCard({ book, isAdmin }: BookOfTheMonthCard
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">URL da Capa</label>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             value={coverUrl}
                             onChange={(e) => setCoverUrl(e.target.value)}
                             className="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800"
@@ -88,7 +89,7 @@ export default function BookOfTheMonthCard({ book, isAdmin }: BookOfTheMonthCard
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Descrição</label>
-                        <textarea 
+                        <textarea
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             className="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 min-h-[100px]"
@@ -96,13 +97,13 @@ export default function BookOfTheMonthCard({ book, isAdmin }: BookOfTheMonthCard
                     </div>
 
                     <div className="flex justify-end gap-2">
-                        <button 
+                        <button
                             onClick={() => setIsEditing(false)}
                             className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg"
                         >
                             Cancelar
                         </button>
-                        <button 
+                        <button
                             onClick={handleSave}
                             disabled={loading}
                             className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2"
@@ -134,12 +135,12 @@ export default function BookOfTheMonthCard({ book, isAdmin }: BookOfTheMonthCard
                         </div>
                     )}
                 </div>
-                
+
                 <div className="flex-1 text-center md:text-left">
                     <div className="flex items-center justify-center md:justify-start gap-2 mb-1">
                         <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{book.book_title}</h2>
                         {isAdmin && (
-                            <button 
+                            <button
                                 onClick={() => setIsEditing(true)}
                                 className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                                 title="Editar Livro"
@@ -149,7 +150,7 @@ export default function BookOfTheMonthCard({ book, isAdmin }: BookOfTheMonthCard
                         )}
                     </div>
                     <p className="text-lg text-indigo-600 dark:text-indigo-400 font-medium mb-4">{book.book_author}</p>
-                    
+
                     <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
                         {book.book_description}
                     </p>

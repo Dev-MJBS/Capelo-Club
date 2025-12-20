@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Plus, Trash2, Loader2, Edit2, X, Save, Tag as TagIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import TagBadge from './TagBadge'
+import toast from 'react-hot-toast'
 
 interface Tag {
     id: string
@@ -61,16 +62,16 @@ export default function AdminTagManager({ initialTags }: { initialTags: Tag[] })
 
             if (error) {
                 console.error('Erro ao criar tag:', error)
-                alert(`Erro: ${error.message}`)
+                toast.error(`Erro: ${error.message}`)
             } else {
-                alert('Tag criada com sucesso!')
+                toast.success('Tag criada com sucesso!')
                 setTags([...tags, data])
                 resetForm()
                 router.refresh()
             }
         } catch (error) {
             console.error('Erro:', error)
-            alert('Erro ao criar tag')
+            toast.error('Erro ao criar tag')
         } finally {
             setLoading(false)
         }
@@ -103,9 +104,9 @@ export default function AdminTagManager({ initialTags }: { initialTags: Tag[] })
 
             if (error) {
                 console.error('Erro ao editar tag:', error)
-                alert(`Erro: ${error.message}`)
+                toast.error(`Erro: ${error.message}`)
             } else {
-                alert('Tag atualizada com sucesso!')
+                toast.success('Tag atualizada com sucesso!')
                 setTags(tags.map(t =>
                     t.id === tagId
                         ? { ...t, name, slug, color, icon, description }
@@ -116,7 +117,7 @@ export default function AdminTagManager({ initialTags }: { initialTags: Tag[] })
             }
         } catch (error) {
             console.error('Erro:', error)
-            alert('Erro ao editar tag')
+            toast.error('Erro ao editar tag')
         } finally {
             setLoading(false)
         }
@@ -131,15 +132,15 @@ export default function AdminTagManager({ initialTags }: { initialTags: Tag[] })
 
             if (error) {
                 console.error('Erro ao deletar tag:', error)
-                alert(`Erro: ${error.message}`)
+                toast.error(`Erro: ${error.message}`)
             } else {
-                alert('Tag deletada com sucesso!')
+                toast.success('Tag deletada com sucesso!')
                 setTags(tags.filter(t => t.id !== tagId))
                 router.refresh()
             }
         } catch (error) {
             console.error('Erro:', error)
-            alert('Erro ao deletar tag')
+            toast.error('Erro ao deletar tag')
         }
     }
 

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, Send, Image as ImageIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 
 export default function CreatePostForm({ groupId }: { groupId: string }) {
     const router = useRouter()
@@ -57,7 +58,7 @@ export default function CreatePostForm({ groupId }: { groupId: string }) {
 
             if (error) {
                 console.error('Erro ao criar post:', error)
-                alert(`Erro ao criar post: ${error.message}`)
+                toast.error(`Erro ao criar post: ${error.message}`)
             } else {
                 console.log('Post criado com sucesso:', data)
                 if (data && data.length > 0) {
@@ -68,7 +69,7 @@ export default function CreatePostForm({ groupId }: { groupId: string }) {
             }
         } catch (error) {
             console.error('Erro inesperado:', error)
-            alert('Erro inesperado ao criar post')
+            toast.error('Erro inesperado ao criar post. Tente novamente.')
         } finally {
             setLoading(false)
         }

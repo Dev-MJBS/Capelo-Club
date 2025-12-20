@@ -2,6 +2,7 @@
 
 import { MessageSquare, Send, Loader2 } from 'lucide-react'
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 
 export default function ContactModerationButton() {
     const [isOpen, setIsOpen] = useState(false)
@@ -30,10 +31,10 @@ export default function ContactModerationButton() {
                     setMessage('')
                 }, 2000)
             } else {
-                alert('Erro ao enviar mensagem')
+                toast.error('Erro ao enviar mensagem. Tente novamente.')
             }
         } catch (error) {
-            alert('Erro ao enviar mensagem')
+            toast.error('Erro ao enviar mensagem. Tente novamente.')
         }
         setLoading(false)
     }

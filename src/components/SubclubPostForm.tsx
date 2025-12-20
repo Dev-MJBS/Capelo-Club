@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 import TagSelector from './TagSelector'
+import toast from 'react-hot-toast'
 
 interface Tag {
     id: string
@@ -31,7 +32,7 @@ export default function SubclubPostForm({ subclubName, subclubId }: { subclubNam
             const { data: { user } } = await supabase.auth.getUser()
 
             if (!user) {
-                alert('Você precisa estar logado.')
+                toast.error('Você precisa estar logado.')
                 return
             }
 
@@ -58,7 +59,7 @@ export default function SubclubPostForm({ subclubName, subclubId }: { subclubNam
             router.push(`/c/${subclubName}`)
             router.refresh()
         } catch (error: any) {
-            alert(`Erro ao postar: ${error.message}`)
+            toast.error(`Erro ao postar: ${error.message}`)
         } finally {
             setLoading(false)
         }

@@ -4,6 +4,7 @@ import { deletePost } from '@/app/actions'
 import { Trash2, Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import toast from 'react-hot-toast'
 
 export default function DeletePostButton({ postId, onSuccess, redirectTo }: { postId: string, onSuccess?: () => void, redirectTo?: string }) {
     const [loading, setLoading] = useState(false)
@@ -32,7 +33,7 @@ export default function DeletePostButton({ postId, onSuccess, redirectTo }: { po
                 router.refresh()
             }
         } else {
-            alert('Erro ao apagar post.')
+            toast.error('Erro ao apagar post. Tente novamente.')
         }
     }
 

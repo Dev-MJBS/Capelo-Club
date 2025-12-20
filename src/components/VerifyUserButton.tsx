@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { ShieldCheck, Loader2 } from 'lucide-react'
 import { toggleVerifiedStatus } from '@/app/actions'
 import { useRouter } from 'next/navigation'
+import toast from 'react-hot-toast'
 
 interface VerifyUserButtonProps {
     userId: string
@@ -20,7 +21,7 @@ export default function VerifyUserButton({ userId, isVerified, isAdmin }: Verify
     const handleToggle = async (e: React.MouseEvent) => {
         e.preventDefault()
         e.stopPropagation()
-        
+
         if (loading) return
         if (!confirm(`Tem certeza que deseja ${isVerified ? 'remover' : 'adicionar'} o selo de verificado para este usuário?`)) return
 
@@ -31,7 +32,7 @@ export default function VerifyUserButton({ userId, isVerified, isAdmin }: Verify
         if (result.success) {
             router.refresh()
         } else {
-            alert('Erro ao atualizar status: ' + result.error)
+            toast.error('Erro ao atualizar status: ' + result.error)
         }
     }
 
@@ -39,11 +40,10 @@ export default function VerifyUserButton({ userId, isVerified, isAdmin }: Verify
         <button
             onClick={handleToggle}
             disabled={loading}
-            className={`p-1 rounded-full transition-colors ${
-                isVerified 
-                    ? 'text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20' 
-                    : 'text-slate-400 hover:text-blue-500 hover:bg-slate-100 dark:hover:bg-slate-800'
-            }`}
+            className={`p-1 rounded-full transition-colors ${isVerified
+                ? 'text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                : 'text-slate-400 hover:text-blue-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
             title={isVerified ? "Remover verificado" : "Verificar usuário"}
         >
             {loading ? <Loader2 size={14} className="animate-spin" /> : <ShieldCheck size={14} />}

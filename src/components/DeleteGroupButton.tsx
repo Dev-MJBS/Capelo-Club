@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import toast from 'react-hot-toast'
 
 interface DeleteGroupButtonProps {
     groupId: string
@@ -23,15 +24,15 @@ export default function DeleteGroupButton({ groupId, groupTitle }: DeleteGroupBu
 
             if (!response.ok) {
                 const error = await response.json()
-                alert(`Erro ao deletar grupo: ${error.message}`)
+                toast.error(`Erro ao deletar grupo: ${error.message}`)
                 return
             }
 
-            alert('Grupo deletado com sucesso!')
+            toast.success('Grupo deletado com sucesso!')
             router.refresh()
             setConfirmDelete(false)
         } catch (error) {
-            alert(`Erro ao deletar grupo: ${error instanceof Error ? error.message : 'Erro desconhecido'}`)
+            toast.error(`Erro ao deletar grupo: ${error instanceof Error ? error.message : 'Erro desconhecido'}`)
         } finally {
             setIsDeleting(false)
         }

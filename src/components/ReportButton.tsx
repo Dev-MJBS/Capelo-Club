@@ -1,6 +1,7 @@
 'use client'
 
 import { Flag, Loader2 } from 'lucide-react'
+import toast from 'react-hot-toast'
 import { useState } from 'react'
 
 interface ReportButtonProps {
@@ -28,7 +29,7 @@ export default function ReportButton({ postId, type }: ReportButtonProps) {
                 setReason('')
             }, 2000)
         } catch (error) {
-            alert('Erro ao enviar denúncia')
+            toast.error('Erro ao enviar denúncia. Tente novamente.')
         }
         setLoading(false)
     }

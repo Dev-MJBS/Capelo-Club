@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { UserPlus, UserMinus, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 
 interface FollowButtonProps {
     targetUserId: string
@@ -85,7 +86,7 @@ export default function FollowButton({
             router.refresh()
         } catch (error: any) {
             console.error('Erro ao seguir/deixar de seguir:', error)
-            alert(error.message || 'Erro ao processar ação. Verifique se a tabela follows existe no Supabase.')
+            toast.error(error.message || 'Erro ao processar ação. Tente novamente.')
         } finally {
             setLoading(false)
         }

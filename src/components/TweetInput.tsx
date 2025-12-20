@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import toast from 'react-hot-toast'
 import { Image as ImageIcon, Send, Loader2, X } from 'lucide-react'
 import { createTweet } from '@/app/actions'
 import TagSelector from './TagSelector'
@@ -68,7 +69,7 @@ export default function TweetInput({ userAvatar }: { userAvatar?: string }) {
             removeImage()
         } catch (error: any) {
             console.error(error)
-            alert('Erro ao publicar: ' + (error.message || 'Erro desconhecido'))
+            toast.error('Erro ao publicar: ' + (error.message || 'Erro desconhecido'))
         } finally {
             setLoading(false)
         }

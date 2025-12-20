@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Pencil, X, Save, Loader2 } from 'lucide-react'
 import { updateGroup } from '@/app/actions'
 import { useRouter } from 'next/navigation'
+import toast from 'react-hot-toast'
 
 interface EditGroupButtonProps {
     group: {
@@ -35,7 +36,7 @@ export default function EditGroupButton({ group }: EditGroupButtonProps) {
             setIsEditing(false)
             router.refresh()
         } else {
-            alert('Erro ao atualizar grupo: ' + result.error)
+            toast.error('Erro ao atualizar grupo: ' + result.error)
         }
         setLoading(false)
     }
@@ -50,12 +51,12 @@ export default function EditGroupButton({ group }: EditGroupButtonProps) {
                             <X size={20} />
                         </button>
                     </div>
-                    
+
                     <div className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nome do Grupo</label>
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
                                 className="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
@@ -63,8 +64,8 @@ export default function EditGroupButton({ group }: EditGroupButtonProps) {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Livro do Grupo</label>
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 value={bookTitle}
                                 onChange={(e) => setBookTitle(e.target.value)}
                                 className="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
@@ -72,7 +73,7 @@ export default function EditGroupButton({ group }: EditGroupButtonProps) {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Descrição</label>
-                            <textarea 
+                            <textarea
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                                 className="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white min-h-[100px]"
@@ -80,13 +81,13 @@ export default function EditGroupButton({ group }: EditGroupButtonProps) {
                         </div>
 
                         <div className="flex justify-end gap-2 pt-2">
-                            <button 
+                            <button
                                 onClick={() => setIsEditing(false)}
                                 className="px-4 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
                             >
                                 Cancelar
                             </button>
-                            <button 
+                            <button
                                 onClick={handleSave}
                                 disabled={loading}
                                 className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2"
@@ -102,7 +103,7 @@ export default function EditGroupButton({ group }: EditGroupButtonProps) {
     }
 
     return (
-        <button 
+        <button
             onClick={() => setIsEditing(true)}
             className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors"
             title="Editar Grupo"
