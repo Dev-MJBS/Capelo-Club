@@ -88,7 +88,7 @@ export default async function FollowersPage({ params }: PageProps) {
                                             href={`/profile/${follower.username}`}
                                             className="flex items-center gap-3 flex-1 min-w-0"
                                         >
-                                            {follower.avatar_url ? (
+                                            {follower.avatar_url && follower.avatar_url !== '/default-avatar.png' ? (
                                                 <Image
                                                     src={follower.avatar_url}
                                                     alt={follower.username}

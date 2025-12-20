@@ -58,7 +58,7 @@ export default async function UserProfilePage({ params }: PageProps) {
                         {/* Avatar */}
                         <div className="flex-shrink-0">
                             <div className="relative">
-                                {profile.avatar_url ? (
+                                {profile.avatar_url && profile.avatar_url !== '/default-avatar.png' ? (
                                     <img
                                         src={profile.avatar_url}
                                         alt={profile.username ?? ''}

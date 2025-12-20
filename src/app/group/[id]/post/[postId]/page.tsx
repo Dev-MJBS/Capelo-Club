@@ -130,7 +130,7 @@ export default async function ThreadPage(props: { params: Promise<{ id: string, 
                 <div className="mb-8 p-6 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
                     <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">{rootPost.title || 'Discussão'}</h1>
                     <div className="flex items-center gap-2 mb-6">
-                        {rootPost.profiles?.avatar_url ? (
+                        {rootPost.profiles?.avatar_url && rootPost.profiles.avatar_url !== '/default-avatar.png' ? (
                             <img
                                 src={rootPost.profiles.avatar_url}
                                 alt={rootPost.profiles.username}

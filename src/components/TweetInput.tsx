@@ -80,7 +80,7 @@ export default function TweetInput({ userAvatar }: { userAvatar?: string }) {
             <form onSubmit={handleSubmit}>
                 <div className="flex gap-4">
                     <div className="flex-shrink-0">
-                        {userAvatar ? (
+                        {userAvatar && userAvatar !== '/default-avatar.png' ? (
                             <img
                                 src={userAvatar}
                                 alt="User"

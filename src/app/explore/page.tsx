@@ -114,7 +114,7 @@ export default async function ExplorePage() {
                                                 className="block bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all"
                                             >
                                                 <div className="flex items-start gap-3">
-                                                    {profile?.avatar_url ? (
+                                                    {profile?.avatar_url && profile.avatar_url !== '/default-avatar.png' ? (
                                                         <Image
                                                             src={profile.avatar_url}
                                                             alt={profile.username}
@@ -211,7 +211,7 @@ export default async function ExplorePage() {
                                         <div key={suggestedUser.id} className="p-4">
                                             <div className="flex items-start gap-3 mb-3">
                                                 <Link href={`/profile/${suggestedUser.username}`}>
-                                                    {suggestedUser.avatar_url ? (
+                                                    {suggestedUser.avatar_url && suggestedUser.avatar_url !== '/default-avatar.png' ? (
                                                         <Image
                                                             src={suggestedUser.avatar_url}
                                                             alt={suggestedUser.username}

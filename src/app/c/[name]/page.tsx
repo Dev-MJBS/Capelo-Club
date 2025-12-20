@@ -109,7 +109,7 @@ export default async function SubclubPage(props: { params: Promise<{ name: strin
                                 <div key={post.id} className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 transition shadow-sm">
                                     <Link href={`/c/${name}/post/${post.id}`}>
                                         <div className="flex items-center gap-2 mb-2 text-xs text-slate-500">
-                                            {post.profiles?.avatar_url ? (
+                                            {post.profiles?.avatar_url && post.profiles.avatar_url !== '/default-avatar.png' ? (
                                                 <img src={post.profiles.avatar_url} className="w-5 h-5 rounded-full object-cover" alt="" />
                                             ) : (
                                                 <div className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">

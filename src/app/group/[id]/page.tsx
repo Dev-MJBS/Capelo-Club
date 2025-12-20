@@ -129,7 +129,7 @@ export default async function GroupPage(props: { params: Promise<{ id: string }>
                                     <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-500 flex-wrap gap-4">
                                         <div className="flex items-center gap-4">
                                             <span className="flex items-center gap-1.5">
-                                                {author?.avatar_url ? (
+                                                {author?.avatar_url && author.avatar_url !== '/default-avatar.png' ? (
                                                     <img
                                                         src={author.avatar_url}
                                                         alt={author.username ?? ''}

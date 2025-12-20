@@ -148,7 +148,7 @@ export default async function SubclubPostPage(props: { params: Promise<{ name: s
                 {/* Main Post */}
                 <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 mb-8 shadow-sm">
                     <div className="flex items-center gap-2 mb-4">
-                        {post.profiles?.avatar_url ? (
+                        {post.profiles?.avatar_url && post.profiles.avatar_url !== '/default-avatar.png' ? (
                             <img src={post.profiles.avatar_url} className="w-8 h-8 rounded-full object-cover" />
                         ) : (
                             <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">

@@ -173,7 +173,7 @@ export default function ModerationPanel({ currentUserId }: ModerationPanelProps)
                                 }}
                                 className="w-full p-3 flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition text-left"
                             >
-                                {user.avatar_url ? (
+                                {user.avatar_url && user.avatar_url !== '/default-avatar.png' ? (
                                     <Image
                                         src={user.avatar_url}
                                         alt={user.username}
@@ -208,7 +208,7 @@ export default function ModerationPanel({ currentUserId }: ModerationPanelProps)
                 <div className="mb-6 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-3">
-                            {selectedUser.avatar_url ? (
+                            {selectedUser.avatar_url && selectedUser.avatar_url !== '/default-avatar.png' ? (
                                 <Image
                                     src={selectedUser.avatar_url}
                                     alt={selectedUser.username}

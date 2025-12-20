@@ -128,7 +128,7 @@ export default function CommentNode({ post, depth = 0, groupId, currentUserId, i
         <div className={`mt-4 ${depth > 0 && depth < MAX_DEPTH ? `ml-4 pl-4 border-l-2 ${renderColors[depth % 3]}` : ''}`}>
             <div className="bg-white dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-2 mb-2">
-                    {post.profiles?.avatar_url ? (
+                    {post.profiles?.avatar_url && post.profiles.avatar_url !== '/default-avatar.png' ? (
                         <img
                             src={post.profiles.avatar_url}
                             alt={post.profiles.username}

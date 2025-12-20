@@ -225,7 +225,7 @@ export default function GlobalSearch() {
                                                         className="block p-3 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition"
                                                     >
                                                         <div className="flex items-start gap-3">
-                                                            {post.profiles?.avatar_url ? (
+                                                            {post.profiles?.avatar_url && post.profiles.avatar_url !== '/default-avatar.png' ? (
                                                                 <Image
                                                                     src={post.profiles.avatar_url}
                                                                     alt={post.profiles.username}
@@ -273,7 +273,7 @@ export default function GlobalSearch() {
                                                         className="block p-3 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition"
                                                     >
                                                         <div className="flex items-center gap-3">
-                                                            {user.avatar_url ? (
+                                                            {user.avatar_url && user.avatar_url !== '/default-avatar.png' ? (
                                                                 <Image
                                                                     src={user.avatar_url}
                                                                     alt={user.username}
