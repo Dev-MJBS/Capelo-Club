@@ -51,7 +51,7 @@ export default async function Dashboard() {
             *,
             group:groups(id, title, book_title),
             subclub:subclubs(id, name, display_name),
-            user:profiles(username, avatar_url, is_verified),
+            user:profiles(username, avatar_url, is_verified, is_founder),
             post_tags(
                 tags(id, name, slug, color, icon)
             )

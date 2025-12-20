@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import DeletePostButton from './DeletePostButton'
 import VerifyUserButton from './VerifyUserButton'
 import VerifiedBadge from './VerifiedBadge'
+import FounderBadge from './FounderBadge'
 
 type Post = {
     id: string
@@ -16,7 +17,7 @@ type Post = {
     parent_id: string | null
     created_at: string
     likes_count: number
-    profiles?: { username: string, avatar_url: string, is_verified?: boolean }
+    profiles?: { username: string, avatar_url: string, is_verified?: boolean, is_founder?: boolean }
     children?: Post[]
 }
 
@@ -142,6 +143,9 @@ export default function CommentNode({ post, depth = 0, groupId, currentUserId, i
                     <div>
                         <span className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-1">
                             {post.profiles?.username || 'Usuário'}
+                            {post.profiles?.is_founder && (
+                                <FounderBadge size="sm" />
+                            )}
                             {post.profiles?.is_verified && (
                                 <VerifiedBadge size={12} />
                             )}

@@ -6,6 +6,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import VerifiedBadge from './VerifiedBadge'
 import VerifyUserButton from './VerifyUserButton'
+import FounderBadge from './FounderBadge'
 
 interface PostHeaderProps {
     post: {
@@ -24,6 +25,7 @@ interface PostHeaderProps {
             username: string
             avatar_url: string
             is_verified?: boolean
+            is_founder?: boolean
         }
         user_id: string
     }
@@ -82,6 +84,9 @@ export default function PostHeader({ post, currentUserId, isAdmin = false }: Pos
                             </div>
                         )}
                         {post.user?.username || 'user'}
+                        {post.user?.is_founder && (
+                            <FounderBadge size="sm" />
+                        )}
                         {post.user?.is_verified && (
                             <VerifiedBadge size={14} />
                         )}

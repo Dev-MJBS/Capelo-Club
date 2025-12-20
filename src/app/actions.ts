@@ -185,4 +185,20 @@ export async function updateGroup(groupId: string, formData: FormData) {
     return { success: true }
 }
 
+export async function toggleFounderStatus(userId: string, isFounder: boolean) {
+    const supabase = await createClient()
 
+    // Check if current user is admin
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'Unauthorized' }
+
+    const { data: profile } = await (supabase.from('profiles') as any).select('is_admin').eq('id', user.id).single()
+    if (!profile?.is_admin) return { success: false, error: 'Forbidden' }
+
+    const { error } = await (supabase.from('profiles') as any).update({ is_founder: isFounder }).eq('id', userId)
+
+    if (error) return { success: false, error: error.message }
+
+    revalidatePath('/', 'layout')
+    return { success: true }
+}

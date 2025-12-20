@@ -48,7 +48,8 @@ export default function FollowingFeed({ userId, isAdmin }: FollowingFeedProps) {
           profiles:user_id (
             username,
             avatar_url,
-            is_verified
+            is_verified,
+            is_founder
           ),
           groups:group_id (
             id,

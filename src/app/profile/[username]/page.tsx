@@ -7,6 +7,8 @@ import Image from 'next/image'
 import FollowButton from '@/components/FollowButton'
 import FollowStats from '@/components/FollowStats'
 import BadgeDisplay from '@/components/BadgeDisplay'
+import FounderBadge from '@/components/FounderBadge'
+import MarkFounderButton from '@/components/MarkFounderButton'
 
 interface PageProps {
     params: Promise<{ username: string }>
@@ -85,6 +87,7 @@ export default async function UserProfilePage({ params }: PageProps) {
                                 <div>
                                     <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                                         @{profile.username}
+                                        {profile.is_founder && <FounderBadge size="md" />}
                                     </h1>
                                     <div className="flex items-center gap-2 text-sm text-slate-500 mt-1">
                                         <Calendar size={14} />
@@ -103,6 +106,13 @@ export default async function UserProfilePage({ params }: PageProps) {
                                     <FollowButton
                                         targetUserId={profile.id}
                                         currentUserId={user.id}
+                                    />
+                                )}
+                                {isAdmin && (
+                                    <MarkFounderButton
+                                        userId={profile.id}
+                                        isFounder={profile.is_founder || false}
+                                        isAdmin={true}
                                     />
                                 )}
                             </div>

@@ -22,7 +22,7 @@ export default async function NotificationsPage() {
         .from('notifications')
         .select(`
             *,
-            actor:profiles!notifications_actor_id_profiles_fkey(username, avatar_url),
+            actor:profiles!notifications_actor_id_profiles_fkey(username, avatar_url, is_verified, is_founder),
             post:posts(id, content, group_id)
         `)
         .eq('user_id', user.id)

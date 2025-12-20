@@ -17,7 +17,7 @@ type Post = {
     parent_id: string | null
     created_at: string
     likes_count: number
-    profiles?: { username: string, avatar_url: string, is_verified?: boolean }
+    profiles?: { username: string, avatar_url: string, is_verified?: boolean, is_founder?: boolean }
     children?: Post[]
 }
 
@@ -41,7 +41,7 @@ export default async function GlobalPostPage(props: { params: Promise<{ id: stri
         .from('posts')
         .select(`
             *,
-            profiles:user_id (username, avatar_url, is_verified)
+            profiles:user_id (username, avatar_url, is_verified, is_founder)
         `)
         .eq('id', postId)
         .single() as any)
@@ -54,7 +54,7 @@ export default async function GlobalPostPage(props: { params: Promise<{ id: stri
         .from('posts')
         .select(`
             *,
-            profiles:user_id (username, avatar_url, is_verified)
+            profiles:user_id (username, avatar_url, is_verified, is_founder)
         `)
         .is('group_id', null)
         .order('created_at', { ascending: true }) as any)

@@ -61,7 +61,7 @@ export default async function BookOfTheMonthPage(props: { params: Promise<{ slug
         .select(`
             *,
             group:groups(id, title, book_title),
-            user:profiles(username, avatar_url, is_verified)
+            user:profiles(username, avatar_url, is_verified, is_founder)
         `)
         .eq('book_of_the_month_id', book.id)
         .order('created_at', { ascending: false }) as any)

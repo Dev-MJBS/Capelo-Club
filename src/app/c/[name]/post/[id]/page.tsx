@@ -20,7 +20,7 @@ export default async function SubclubPostPage(props: { params: Promise<{ name: s
         .select(`
             *,
             subclubs!inner ( name, display_name ),
-            profiles:user_id ( username, avatar_url, is_verified )
+            profiles:user_id ( username, avatar_url, is_verified, is_founder )
         `)
         .eq('id', id)
         .eq('subclubs.name', name)
@@ -64,7 +64,7 @@ export default async function SubclubPostPage(props: { params: Promise<{ name: s
         .from('posts') as any)
         .select(`
             *,
-            profiles:user_id ( username, avatar_url, is_verified )
+            profiles:user_id ( username, avatar_url, is_verified, is_founder )
         `)
         .eq('subclub_id', post.subclub_id)
         .neq('id', post.id) // Exclude the main post
@@ -114,7 +114,7 @@ export default async function SubclubPostPage(props: { params: Promise<{ name: s
         .from('posts') as any)
         .select(`
             *,
-            profiles:user_id ( username, avatar_url, is_verified )
+            profiles:user_id ( username, avatar_url, is_verified, is_founder )
         `)
         .eq('subclub_id', post.subclub_id)
         .order('created_at', { ascending: true })

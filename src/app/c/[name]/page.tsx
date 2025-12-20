@@ -24,7 +24,7 @@ export default async function SubclubPage(props: { params: Promise<{ name: strin
         .from('posts') as any)
         .select(`
             *,
-            profiles:user_id ( username, avatar_url, is_verified ),
+            profiles:user_id ( username, avatar_url, is_verified, is_founder ),
             post_tags(
                 tags(id, name, slug, color, icon)
             )

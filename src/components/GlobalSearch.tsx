@@ -42,7 +42,7 @@ export default function GlobalSearch() {
           title,
           content,
           likes_count,
-          profiles:user_id (username, avatar_url)
+          profiles:user_id (username, avatar_url, is_verified, is_founder)
         `)
                 .or(`title.ilike.%${searchQuery}%,content.ilike.%${searchQuery}%`)
                 .is('parent_id', null)

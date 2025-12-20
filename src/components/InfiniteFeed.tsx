@@ -54,7 +54,8 @@ export default function InfiniteFeed({ currentUserId, isAdmin = false, groupId, 
         profiles:user_id (
           username,
           avatar_url,
-          is_verified
+          is_verified,
+          is_founder
         )
       `)
             .is('parent_id', null) // Only top-level posts

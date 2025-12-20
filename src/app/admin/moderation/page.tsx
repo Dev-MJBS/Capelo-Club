@@ -39,7 +39,7 @@ export default async function AdminDashboard() {
         .select(`
             *,
             group:groups(title),
-            user:profiles(username)
+            user:profiles(username, is_verified, is_founder)
         `)
         .order('created_at', { ascending: false })
 

@@ -33,6 +33,7 @@ export interface FeedPost {
         username: string
         avatar_url: string
         is_verified?: boolean
+        is_founder?: boolean
     }
     user_id: string
     tags?: Array<{

@@ -63,7 +63,8 @@ export default async function TagPage({ params }: PageProps) {
         profiles:user_id (
           username,
           avatar_url,
-          is_verified
+          is_verified,
+          is_founder
         )
       )
     `)

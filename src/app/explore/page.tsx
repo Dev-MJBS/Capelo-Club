@@ -27,7 +27,7 @@ export default async function ExplorePage() {
       title,
       content,
       likes_count,
-      profiles:user_id (username, avatar_url, is_verified),
+      profiles:user_id (username, avatar_url, is_verified, is_founder),
       post_tags(tags(id, name, slug, color, icon))
     `)
         .is('parent_id', null)

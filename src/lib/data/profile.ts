@@ -16,6 +16,7 @@ export const getProfileByUsername = cache(async (username: string) => {
             updated_at: string | null
             is_admin: boolean | null
             is_verified: boolean | null
+            is_founder: boolean | null
             bio: string | null
             favorite_book: string | null
             favorite_genre: string | null
