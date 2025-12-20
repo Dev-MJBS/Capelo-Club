@@ -6,6 +6,7 @@ import { X, Loader2, Send } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import TagSelector from './TagSelector'
+import toast from 'react-hot-toast'
 
 interface QuickPostModalProps {
     isOpen: boolean
@@ -22,7 +23,20 @@ export default function QuickPostModal({ isOpen, onClose, preselectedTags = [], 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!content.trim()) return
+        if (!content.trim()) {
+            toast.error('Digite algo antes de publicar')
+            return
+        }
+
+        if (content.trim().length < 3) {
+            toast.error('O post deve ter pelo menos 3 caracteres')
+            return
+        }
+
+        if (content.trim().length > 5000) {
+            toast.error('O post não pode ter mais de 5000 caracteres')
+            return
+        }
 
         setLoading(true)
 
@@ -66,12 +80,12 @@ export default function QuickPostModal({ isOpen, onClose, preselectedTags = [], 
 
                 if (tagsError) {
                     console.error('Error adding tags:', tagsError)
-                    alert(`Post criado, mas erro ao adicionar tags: ${tagsError.message}`)
+                    toast.error(`Post criado, mas erro ao adicionar tags: ${tagsError.message}`)
                 }
             }
 
             // Success
-            alert('Post criado com sucesso!')
+            toast.success('Post criado com sucesso!')
             setContent('')
             setSelectedTags([])
 
@@ -84,7 +98,7 @@ export default function QuickPostModal({ isOpen, onClose, preselectedTags = [], 
             }, 500)
         } catch (error: any) {
             console.error('Error creating post:', error)
-            alert(error.message || 'Erro ao criar post')
+            toast.error(error.message || 'Erro ao criar post. Tente novamente.')
         } finally {
             setLoading(false)
         }

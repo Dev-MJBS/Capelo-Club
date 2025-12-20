@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import { User, Save, Loader2, Camera } from 'lucide-react'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import toast from 'react-hot-toast'
 
 interface ProfileFormProps {
     initialUsername?: string
@@ -59,9 +60,24 @@ export default function ProfileForm({ initialUsername = '', initialAvatarUrl = '
         }
 
         const file = e.target.files[0]
+
+        // Validar tipo de arquivo
+        const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+        if (!validTypes.includes(file.type)) {
+            toast.error('Formato inválido. Use JPG, PNG, GIF ou WebP')
+            return
+        }
+
+        // Validar tamanho (2MB)
+        const maxSize = 2 * 1024 * 1024 // 2MB em bytes
+        if (file.size > maxSize) {
+            toast.error('Imagem muito grande. Máximo 2MB')
+            return
+        }
+
         const fileExt = file.name.split('.').pop()
-        const fileName = `${userId}-${Math.random()}.${fileExt}`
-        const filePath = `${fileName}`
+        const fileName = `${userId}/${Date.now()}.${fileExt}`
+        const filePath = fileName
 
         setUploading(true)
         const supabase = createClient()
@@ -79,7 +95,7 @@ export default function ProfileForm({ initialUsername = '', initialAvatarUrl = '
             setAvatarUrl(data.publicUrl)
         } catch (error: any) {
             console.error(error)
-            alert('Erro ao fazer upload da imagem. Certifique-se que o bucket "avatars" existe e é público no Supabase.')
+            toast.error('Erro ao fazer upload. Verifique se o bucket "avatars" existe e é público.')
         } finally {
             setUploading(false)
         }

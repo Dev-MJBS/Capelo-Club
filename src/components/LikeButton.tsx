@@ -4,6 +4,7 @@ import { Heart, Loader2 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 
 interface LikeButtonProps {
     postId: string
@@ -48,7 +49,7 @@ export default function LikeButton({ postId, initialLikes, currentUserId }: Like
         if (loading) return
         if (!currentUserId) {
             console.log('No user ID - user not logged in')
-            alert('Você precisa estar logado para curtir')
+            toast.error('Você precisa estar logado para curtir')
             return
         }
 
@@ -93,7 +94,7 @@ export default function LikeButton({ postId, initialLikes, currentUserId }: Like
             }
         } catch (error) {
             console.error('Erro ao curtir post:', error)
-            alert('Erro ao curtir post. Veja o console para detalhes.')
+            toast.error('Erro ao curtir post. Tente novamente.')
             // Revert
             setLiked(previousLiked)
             setLikes(previousLikes)
