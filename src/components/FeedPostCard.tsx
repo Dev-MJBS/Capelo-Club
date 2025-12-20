@@ -93,8 +93,8 @@ export default function FeedPostCard({ post, currentUserId, isAdmin = false }: F
         const supabase = createClient()
 
         try {
-            const { error } = await supabase
-                .from('posts')
+            const { error } = await (supabase
+                .from('posts') as any)
                 .update({
                     title: editedTitle || null,
                     content: editedContent,

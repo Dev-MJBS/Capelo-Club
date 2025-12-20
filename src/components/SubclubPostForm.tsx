@@ -35,7 +35,7 @@ export default function SubclubPostForm({ subclubName, subclubId }: { subclubNam
                 return
             }
 
-            const { data: post, error } = await supabase.from('posts').insert({
+            const { data: post, error } = await (supabase.from('posts') as any).insert({
                 subclub_id: subclubId,
                 user_id: user.id,
                 title,
@@ -52,7 +52,7 @@ export default function SubclubPostForm({ subclubName, subclubId }: { subclubNam
                     tag_id: tag.id
                 }))
 
-                await supabase.from('post_tags').insert(tagInserts)
+                await (supabase.from('post_tags') as any).insert(tagInserts)
             }
 
             router.push(`/c/${subclubName}`)

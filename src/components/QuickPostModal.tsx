@@ -34,8 +34,8 @@ export default function QuickPostModal({ isOpen, onClose, preselectedTags = [], 
             console.log('Selected tags:', selectedTags)
 
             // Create post and get ID
-            const { data, error: postError } = await supabase
-                .from('posts')
+            const { data, error: postError } = await (supabase
+                .from('posts') as any)
                 .insert({
                     content: content.trim(),
                     user_id: userId,
@@ -60,8 +60,8 @@ export default function QuickPostModal({ isOpen, onClose, preselectedTags = [], 
 
                 console.log('Adding tags:', tagInserts)
 
-                const { error: tagsError } = await supabase
-                    .from('post_tags')
+                const { error: tagsError } = await (supabase
+                    .from('post_tags') as any)
                     .insert(tagInserts)
 
                 if (tagsError) {

@@ -25,8 +25,8 @@ export default function FollowingFeed({ userId, isAdmin }: FollowingFeedProps) {
 
         try {
             // Buscar IDs de quem o usuário segue
-            const { data: follows } = await supabase
-                .from('follows')
+            const { data: follows } = await (supabase
+                .from('follows') as any)
                 .select('following_id')
                 .eq('follower_id', userId)
 
@@ -38,7 +38,7 @@ export default function FollowingFeed({ userId, isAdmin }: FollowingFeedProps) {
             }
 
             setFollowingCount(follows.length)
-            const followingIds = follows.map(f => f.following_id)
+            const followingIds = follows.map((f: any) => f.following_id)
 
             // Buscar posts dos usuários seguidos
             const { data: followingPosts, error } = await (supabase

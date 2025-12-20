@@ -28,8 +28,8 @@ export default function ModerationPanel({ currentUserId }: ModerationPanelProps)
         }
 
         const supabase = createClient()
-        const { data, error } = await supabase
-            .from('profiles')
+        const { data, error } = await (supabase
+            .from('profiles') as any)
             .select('id, username, avatar_url, is_banned, kicked_until')
             .ilike('username', `%${query}%`)
             .limit(10)
@@ -49,7 +49,7 @@ export default function ModerationPanel({ currentUserId }: ModerationPanelProps)
         try {
             const supabase = createClient()
 
-            const { error } = await supabase.rpc('kick_user', {
+            const { error } = await (supabase as any).rpc('kick_user', {
                 target_user_id: selectedUser.id,
                 moderator_id: currentUserId,
                 reason: reason.trim(),
@@ -83,7 +83,7 @@ export default function ModerationPanel({ currentUserId }: ModerationPanelProps)
         try {
             const supabase = createClient()
 
-            const { error } = await supabase.rpc('ban_user', {
+            const { error } = await (supabase as any).rpc('ban_user', {
                 target_user_id: selectedUser.id,
                 moderator_id: currentUserId,
                 reason: reason.trim()
@@ -109,7 +109,7 @@ export default function ModerationPanel({ currentUserId }: ModerationPanelProps)
         try {
             const supabase = createClient()
 
-            const { error } = await supabase.rpc('unban_user', {
+            const { error } = await (supabase as any).rpc('unban_user', {
                 target_user_id: userId,
                 moderator_id: currentUserId
             })
@@ -241,8 +241,8 @@ export default function ModerationPanel({ currentUserId }: ModerationPanelProps)
                                 <button
                                     onClick={() => setAction('kick')}
                                     className={`flex-1 px-4 py-2 rounded-lg transition flex items-center justify-center gap-2 ${action === 'kick'
-                                            ? 'bg-orange-600 text-white'
-                                            : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+                                        ? 'bg-orange-600 text-white'
+                                        : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
                                         }`}
                                 >
                                     <Clock size={16} />
@@ -251,8 +251,8 @@ export default function ModerationPanel({ currentUserId }: ModerationPanelProps)
                                 <button
                                     onClick={() => setAction('ban')}
                                     className={`flex-1 px-4 py-2 rounded-lg transition flex items-center justify-center gap-2 ${action === 'ban'
-                                            ? 'bg-red-600 text-white'
-                                            : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+                                        ? 'bg-red-600 text-white'
+                                        : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
                                         }`}
                                 >
                                     <Ban size={16} />

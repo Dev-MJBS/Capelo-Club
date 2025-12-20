@@ -32,8 +32,8 @@ export default function FollowButton({
 
     const checkFollowStatus = async () => {
         const supabase = createClient()
-        const { data, error } = await supabase
-            .from('follows')
+        const { data, error } = await (supabase
+            .from('follows') as any)
             .select('id')
             .eq('follower_id', currentUserId)
             .eq('following_id', targetUserId)
@@ -55,8 +55,8 @@ export default function FollowButton({
 
             if (isFollowing) {
                 // Deixar de seguir
-                const { error } = await supabase
-                    .from('follows')
+                const { error } = await (supabase
+                    .from('follows') as any)
                     .delete()
                     .eq('follower_id', currentUserId)
                     .eq('following_id', targetUserId)
@@ -68,8 +68,8 @@ export default function FollowButton({
                 setIsFollowing(false)
             } else {
                 // Seguir
-                const { error } = await supabase
-                    .from('follows')
+                const { error } = await (supabase
+                    .from('follows') as any)
                     .insert({
                         follower_id: currentUserId,
                         following_id: targetUserId

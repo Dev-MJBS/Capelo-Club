@@ -35,7 +35,7 @@ export default function PasswordResetPanel({ currentUserId }: PasswordResetPanel
         try {
             const supabase = createClient()
 
-            const { error } = await supabase.rpc('admin_reset_user_password', {
+            const { error } = await (supabase as any).rpc('admin_reset_user_password', {
                 target_email: email,
                 new_password: newPassword,
                 admin_id: currentUserId

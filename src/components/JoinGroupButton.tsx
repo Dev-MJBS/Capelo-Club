@@ -19,13 +19,13 @@ export default function JoinGroupButton({ groupId, userId }: JoinGroupButtonProp
     useEffect(() => {
         const checkMembership = async () => {
             const supabase = createClient()
-            const { data } = await supabase
-                .from('group_members')
+            const { data } = await (supabase
+                .from('group_members') as any)
                 .select('*')
                 .eq('group_id', groupId)
                 .eq('user_id', userId)
                 .maybeSingle()
-            
+
             if (data) setIsMember(true)
             setLoading(false)
         }
@@ -37,19 +37,19 @@ export default function JoinGroupButton({ groupId, userId }: JoinGroupButtonProp
         setActionLoading(true)
 
         const supabase = createClient()
-        
+
         try {
             if (isMember) {
-                const { error } = await supabase
-                    .from('group_members')
+                const { error } = await (supabase
+                    .from('group_members') as any)
                     .delete()
                     .eq('group_id', groupId)
                     .eq('user_id', userId)
                 if (error) throw error
                 setIsMember(false)
             } else {
-                const { error } = await supabase
-                    .from('group_members')
+                const { error } = await (supabase
+                    .from('group_members') as any)
                     .insert({ group_id: groupId, user_id: userId })
                 if (error) throw error
                 setIsMember(true)
@@ -69,11 +69,10 @@ export default function JoinGroupButton({ groupId, userId }: JoinGroupButtonProp
         <button
             onClick={handleToggle}
             disabled={actionLoading}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                isMember
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isMember
                     ? 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600'
                     : 'bg-indigo-600 text-white hover:bg-indigo-700'
-            }`}
+                }`}
         >
             {actionLoading ? (
                 <Loader2 size={16} className="animate-spin" />

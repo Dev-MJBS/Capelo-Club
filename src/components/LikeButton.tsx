@@ -25,8 +25,8 @@ export default function LikeButton({ postId, initialLikes, currentUserId }: Like
 
         const checkLike = async () => {
             const supabase = createClient()
-            const { data } = await supabase
-                .from('post_likes')
+            const { data } = await (supabase
+                .from('post_likes') as any)
                 .select('*')
                 .eq('post_id', postId)
                 .eq('user_id', currentUserId)
@@ -67,8 +67,8 @@ export default function LikeButton({ postId, initialLikes, currentUserId }: Like
             if (previousLiked) {
                 // Unlike
                 console.log('Unliking post...')
-                const { error } = await supabase
-                    .from('post_likes')
+                const { error } = await (supabase
+                    .from('post_likes') as any)
                     .delete()
                     .eq('post_id', postId)
                     .eq('user_id', currentUserId)
@@ -81,8 +81,8 @@ export default function LikeButton({ postId, initialLikes, currentUserId }: Like
             } else {
                 // Like
                 console.log('Liking post...')
-                const { error } = await supabase
-                    .from('post_likes')
+                const { error } = await (supabase
+                    .from('post_likes') as any)
                     .insert({ post_id: postId, user_id: currentUserId })
 
                 if (error) {

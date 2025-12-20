@@ -46,8 +46,8 @@ export default function NotificationCenter({ userId }: { userId: string }) {
         setLoading(true)
         const supabase = createClient()
 
-        const { data, error } = await supabase
-            .from('notifications')
+        const { data, error } = await (supabase
+            .from('notifications') as any)
             .select('*')
             .eq('user_id', userId)
             .order('created_at', { ascending: false })
@@ -55,7 +55,7 @@ export default function NotificationCenter({ userId }: { userId: string }) {
 
         if (!error && data) {
             setNotifications(data)
-            setUnreadCount(data.filter(n => !n.read).length)
+            setUnreadCount(data.filter((n: any) => !n.read).length)
         }
         setLoading(false)
     }
@@ -88,8 +88,8 @@ export default function NotificationCenter({ userId }: { userId: string }) {
     const markAsRead = async (notificationId: string) => {
         const supabase = createClient()
 
-        await supabase
-            .from('notifications')
+        await (supabase
+            .from('notifications') as any)
             .update({ read: true })
             .eq('id', notificationId)
 
@@ -102,8 +102,8 @@ export default function NotificationCenter({ userId }: { userId: string }) {
     const markAllAsRead = async () => {
         const supabase = createClient()
 
-        await supabase
-            .from('notifications')
+        await (supabase
+            .from('notifications') as any)
             .update({ read: true })
             .eq('user_id', userId)
             .eq('read', false)

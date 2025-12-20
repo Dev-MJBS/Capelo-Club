@@ -53,7 +53,7 @@ export default function CreatePostForm({ groupId }: { groupId: string }) {
                 postData.image_url = imageUrl
             }
 
-            const { data, error } = await supabase.from('posts').insert([postData]).select()
+            const { data, error } = await (supabase.from('posts') as any).insert([postData]).select()
 
             if (error) {
                 console.error('Erro ao criar post:', error)

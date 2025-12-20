@@ -38,7 +38,7 @@ export default function CommentNode({ post, depth = 0, groupId, currentUserId, i
         if (!currentUserId) return
         const checkLike = async () => {
             const supabase = createClient()
-            const { data } = await supabase.from('post_likes').select('*').eq('post_id', post.id).eq('user_id', currentUserId).maybeSingle()
+            const { data } = await (supabase.from('post_likes') as any).select('*').eq('post_id', post.id).eq('user_id', currentUserId).maybeSingle()
             if (data) setLiked(true)
         }
         checkLike()
@@ -47,19 +47,19 @@ export default function CommentNode({ post, depth = 0, groupId, currentUserId, i
     const handleLike = async () => {
         if (likeLoading || !currentUserId) return
         setLikeLoading(true)
-        
+
         const previousLiked = liked
         const previousLikes = likes
-        
+
         setLiked(!previousLiked)
         setLikes(previousLiked ? previousLikes - 1 : previousLikes + 1)
 
         try {
             const supabase = createClient()
             if (previousLiked) {
-                await supabase.from('post_likes').delete().eq('post_id', post.id).eq('user_id', currentUserId)
+                await (supabase.from('post_likes') as any).delete().eq('post_id', post.id).eq('user_id', currentUserId)
             } else {
-                await supabase.from('post_likes').insert({ post_id: post.id, user_id: currentUserId })
+                await (supabase.from('post_likes') as any).insert({ post_id: post.id, user_id: currentUserId })
             }
         } catch (error) {
             console.error(error)
@@ -90,7 +90,7 @@ export default function CommentNode({ post, depth = 0, groupId, currentUserId, i
         // Actually, looking at the schema: `posts` table has `parent_id`. Top level posts have `parent_id` IS NULL. Comments have `parent_id` -> other post.
         // If we want to "continue on main topic", we should probably link to the top-level parent.
         // But simply, I will hide the inline reply form for depth >= 6 and show a button that scrolls to top or opens a form to reply to the root.
-        
+
         // BETTER APPROACH based on "cria resposta no nível superior":
         // When depth >= 6, the reply's parent_id will be set to the *current comment's parent* (flattening) or the thread root?
         // The user phrasing "cria resposta no nível superior" is slightly ambiguous. It could mean "reply to the OP".
@@ -98,17 +98,17 @@ export default function CommentNode({ post, depth = 0, groupId, currentUserId, i
         // Given existing code structure, we don't strictly know the Root ID easily without traversing up.
         // However, standard Reddit style is: after depth N, just stop indenting or link to "continue this thread" on a new page.
         // The user wants: "cria resposta no nível superior". I will interpret this as replying to the *Post* (depth 0).
-        
+
         // Wait, looking at props: `post` is the comment. `groupId` is known.
         // If I reply to the *Post* (meaning the root entity), I need its ID.
         // But `post` here *is* a post (recursive structure).
-        
+
         // Let's refine the UI first:
         // If depth < 6: standard inline reply.
         // If depth >= 6: Show "Limit of nesting reached. Reply to the main post instead."
-        
+
         if (user) {
-            await supabase.from('posts').insert({
+            await (supabase.from('posts') as any).insert({
                 group_id: groupId || null,
                 user_id: user.id,
                 content: replyContent,
@@ -129,9 +129,9 @@ export default function CommentNode({ post, depth = 0, groupId, currentUserId, i
             <div className="bg-white dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-2 mb-2">
                     {post.profiles?.avatar_url ? (
-                        <img 
-                            src={post.profiles.avatar_url} 
-                            alt={post.profiles.username} 
+                        <img
+                            src={post.profiles.avatar_url}
+                            alt={post.profiles.username}
                             className="w-8 h-8 rounded-full object-cover"
                         />
                     ) : (
@@ -146,10 +146,10 @@ export default function CommentNode({ post, depth = 0, groupId, currentUserId, i
                                 <VerifiedBadge size={12} />
                             )}
                             {isAdmin && (
-                                <VerifyUserButton 
-                                    userId={post.user_id} 
-                                    isVerified={!!post.profiles?.is_verified} 
-                                    isAdmin={isAdmin} 
+                                <VerifyUserButton
+                                    userId={post.user_id}
+                                    isVerified={!!post.profiles?.is_verified}
+                                    isAdmin={isAdmin}
                                 />
                             )}
                         </span>
@@ -164,13 +164,13 @@ export default function CommentNode({ post, depth = 0, groupId, currentUserId, i
                     <button onClick={handleLike} className={`flex items-center gap-1 transition-colors ${liked ? 'text-indigo-600 font-medium' : 'hover:text-indigo-600'}`}>
                         <ThumbsUp size={14} fill={liked ? 'currentColor' : 'none'} /> {likes} Likes
                     </button>
-                    
+
                     {depth < MAX_DEPTH ? (
                         <button onClick={() => setIsReplying(!isReplying)} className="flex items-center gap-1 hover:text-indigo-600 transition-colors">
                             <MessageSquare size={14} /> Responder
                         </button>
                     ) : (
-                         <button 
+                        <button
                             onClick={() => {
                                 const element = document.getElementById('main-reply-form');
                                 if (element) {
@@ -178,7 +178,7 @@ export default function CommentNode({ post, depth = 0, groupId, currentUserId, i
                                 }
                             }}
                             className="text-indigo-600 hover:underline text-xs font-medium flex items-center gap-1"
-                         >
+                        >
                             <MessageSquare size={14} /> Continuar discussão no tópico principal
                         </button>
                     )}
@@ -211,7 +211,7 @@ export default function CommentNode({ post, depth = 0, groupId, currentUserId, i
             {/* Recursion with Indentation Limit Logic */}
             {post.children && post.children.length > 0 && (
                 <div className={`space-y-4 ${depth >= MAX_DEPTH ? 'mt-4' : ''}`}>
-                   {/* If depth exceeds MAX, we effectively stop indenting or flatten? 
+                    {/* If depth exceeds MAX, we effectively stop indenting or flatten? 
                        User asked: "use indentação moderada... e se ultrapassar, alinhe à esquerda"
                        The current recursion naturally adds margin/padding.
                        To "align left" after max depth, we check depth in the CHILD component call.
@@ -220,13 +220,13 @@ export default function CommentNode({ post, depth = 0, groupId, currentUserId, i
                        Instead, we modify the outer wrapper style based on depth.
                     */}
                     {post.children.map(child => (
-                        <CommentNode 
-                            key={child.id} 
-                            post={child} 
-                            depth={depth + 1} 
-                            groupId={groupId} 
-                            currentUserId={currentUserId} 
-                            isAdmin={isAdmin} 
+                        <CommentNode
+                            key={child.id}
+                            post={child}
+                            depth={depth + 1}
+                            groupId={groupId}
+                            currentUserId={currentUserId}
+                            isAdmin={isAdmin}
                             rootPostId={rootPostId}
                         />
                     ))}

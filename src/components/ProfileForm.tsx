@@ -97,8 +97,8 @@ export default function ProfileForm({ initialUsername = '', initialAvatarUrl = '
         setMessage(null)
 
         const supabase = createClient()
-        const { error } = await supabase
-            .from('profiles')
+        const { error } = await (supabase
+            .from('profiles') as any)
             .upsert({
                 id: userId,
                 username,
@@ -182,8 +182,8 @@ export default function ProfileForm({ initialUsername = '', initialAvatarUrl = '
                             onChange={(e) => handleUsernameChange(e.target.value)}
                             placeholder="Seu nome no fórum"
                             className={`w-full pl-10 pr-4 py-2 rounded-lg border ${usernameError
-                                    ? 'border-red-500 focus:ring-red-500'
-                                    : 'border-slate-300 dark:border-slate-700 focus:ring-indigo-500'
+                                ? 'border-red-500 focus:ring-red-500'
+                                : 'border-slate-300 dark:border-slate-700 focus:ring-indigo-500'
                                 } bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus:ring-2 outline-none`}
                             required
                         />

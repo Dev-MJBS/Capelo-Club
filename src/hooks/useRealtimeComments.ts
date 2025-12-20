@@ -148,7 +148,7 @@ export function useRealtimeComments({
 
                     if (newComment) {
                         const transformed = {
-                            ...newComment,
+                            ...(newComment as any),
                             profiles: Array.isArray((newComment as any).profiles)
                                 ? (newComment as any).profiles[0]
                                 : (newComment as any).profiles
@@ -193,7 +193,7 @@ export function useRealtimeComments({
 
                     if (updatedComment) {
                         const transformed = {
-                            ...updatedComment,
+                            ...(updatedComment as any),
                             profiles: Array.isArray((updatedComment as any).profiles)
                                 ? (updatedComment as any).profiles[0]
                                 : (updatedComment as any).profiles

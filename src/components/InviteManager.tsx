@@ -34,7 +34,7 @@ export default function InviteManager({ initialCodes }: { initialCodes: InviteCo
             const supabase = createClient()
 
             // Gerar código
-            const { data: codeData, error: codeError } = await supabase
+            const { data: codeData, error: codeError } = await (supabase as any)
                 .rpc('generate_invite_code')
 
             if (codeError) throw codeError
@@ -47,8 +47,8 @@ export default function InviteManager({ initialCodes }: { initialCodes: InviteCo
                 : null
 
             // Inserir código
-            const { data, error } = await supabase
-                .from('invite_codes')
+            const { data, error } = await (supabase
+                .from('invite_codes') as any)
                 .insert({
                     code: newCode,
                     max_uses: formData.max_uses,
@@ -82,8 +82,8 @@ export default function InviteManager({ initialCodes }: { initialCodes: InviteCo
 
         try {
             const supabase = createClient()
-            const { error } = await supabase
-                .from('invite_codes')
+            const { error } = await (supabase
+                .from('invite_codes') as any)
                 .delete()
                 .eq('id', id)
 
