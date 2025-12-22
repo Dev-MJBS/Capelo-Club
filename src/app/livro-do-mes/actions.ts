@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { getMonthName, getMonthSlug } from '@/lib/utils'
 
 export type VotingState = {
     status: 'nomination' | 'voting' | 'closed'
@@ -27,18 +28,6 @@ function getTargetMonthDate(date: Date): Date {
         return currentMonth
     }
     return new Date(0) // Invalid/No target
-}
-
-export function getMonthName(monthIndex: number): string {
-    const months = [
-        'janeiro', 'fevereiro', 'marco', 'abril', 'maio', 'junho',
-        'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'
-    ]
-    return months[monthIndex]
-}
-
-export function getMonthSlug(date: Date): string {
-    return `${getMonthName(date.getMonth())}-${date.getFullYear()}`
 }
 
 export async function getCurrentBook() {
