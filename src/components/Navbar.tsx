@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { LogOut, User, Menu, Bell, Settings } from 'lucide-react'
+import { LogOut, User, Menu, Bell, Settings, BookOpen } from 'lucide-react'
 import { ModeToggle } from '@/components/mode-toggle'
 import { type User as SupabaseUser } from '@supabase/supabase-js'
 import NotificationCenter from './NotificationCenter'
@@ -40,6 +40,15 @@ export default function Navbar({ user, isAdmin, onOpenMobileMenu }: { user: Supa
                             <Settings size={18} />
                         </Link>
                     )}
+
+                    <Link
+                        href="/livro-do-mes/atual"
+                        className="flex items-center gap-2 text-sm font-medium text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 transition-colors p-2 rounded-md hover:bg-amber-50 dark:hover:bg-amber-900/30"
+                        title="Livro do Mês"
+                    >
+                        <BookOpen size={18} />
+                        <span className="hidden lg:inline-block">Livro do Mês</span>
+                    </Link>
 
                     <Link
                         href="/profile"

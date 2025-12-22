@@ -9,6 +9,8 @@ import { PlusCircle, Compass, BookOpen } from 'lucide-react'
 import TweetInput from '@/components/TweetInput'
 import FeedTabs from '@/components/FeedTabs'
 import FollowingFeed from '@/components/FollowingFeed'
+import { getCurrentBook } from '@/app/livro-do-mes/actions'
+import BookOfTheMonthCard from '@/components/BookOfTheMonthCard'
 
 export default async function Dashboard() {
     const supabase = await createClient()
@@ -64,6 +66,8 @@ export default async function Dashboard() {
         ...post,
         tags: post.post_tags?.map((pt: any) => pt.tags).filter(Boolean) || []
     })) || []
+
+    const currentBook = await getCurrentBook()
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -167,24 +171,30 @@ export default async function Dashboard() {
                             </Link>
                         </div>
 
-                        {/* Livro do Mês CTA */}
-                        <div className="bg-gradient-to-r from-amber-600 to-orange-600 rounded-xl p-6 text-white shadow-lg">
-                            <div className="flex items-center gap-3 mb-3">
-                                <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
-                                    <BookOpen size={24} className="text-white" />
-                                </div>
-                                <h3 className="font-bold text-lg">Livro do Mês</h3>
-                            </div>
-                            <p className="text-amber-100 text-sm mb-4">
-                                Confira a leitura do mês e participe das discussões sobre o livro escolhido.
-                            </p>
-                            <Link
-                                href="/livro-do-mes/votacao"
-                                className="block w-full text-center bg-white text-amber-600 font-bold py-2 px-4 rounded-lg hover:bg-amber-50 transition-colors"
-                            >
-                                Ver Livro do Mês 📖
+                        {/* Livro do Mês Section */}
+                        {currentBook ? (
+                            <Link href="/livro-do-mes/atual" className="block transform transition-transform hover:scale-[1.02]">
+                                <BookOfTheMonthCard book={currentBook} isAdmin={!!profile?.is_admin} />
                             </Link>
-                        </div>
+                        ) : (
+                            <div className="bg-gradient-to-r from-amber-600 to-orange-600 rounded-xl p-6 text-white shadow-lg">
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                                        <BookOpen size={24} className="text-white" />
+                                    </div>
+                                    <h3 className="font-bold text-lg">Livro do Mês</h3>
+                                </div>
+                                <p className="text-amber-100 text-sm mb-4">
+                                    Confira a leitura do mês e participe das discussões sobre o livro escolhido.
+                                </p>
+                                <Link
+                                    href="/livro-do-mes/votacao"
+                                    className="block w-full text-center bg-white text-amber-600 font-bold py-2 px-4 rounded-lg hover:bg-amber-50 transition-colors"
+                                >
+                                    Ver Livro do Mês 📖
+                                </Link>
+                            </div>
+                        )}
 
                         <div>
                             <div className="flex items-center justify-between mb-4">

@@ -2,6 +2,7 @@ import { BookOpen, Compass } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import SubclubCard from '@/components/SubclubCard'
+import { getCurrentBook } from '@/app/livro-do-mes/actions'
 
 export default async function Home() {
     const supabase = await createClient()
@@ -13,6 +14,8 @@ export default async function Home() {
         .eq('is_official', true)
         .limit(6)
         .order('member_count', { ascending: false })
+
+    const currentBook = await getCurrentBook()
 
     return (
         <div className="min-h-screen flex flex-col items-center bg-slate-50 dark:bg-slate-950 relative">
@@ -75,24 +78,71 @@ export default async function Home() {
 
             {/* Livro do Mês Section */}
             <section className="w-full max-w-6xl mx-auto px-4 py-12">
-                <div className="bg-gradient-to-r from-amber-600 to-orange-600 rounded-2xl p-8 text-white shadow-lg">
-                    <div className="flex items-center gap-4 mb-4">
-                        <div className="p-3 bg-white/20 rounded-lg backdrop-blur-sm">
-                            <BookOpen size={32} className="text-white" />
-                        </div>
-                        <div>
-                            <h2 className="text-3xl font-bold">Livro do Mês</h2>
-                            <p className="text-amber-100">Leitura recomendada e discussões da comunidade</p>
+                {currentBook ? (
+                    <div className="bg-gradient-to-r from-amber-600 to-orange-600 rounded-3xl p-8 md:p-12 text-white shadow-2xl relative overflow-hidden group">
+                        {/* Decorative Background Elements */}
+                        <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-colors duration-700"></div>
+
+                        <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center">
+                            <div className="w-48 md:w-64 flex-shrink-0 shadow-2xl rounded-xl overflow-hidden transform group-hover:scale-105 transition-transform duration-500">
+                                {currentBook.book_cover_url ? (
+                                    <img src={currentBook.book_cover_url} alt={currentBook.book_title} className="w-full h-auto" />
+                                ) : (
+                                    <div className="w-full h-80 bg-white/20 backdrop-blur-md flex items-center justify-center">
+                                        <BookOpen size={64} className="text-white/40" />
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="flex-1 text-center md:text-left">
+                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-sm font-medium mb-6">
+                                    <span className="uppercase tracking-wider font-bold">Leitura do Mês</span>
+                                </div>
+
+                                <h3 className="text-4xl md:text-5xl font-black mb-2 leading-tight">{currentBook.book_title}</h3>
+                                <p className="text-2xl text-amber-100 mb-6 font-medium italic opacity-90">de {currentBook.book_author}</p>
+
+                                <p className="text-lg text-amber-50 leading-relaxed mb-8 max-w-2xl opacity-80 line-clamp-3">
+                                    {currentBook.book_description || "Junte-se a nós na leitura deste mês! Participe das discussões e compartilhe suas impressões com a nossa comunidade."}
+                                </p>
+
+                                <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+                                    <Link
+                                        href="/livro-do-mes/atual"
+                                        className="bg-white text-amber-600 hover:bg-amber-50 font-bold py-4 px-8 rounded-xl transition-all shadow-lg hover:shadow-xl active:scale-95"
+                                    >
+                                        Acessar Discussões 📖
+                                    </Link>
+                                    <Link
+                                        href="/livro-do-mes/votacao"
+                                        className="bg-amber-700/30 hover:bg-amber-700/50 backdrop-blur-sm text-white font-bold py-4 px-8 rounded-xl transition-all border border-white/20"
+                                    >
+                                        Ver Próxima Votação
+                                    </Link>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <p className="text-amber-100 mb-6">Descubra qual é o livro do mês escolhido pela nossa comunidade. Participe da votação, leia junto com outros membros e compartilhe suas opiniões!</p>
-                    <Link
-                        href="/livro-do-mes/votacao"
-                        className="inline-block bg-white text-amber-600 font-bold py-3 px-6 rounded-lg hover:bg-amber-50 transition-colors"
-                    >
-                        Acessar Livro do Mês 📖
-                    </Link>
-                </div>
+                ) : (
+                    <div className="bg-gradient-to-r from-amber-600 to-orange-600 rounded-2xl p-8 text-white shadow-lg">
+                        <div className="flex items-center gap-4 mb-4">
+                            <div className="p-3 bg-white/20 rounded-lg backdrop-blur-sm">
+                                <BookOpen size={32} className="text-white" />
+                            </div>
+                            <div>
+                                <h2 className="text-3xl font-bold">Livro do Mês</h2>
+                                <p className="text-amber-100">Leitura recomendada e discussões da comunidade</p>
+                            </div>
+                        </div>
+                        <p className="text-amber-100 mb-6">Descubra qual é o livro do mês escolhido pela nossa comunidade. Participe da votação, leia junto com outros membros e compartilhe suas opiniões!</p>
+                        <Link
+                            href="/livro-do-mes/votacao"
+                            className="inline-block bg-white text-amber-600 font-bold py-3 px-6 rounded-lg hover:bg-amber-50 transition-colors"
+                        >
+                            Acessar Livro do Mês 📖
+                        </Link>
+                    </div>
+                )}
             </section>
 
             <footer className="mt-auto py-8 text-slate-400 text-sm w-full text-center border-t border-slate-200 dark:border-slate-800">

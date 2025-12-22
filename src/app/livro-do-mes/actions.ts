@@ -29,12 +29,30 @@ function getTargetMonthDate(date: Date): Date {
     return new Date(0) // Invalid/No target
 }
 
-function getMonthSlug(date: Date): string {
+export function getMonthName(monthIndex: number): string {
     const months = [
         'janeiro', 'fevereiro', 'marco', 'abril', 'maio', 'junho',
         'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'
     ]
-    return `${months[date.getMonth()]}-${date.getFullYear()}`
+    return months[monthIndex]
+}
+
+export function getMonthSlug(date: Date): string {
+    return `${getMonthName(date.getMonth())}-${date.getFullYear()}`
+}
+
+export async function getCurrentBook() {
+    const supabase = await createClient()
+    const now = new Date()
+    const slug = getMonthSlug(now)
+
+    const { data } = await (supabase
+        .from('book_of_the_month') as any)
+        .select('*')
+        .eq('slug', slug)
+        .single()
+
+    return data
 }
 
 export async function getVotingState(): Promise<VotingState> {
