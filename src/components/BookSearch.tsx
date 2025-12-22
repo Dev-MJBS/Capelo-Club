@@ -4,13 +4,21 @@ import { useState, useEffect, useRef } from 'react'
 import { Search, Loader2, Book } from 'lucide-react'
 
 type BookResult = {
-    key: string
-    title: string
-    author_name?: string[]
-    cover_i?: number
-    isbn?: string[]
-    first_publish_year?: number
-    publisher?: string[]
+    id: string
+    volumeInfo: {
+        title: string
+        authors?: string[]
+        imageLinks?: {
+            thumbnail: string
+            smallThumbnail: string
+        }
+        industryIdentifiers?: Array<{
+            type: string
+            identifier: string
+        }>
+        publishedDate?: string
+        publisher?: string
+    }
 }
 
 interface BookSearchProps {
@@ -19,7 +27,7 @@ interface BookSearchProps {
         author: string
         isbn?: string
         cover_url?: string
-        openlibrary_key: string
+        google_id: string
     }) => void
 }
 
@@ -49,9 +57,9 @@ export default function BookSearch({ onSelect }: BookSearchProps) {
 
             setLoading(true)
             try {
-                const res = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=8&fields=key,title,author_name,cover_i,isbn,first_publish_year,publisher`)
+                const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=8&langRestrict=pt`)
                 const data = await res.json()
-                setResults(data.docs || [])
+                setResults(data.items || [])
                 setIsOpen(true)
             } catch (error) {
                 console.error('Error searching books:', error)
@@ -64,18 +72,16 @@ export default function BookSearch({ onSelect }: BookSearchProps) {
     }, [query])
 
     const handleSelect = (book: BookResult) => {
-        const coverUrl = book.cover_i 
-            ? `https://covers.openlibrary.org/b/id/${book.cover_i}-L.jpg` 
-            : undefined
-        
-        const isbn = book.isbn?.[0]
+        const coverUrl = book.volumeInfo.imageLinks?.thumbnail || book.volumeInfo.imageLinks?.smallThumbnail
+
+        const isbn = book.volumeInfo.industryIdentifiers?.find(id => id.type === 'ISBN_13' || id.type === 'ISBN_10')?.identifier
 
         onSelect({
-            title: book.title,
-            author: book.author_name?.[0] || 'Autor Desconhecido',
+            title: book.volumeInfo.title,
+            author: book.volumeInfo.authors?.[0] || 'Autor Desconhecido',
             isbn,
             cover_url: coverUrl,
-            openlibrary_key: book.key
+            google_id: book.id
         })
         setQuery('')
         setIsOpen(false)
@@ -103,15 +109,15 @@ export default function BookSearch({ onSelect }: BookSearchProps) {
                 <div className="absolute z-50 w-full mt-2 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 max-h-96 overflow-y-auto">
                     {results.map((book) => (
                         <button
-                            key={book.key}
+                            key={book.id}
                             onClick={() => handleSelect(book)}
                             className="w-full text-left p-3 hover:bg-slate-50 dark:hover:bg-slate-800 flex gap-3 transition-colors border-b border-slate-100 dark:border-slate-800 last:border-0"
                         >
                             <div className="w-12 h-16 bg-slate-200 dark:bg-slate-800 rounded flex-shrink-0 overflow-hidden">
-                                {book.cover_i ? (
-                                    <img 
-                                        src={`https://covers.openlibrary.org/b/id/${book.cover_i}-S.jpg`} 
-                                        alt={book.title}
+                                {book.volumeInfo.imageLinks?.smallThumbnail || book.volumeInfo.imageLinks?.thumbnail ? (
+                                    <img
+                                        src={book.volumeInfo.imageLinks?.smallThumbnail || book.volumeInfo.imageLinks?.thumbnail}
+                                        alt={book.volumeInfo.title}
                                         className="w-full h-full object-cover"
                                     />
                                 ) : (
@@ -121,12 +127,12 @@ export default function BookSearch({ onSelect }: BookSearchProps) {
                                 )}
                             </div>
                             <div>
-                                <h4 className="font-medium text-slate-900 dark:text-white line-clamp-1">{book.title}</h4>
+                                <h4 className="font-medium text-slate-900 dark:text-white line-clamp-1">{book.volumeInfo.title}</h4>
                                 <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-1">
-                                    {book.author_name?.join(', ') || 'Autor Desconhecido'}
+                                    {book.volumeInfo.authors?.join(', ') || 'Autor Desconhecido'}
                                 </p>
                                 <p className="text-xs text-slate-400 mt-1">
-                                    {book.first_publish_year} • {book.publisher?.[0]}
+                                    {book.volumeInfo.publishedDate?.split('-')[0]} • {book.volumeInfo.publisher}
                                 </p>
                             </div>
                         </button>

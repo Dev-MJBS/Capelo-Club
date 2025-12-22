@@ -228,7 +228,7 @@ export default async function Dashboard() {
                             </div>
                         </div>
 
-                        <div className="text-xs text-slate-400 dark:text-slate-600">
+                        <div className="text-xs text-slate-500 dark:text-slate-400">
                             <p>© 2025 Capelo Club. Todos os direitos reservados.</p>
                         </div>
                     </div>

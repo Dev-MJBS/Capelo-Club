@@ -113,10 +113,10 @@ export default function BookOfMonthManager({ currentBooks, nominations, votingSt
         try {
             await nominateBookAdmin(manualMonth, {
                 title: book.title,
-                author: book.author || book.authors?.[0]?.name || 'Autor Desconhecido',
-                cover_url: book.cover_url || (book.cover_i ? `https://covers.openlibrary.org/b/id/${book.cover_i}-L.jpg` : undefined),
-                openlibrary_key: book.key,
-                isbn: book.isbn?.[0]
+                author: book.author,
+                cover_url: book.cover_url,
+                google_id: book.google_id,
+                isbn: book.isbn
             })
             toast.success('Livro indicado para a enquete!')
         } catch (error: any) {
@@ -132,10 +132,10 @@ export default function BookOfMonthManager({ currentBooks, nominations, votingSt
         try {
             await createDirectWinner(manualMonth, {
                 title: book.title,
-                author: book.author || book.authors?.[0]?.name || 'Autor Desconhecido',
-                cover_url: book.cover_url || (book.cover_i ? `https://covers.openlibrary.org/b/id/${book.cover_i}-L.jpg` : undefined),
-                openlibrary_key: book.key,
-                isbn: book.isbn?.[0]
+                author: book.author,
+                cover_url: book.cover_url,
+                google_id: book.google_id,
+                isbn: book.isbn
             })
             toast.success('Livro do Mês definido!')
         } catch (error: any) {
@@ -162,7 +162,7 @@ export default function BookOfMonthManager({ currentBooks, nominations, votingSt
                             </h3>
 
                             <div>
-                                <label className="block text-xs font-medium text-slate-500 mb-2">Mês de Referência</label>
+                                <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Mês de Referência</label>
                                 <input
                                     type="month"
                                     value={manualMonth.substring(0, 7)}
@@ -233,7 +233,7 @@ export default function BookOfMonthManager({ currentBooks, nominations, votingSt
                             <div key={n.id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/30 rounded-xl border border-slate-100 dark:border-slate-700 group hover:border-indigo-300 transition-all">
                                 <div className="min-w-0 flex-1">
                                     <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{n.book_title}</p>
-                                    <p className="text-xs text-slate-500 truncate">{n.book_author} • <span className="font-bold text-indigo-600 dark:text-indigo-400">{n.vote_count} votos</span></p>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{n.book_author} • <span className="font-bold text-indigo-600 dark:text-indigo-400">{n.vote_count} votos</span></p>
                                 </div>
                                 <button
                                     onClick={() => handleDeleteNomination(n.id)}
@@ -260,21 +260,21 @@ export default function BookOfMonthManager({ currentBooks, nominations, votingSt
                                             type="text"
                                             value={editData.book_title || ''}
                                             onChange={e => setEditData({ ...editData, book_title: e.target.value })}
-                                            className="w-full px-4 py-2 bg-white dark:bg-slate-900 border rounded-xl text-sm"
+                                            className="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-sm"
                                             placeholder="Título"
                                         />
                                         <input
                                             type="text"
                                             value={editData.book_author || ''}
                                             onChange={e => setEditData({ ...editData, book_author: e.target.value })}
-                                            className="w-full px-4 py-2 bg-white dark:bg-slate-900 border rounded-xl text-sm"
+                                            className="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-sm"
                                             placeholder="Autor"
                                         />
                                     </div>
                                     <textarea
                                         value={editData.book_description || ''}
                                         onChange={e => setEditData({ ...editData, book_description: e.target.value })}
-                                        className="w-full px-4 py-2 bg-white dark:bg-slate-900 border rounded-xl text-sm"
+                                        className="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-sm"
                                         placeholder="Descrição"
                                         rows={3}
                                     />

@@ -99,7 +99,7 @@ export async function nominateBook(bookData: {
     author: string
     isbn?: string
     cover_url?: string
-    openlibrary_key: string
+    google_id: string
 }) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -127,7 +127,7 @@ export async function nominateBook(bookData: {
         book_author: bookData.author,
         book_isbn: bookData.isbn,
         book_cover_url: bookData.cover_url,
-        openlibrary_key: bookData.openlibrary_key,
+        google_id: bookData.google_id,
         nominated_by: user.id
     })
 
@@ -256,7 +256,7 @@ export async function adminPickWinner(nominationId: string) {
         book_isbn: nomination.book_isbn,
         book_cover_url: nomination.book_cover_url,
         book_description: 'Vencedor da votação da comunidade.',
-        openlibrary_key: nomination.openlibrary_key,
+        google_id: nomination.google_id,
         winner_votes: count || 0,
         selected_at: new Date().toISOString()
     })
@@ -364,7 +364,7 @@ export async function createDirectWinner(targetMonthDate: string, bookData: {
     author: string
     isbn?: string
     cover_url?: string
-    openlibrary_key: string
+    google_id: string
 }) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -384,7 +384,7 @@ export async function createDirectWinner(targetMonthDate: string, bookData: {
         book_isbn: bookData.isbn,
         book_cover_url: bookData.cover_url,
         book_description: 'Escolha da Administração.',
-        openlibrary_key: bookData.openlibrary_key,
+        google_id: bookData.google_id,
         winner_votes: 0,
         selected_at: new Date().toISOString()
     })
@@ -401,7 +401,7 @@ export async function nominateBookAdmin(targetMonthDate: string, bookData: {
     author: string
     isbn?: string
     cover_url?: string
-    openlibrary_key: string
+    google_id: string
 }) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -416,7 +416,7 @@ export async function nominateBookAdmin(targetMonthDate: string, bookData: {
         book_author: bookData.author,
         book_isbn: bookData.isbn,
         book_cover_url: bookData.cover_url,
-        openlibrary_key: bookData.openlibrary_key,
+        google_id: bookData.google_id,
         nominated_by: user.id
     })
 

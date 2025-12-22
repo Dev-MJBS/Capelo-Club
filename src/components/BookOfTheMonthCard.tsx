@@ -155,8 +155,8 @@ export default function BookOfTheMonthCard({ book, isAdmin }: BookOfTheMonthCard
                         {book.book_description}
                     </p>
 
-                    <div className="text-sm text-slate-500">
-                        Leitura de <span className="font-semibold capitalize">{monthName}</span>
+                    <div className="text-sm text-slate-500 dark:text-slate-400">
+                        Leitura de <span className="font-semibold capitalize text-slate-700 dark:text-slate-200">{monthName}</span>
                     </div>
                 </div>
             </div>

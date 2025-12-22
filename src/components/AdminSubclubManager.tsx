@@ -201,7 +201,7 @@ export default function AdminSubclubManager({ initialSubclubs }: { initialSubclu
                                         </span>
                                     </div>
                                     {subclub.description && (
-                                        <p className="text-sm text-slate-500 mt-1 line-clamp-2">
+                                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
                                             {subclub.description}
                                         </p>
                                     )}

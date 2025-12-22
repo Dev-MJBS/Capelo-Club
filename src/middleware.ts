@@ -51,32 +51,24 @@ export async function updateSession(request: NextRequest) {
     if (user && !path.startsWith('/banned') && !path.startsWith('/kicked') && !path.startsWith('/validate-invite')) {
         const { data: profile, error: profileError } = await (supabase
             .from('profiles') as any)
-            .select('id, is_banned, banned_reason, kicked_until, kick_reason')
+            .select('id, is_banned, ban_reason, kicked_until, kick_reason')
             .eq('id', user.id)
             .maybeSingle()
 
-        // Se deu erro na query, deixa passar (evita loop)
         if (profileError) {
             console.error('Middleware profile check error:', profileError)
             return supabaseResponse
         }
 
-        // Se não tem perfil, o trigger de criação automática deve lidar. 
-        // Se falhar ou for usuário antigo sem perfil, idealmente redirecionaríamos para um setup,
-        // mas para "abrir" o clube, vamos deixar passar. O dashboard pode mostrar avatar default.
-        /*
         if (!profile) {
-            const url = request.nextUrl.clone()
-            url.pathname = '/validate-invite'
-            return NextResponse.redirect(url)
+            return supabaseResponse
         }
-        */
 
         // Redirect banned users
         if (profile.is_banned) {
             const url = request.nextUrl.clone()
             url.pathname = '/banned'
-            url.searchParams.set('reason', profile.banned_reason || 'Violação dos termos de uso')
+            url.searchParams.set('reason', profile.ban_reason || 'Violação dos termos de uso')
             return NextResponse.redirect(url)
         }
 

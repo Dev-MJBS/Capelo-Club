@@ -21,7 +21,7 @@ export default async function BannedPage({
     // Verificar se realmente está banido
     const { data: profile } = await (supabase
         .from('profiles') as any)
-        .select('is_banned, banned_reason, banned_at')
+        .select('is_banned, ban_reason, banned_at')
         .eq('id', user.id)
         .single()
 
@@ -57,7 +57,7 @@ export default async function BannedPage({
                         Motivo do Banimento:
                     </p>
                     <p className="text-sm text-red-700 dark:text-red-300">
-                        {params.reason || profile.banned_reason || 'Violação dos termos de uso'}
+                        {params.reason || profile.ban_reason || 'Violação dos termos de uso'}
                     </p>
                     {profile.banned_at && (
                         <p className="text-xs text-red-600 dark:text-red-400 mt-2">
