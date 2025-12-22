@@ -23,7 +23,7 @@ type Post = {
 
 const renderColors = ['border-l-indigo-500', 'border-l-pink-500', 'border-l-cyan-500']
 
-export default function CommentNode({ post, depth = 0, groupId, currentUserId, isAdmin = false, rootPostId }: { post: Post, depth: number, groupId?: string | null, currentUserId: string, isAdmin?: boolean, rootPostId?: string }) {
+export default function CommentNode({ post, depth = 0, groupId, currentUserId, isAdmin = false, rootPostId, highlightedPostId }: { post: Post, depth: number, groupId?: string | null, currentUserId: string, isAdmin?: boolean, rootPostId?: string, highlightedPostId?: string }) {
     const router = useRouter()
     const [likes, setLikes] = useState(post.likes_count)
     const [liked, setLiked] = useState(false)
@@ -125,9 +125,11 @@ export default function CommentNode({ post, depth = 0, groupId, currentUserId, i
 
     const MAX_DEPTH = 6
 
+    const isHighlighted = post.id === highlightedPostId
+
     return (
-        <div className={`mt-4 ${depth > 0 && depth < MAX_DEPTH ? `ml-4 pl-4 border-l-2 ${renderColors[depth % 3]}` : ''}`}>
-            <div className="bg-white dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
+        <div id={`comment-${post.id}`} className={`mt-4 ${depth > 0 && depth < MAX_DEPTH ? `ml-4 pl-4 border-l-2 ${renderColors[depth % 3]}` : ''}`}>
+            <div className={`p-4 rounded-lg border transition-all ${isHighlighted ? 'bg-indigo-50/50 dark:bg-indigo-900/10 border-indigo-200 dark:border-indigo-800 ring-1 ring-indigo-200 dark:ring-indigo-800' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'}`}>
                 <div className="flex items-center gap-2 mb-2">
                     {post.profiles?.avatar_url && post.profiles.avatar_url !== '/default-avatar.png' ? (
                         <img
@@ -232,6 +234,7 @@ export default function CommentNode({ post, depth = 0, groupId, currentUserId, i
                             currentUserId={currentUserId}
                             isAdmin={isAdmin}
                             rootPostId={rootPostId}
+                            highlightedPostId={highlightedPostId}
                         />
                     ))}
                 </div>

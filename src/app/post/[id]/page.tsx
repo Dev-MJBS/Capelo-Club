@@ -73,25 +73,22 @@ export default async function GlobalPostPage(props: { params: Promise<{ id: stri
     allGlobalPosts?.forEach((post: any) => {
         if (post.parent_id && postMap.has(post.parent_id)) {
             postMap.get(post.parent_id)!.children!.push(postMap.get(post.id)!)
-        } else if (post.id === postId) {
-            // This is our main post (or a root post, but we only care about the one matching postId)
-            // Actually, if we are viewing a specific post, we want that post to be the "root" of our view.
-            // But the mainPost might be a child of another post?
-            // If mainPost is a reply, we might want to show context?
-            // For now, let's assume we just show the tree starting from mainPost.
         }
     })
 
-    // The tree we want to render is the one starting at 'postId'
-    const postTree = postMap.get(postId)
-
-    if (!postTree) {
-        // Should not happen if mainPost exists and is in allGlobalPosts
-        // But if mainPost has a group_id (e.g. we are viewing a group post via this route by mistake), it won't be in allGlobalPosts.
-        // If mainPost has group_id, we should redirect to the group route?
+    // Find the requested post in the map
+    const targetPost = postMap.get(postId)
+    if (!targetPost) {
         if (mainPost.group_id) {
             redirect(`/group/${mainPost.group_id}/post/${mainPost.id}`)
         }
+        notFound()
+    }
+
+    // Traverse up to find the absolute root of this thread
+    let postTree = targetPost
+    while (postTree.parent_id && postMap.has(postTree.parent_id)) {
+        postTree = postMap.get(postTree.parent_id)!
     }
 
     return (
@@ -189,6 +186,7 @@ export default async function GlobalPostPage(props: { params: Promise<{ id: stri
                             currentUserId={user.id}
                             isAdmin={isAdmin}
                             rootPostId={mainPost.id}
+                            highlightedPostId={postId}
                         />
                     ))}
                     {(!postTree?.children || postTree.children.length === 0) && (

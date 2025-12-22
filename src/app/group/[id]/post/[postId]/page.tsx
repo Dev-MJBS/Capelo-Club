@@ -102,18 +102,24 @@ export default async function ThreadPage(props: { params: Promise<{ id: string, 
         postMap.set(p.id, p)
     })
 
-    // We only care about children of the CURRENT mainPost
-    const rootPost = postMap.get(postId)
-    if (!rootPost) notFound()
-
-    const isOwner = user.id === rootPost.user_id
-
-    // Populate children
+    // Populate children for everyone in the map
     postsWithProfiles?.forEach(p => {
         if (p.parent_id && postMap.has(p.parent_id)) {
             postMap.get(p.parent_id)!.children!.push(p)
         }
     })
+
+    // Find the requested post in the map
+    const targetPost = postMap.get(postId)
+    if (!targetPost) notFound()
+
+    // Traverse up to find the absolute root of this thread
+    let rootPost = targetPost
+    while (rootPost.parent_id && postMap.has(rootPost.parent_id)) {
+        rootPost = postMap.get(rootPost.parent_id)!
+    }
+
+    const isOwner = user.id === rootPost.user_id
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
@@ -181,11 +187,9 @@ export default async function ThreadPage(props: { params: Promise<{ id: string, 
                         <CommentInput groupId={groupId} parentId={rootPost.id} />
                     </div>
 
-                    <div className="space-y-6 mt-8">
-                        {rootPost.children?.map(child => (
-                            <CommentNode key={child.id} post={child} depth={0} groupId={groupId} currentUserId={user.id} isAdmin={isAdmin} rootPostId={rootPost.id} />
-                        ))}
-                    </div>
+                    {rootPost.children?.map(child => (
+                        <CommentNode key={child.id} post={child} depth={0} groupId={groupId} currentUserId={user.id} isAdmin={isAdmin} rootPostId={rootPost.id} highlightedPostId={postId} />
+                    ))}
                 </div>
             </main>
         </div>

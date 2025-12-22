@@ -121,13 +121,32 @@ export default async function SubclubPostPage(props: { params: Promise<{ name: s
         .order('created_at', { ascending: true })
         .limit(500)
 
-    // Build Tree
-    const buildTree = (rootId: string, allPosts: any[]) => {
-        const children = allPosts.filter(p => p.parent_id === rootId)
-        return children.map((child): any => ({
-            ...child,
-            children: buildTree(child.id, allPosts)
-        }))
+    // Build Tree using Map for better performance and context finding
+    const postMap = new Map<string, any>()
+    const sortedSubclubPosts = allSubclubPosts || []
+
+    // Add main post to the list if not there
+    if (!sortedSubclubPosts.find((p: any) => p.id === post.id)) {
+        sortedSubclubPosts.push(post)
+    }
+
+    sortedSubclubPosts.forEach((p: any) => {
+        postMap.set(p.id, { ...p, children: [] })
+    })
+
+    sortedSubclubPosts.forEach((p: any) => {
+        if (p.parent_id && postMap.has(p.parent_id)) {
+            postMap.get(p.parent_id).children.push(postMap.get(p.id))
+        }
+    })
+
+    // Find requested post
+    const targetPost = postMap.get(post.id)
+
+    // Traverse up to find the absolute root
+    let rootPost = targetPost
+    while (rootPost.parent_id && postMap.has(rootPost.parent_id)) {
+        rootPost = postMap.get(rootPost.parent_id)
     }
 
     const { data: profile } = await supabase
@@ -137,7 +156,10 @@ export default async function SubclubPostPage(props: { params: Promise<{ name: s
         .single<{ is_admin: boolean | null }>()
     const isAdmin = !!profile?.is_admin
 
-    const commentTree = buildTree(post.id, allSubclubPosts || [])
+    // The display root is rootPost
+    // And its children are the commentTree
+    const displayPost = rootPost
+    const commentTree = rootPost.children || []
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
@@ -156,29 +178,29 @@ export default async function SubclubPostPage(props: { params: Promise<{ name: s
                 {/* Main Post */}
                 <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 mb-8 shadow-sm">
                     <div className="flex items-center gap-2 mb-4">
-                        {post.profiles?.avatar_url && post.profiles.avatar_url !== '/default-avatar.png' ? (
-                            <img src={post.profiles.avatar_url} className="w-8 h-8 rounded-full object-cover" />
+                        {displayPost.profiles?.avatar_url && displayPost.profiles.avatar_url !== '/default-avatar.png' ? (
+                            <img src={displayPost.profiles.avatar_url} className="w-8 h-8 rounded-full object-cover" />
                         ) : (
                             <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
                                 <User size={16} className="text-slate-500" />
                             </div>
                         )}
                         <div>
-                            <div className="text-sm font-bold text-slate-900 dark:text-white">{post.profiles?.username}</div>
-                            <div className="text-xs text-slate-500">{new Date(post.created_at).toLocaleString()}</div>
+                            <div className="text-sm font-bold text-slate-900 dark:text-white">{displayPost.profiles?.username}</div>
+                            <div className="text-xs text-slate-500">{new Date(displayPost.created_at).toLocaleString()}</div>
                         </div>
                     </div>
 
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">{post.title}</h1>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">{displayPost.title || 'Discussão'}</h1>
                     <div className="prose dark:prose-invert max-w-none text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
-                        {post.content}
+                        {displayPost.content}
                     </div>
 
                     <div className="mt-6 flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-4">
                         <div className="flex items-center gap-6 text-slate-500 text-sm">
                             <div className="flex items-center gap-2">
                                 <ThumbsUp size={18} />
-                                {post.likes_count}
+                                {displayPost.likes_count}
                             </div>
                             <div className="flex items-center gap-2">
                                 <MessageSquare size={18} />
@@ -186,8 +208,8 @@ export default async function SubclubPostPage(props: { params: Promise<{ name: s
                             </div>
                         </div>
 
-                        {(user?.id === post.user_id || isAdmin) && (
-                            <DeletePostButton postId={post.id} redirectTo={`/c/${name}`} />
+                        {(user?.id === displayPost.user_id || isAdmin) && (
+                            <DeletePostButton postId={displayPost.id} redirectTo={`/c/${name}`} />
                         )}
                     </div>
                 </div>
@@ -196,8 +218,8 @@ export default async function SubclubPostPage(props: { params: Promise<{ name: s
                 {user && (
                     <div className="mb-8">
                         <CommentInput
-                            parentId={post.id}
-                            subclubId={post.subclub_id}
+                            parentId={displayPost.id}
+                            subclubId={displayPost.subclub_id}
                         />
                     </div>
                 )}
@@ -209,9 +231,11 @@ export default async function SubclubPostPage(props: { params: Promise<{ name: s
                             key={comment.id}
                             post={comment}
                             depth={0}
-                            groupId={post.group_id || ''}
+                            groupId={displayPost.group_id || ''}
                             currentUserId={user?.id || ''}
                             isAdmin={isAdmin}
+                            rootPostId={displayPost.id}
+                            highlightedPostId={post.id}
                         />
                     ))}
                 </div>
