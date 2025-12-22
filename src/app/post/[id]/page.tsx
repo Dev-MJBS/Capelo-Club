@@ -144,8 +144,8 @@ export default async function GlobalPostPage(props: { params: Promise<{ id: stri
                                 </div>
                             </div>
 
-                            {user.id === mainPost.user_id && (
-                                <DeletePostButton postId={mainPost.id} />
+                            {(user.id === mainPost.user_id || isAdmin) && (
+                                <DeletePostButton postId={mainPost.id} redirectTo="/dashboard" />
                             )}
                         </div>
 

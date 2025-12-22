@@ -6,6 +6,7 @@ import CommentNode from '@/components/CommentNode'
 import GroupPostCardActions from '@/components/GroupPostCardActions'
 import VerifiedBadge from '@/components/VerifiedBadge'
 import CommentInput from '@/components/CommentInput'
+import DeletePostButton from '@/components/DeletePostButton'
 
 export default async function SubclubPostPage(props: { params: Promise<{ name: string, id: string }> }) {
     const params = await props.params;
@@ -129,6 +130,13 @@ export default async function SubclubPostPage(props: { params: Promise<{ name: s
         }))
     }
 
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user?.id || '')
+        .single<{ is_admin: boolean | null }>()
+    const isAdmin = !!profile?.is_admin
+
     const commentTree = buildTree(post.id, allSubclubPosts || [])
 
     return (
@@ -166,15 +174,21 @@ export default async function SubclubPostPage(props: { params: Promise<{ name: s
                         {post.content}
                     </div>
 
-                    <div className="mt-6 flex items-center gap-6 text-slate-500 text-sm border-t border-slate-100 dark:border-slate-800 pt-4">
-                        <div className="flex items-center gap-2">
-                            <ThumbsUp size={18} />
-                            {post.likes_count}
+                    <div className="mt-6 flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-4">
+                        <div className="flex items-center gap-6 text-slate-500 text-sm">
+                            <div className="flex items-center gap-2">
+                                <ThumbsUp size={18} />
+                                {post.likes_count}
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <MessageSquare size={18} />
+                                {commentTree.length} Comentários
+                            </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <MessageSquare size={18} />
-                            {commentTree.length} Comentários (loading logic approx)
-                        </div>
+
+                        {(user?.id === post.user_id || isAdmin) && (
+                            <DeletePostButton postId={post.id} redirectTo={`/c/${name}`} />
+                        )}
                     </div>
                 </div>
 
@@ -185,15 +199,6 @@ export default async function SubclubPostPage(props: { params: Promise<{ name: s
                             parentId={post.id}
                             subclubId={post.subclub_id}
                         />
-                        {/* Actually CommentInput might be tied to 'groups'. Let's check or use a new form.
-                            The existing CommentInput takes `groupId`.
-                            I should update CommentInput to accept `subclubId` or just optional.
-                            For now I'll use the generic form inline or new component?
-                            Or reuse logic.
-                            The insertion logic in CommentInput likely inserts `group_id` which might be null for subclubs posts?
-                            My schema allows null group_id?
-                            I should update CommentInput or make a `SubclubCommentInput`.
-                        */}
                     </div>
                 )}
 
@@ -206,7 +211,7 @@ export default async function SubclubPostPage(props: { params: Promise<{ name: s
                             depth={0}
                             groupId={post.group_id || ''}
                             currentUserId={user?.id || ''}
-                            isAdmin={false} // pass correct admin check
+                            isAdmin={isAdmin}
                         />
                     ))}
                 </div>
